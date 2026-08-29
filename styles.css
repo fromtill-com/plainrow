@@ -272,6 +272,10 @@ ul, ol { margin: 0; padding: 0; }
   max-width: 34rem;
 }
 
+.product .steps + .fine {
+  margin-top: 2.4rem;
+}
+
 .steps {
   margin-top: 2.4rem;
   padding-top: 1.4rem;
