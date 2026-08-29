@@ -18,9 +18,44 @@
     <p class="lede">Stack two CSVs and remove duplicate rows in your browser. Nothing is uploaded.</p>
     <div class="actions">
       <a class="btn primary" href="app.html">Try Lite</a>
+      <a class="btn" id="downloadLite" href="plainrow-lite.html" download="plainrow-lite.html">Download Lite</a>
     </div>
-    <p class="fine"><a href="/plainrow/support/">Support</a>. <a href="/plainrow/merge-csv-without-uploading/">Merge CSV without uploading</a>. <a href="/plainrow/merge-csv-in-browser/">Merge two CSV files in JavaScript</a>. <a href="/plainrow/stack-two-csv-files-in-browser/">Stack two CSV files in your browser</a>. <a href="/plainrow/dedupe-csv-without-uploading/">Dedupe CSV without uploading</a>. Kitchen (join, recipes, the rest) is $19 one-time when checkout is live. Lite is the smaller tool, not a switch.</p>
+    <p class="fine">Download Lite is one HTML file you keep. Open it later from disk. <a href="/plainrow/support/">Support</a>. <a href="/plainrow/merge-csv-without-uploading/">Merge CSV without uploading</a>. <a href="/plainrow/merge-csv-in-browser/">Merge two CSV files in JavaScript</a>. <a href="/plainrow/stack-two-csv-files-in-browser/">Stack two CSV files in your browser</a>. <a href="/plainrow/dedupe-csv-without-uploading/">Dedupe CSV without uploading</a>. Kitchen (join, recipes, the rest) is $19 one-time when checkout is live. Lite is the smaller tool, not a switch.</p>
   </main>
   <footer class="colophon">fromtill.com</footer>
+  <script>
+    (function () {
+      var a = document.getElementById("downloadLite");
+      if (!a) return;
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        var name = a.getAttribute("download") || "plainrow-lite.html";
+        fetch(a.getAttribute("href"))
+          .then(function (res) {
+            if (!res.ok) throw new Error("Could not read Lite");
+            return res.blob();
+          })
+          .then(function (blob) {
+            var file = blob.slice(0, blob.size, "application/octet-stream");
+            var url = URL.createObjectURL(file);
+            var tmp = document.createElement("a");
+            tmp.href = url;
+            tmp.download = name;
+            document.body.appendChild(tmp);
+            tmp.click();
+            tmp.remove();
+            setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+          })
+          .catch(function () {
+            var tmp = document.createElement("a");
+            tmp.href = a.getAttribute("href");
+            tmp.download = name;
+            document.body.appendChild(tmp);
+            tmp.click();
+            tmp.remove();
+          });
+      });
+    })();
+  </script>
 </body>
 </html>
