@@ -74,14 +74,6 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
 .tagline { margin: 0; color: var(--muted); font-size: 0.86rem; flex: 1; }
 .top-actions { display: flex; gap: 8px; }
 
-.litebar {
-  background: #214136;
-  color: #f3eee4;
-  text-align: center;
-  padding: 7px 16px;
-  font-size: 0.82rem;
-}
-
 .app { display: flex; flex: 1; min-height: 0; }
 .rail {
   width: var(--rail);
@@ -91,7 +83,6 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
   padding: 16px 14px 24px;
   overflow: auto;
 }
-.rail section + section { margin-top: 22px; }
 .rail h2 {
   font-size: 0.68rem;
   letter-spacing: 0.14em;
@@ -120,79 +111,14 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
   background: none; border: 0; color: var(--muted); padding: 2px 6px; border-radius: 4px;
 }
 .icon-btn:hover { background: var(--paper-2); color: var(--brick); }
-
-.recipe-item {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 8px 8px 8px 10px;
-  margin-bottom: 6px;
-}
-.recipe-item.teaser {
-  background: #f6f1e8;
-  border-color: #cfc6b7;
-  opacity: 0.9;
-}
-.recipe-item.teaser:hover { opacity: 1; border-color: #b8ae9f; }
-.recipe-item button.pick {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: 0;
-  padding: 0;
-}
-.recipe-item .name { display: block; font-weight: 600; font-size: 0.86rem; word-break: break-word; }
-
-.toolbar button.teaser {
-  color: #3f3b36;
-  background: #f6f1e8;
-  border-color: #cfc6b7;
-  opacity: 0.9;
-}
-.toolbar button.teaser:hover { opacity: 1; border-color: #b8ae9f; }
-.k-badge {
-  display: inline-flex;
+.file-item.slot {
+  border-style: dashed;
+  background: transparent;
+  color: var(--muted);
+  min-height: 46px;
   align-items: center;
-  gap: 4px;
-  margin-left: 6px;
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--pine-2);
-  background: var(--pine-soft);
-  border: 1px solid #c5d9d2;
-  border-radius: 999px;
-  padding: 1px 6px 1px 5px;
-  vertical-align: 1px;
-  line-height: 1.45;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
-.k-lock {
-  display: inline-block;
-  width: 7px;
-  height: 6px;
-  border: 1.35px solid currentColor;
-  border-radius: 1px 1px 1.5px 1.5px;
-  position: relative;
-  box-sizing: border-box;
-}
-.k-lock::before {
-  content: "";
-  position: absolute;
-  left: 0.55px;
-  top: -4px;
-  width: 2.5px;
-  height: 3.2px;
-  border: 1.35px solid currentColor;
-  border-bottom: 0;
-  border-radius: 3px 3px 0 0;
-}
+.rail-lead { margin: 0 0 8px; color: var(--muted); font-size: 0.78rem; line-height: 1.4; }
 
 .drop {
   border: 1px dashed #b7ad9d;
@@ -342,21 +268,21 @@ table.data tbody tr:hover td { background: #f7f3ea; }
     <div class="wordmark">Plainrow</div>
     <div class="edition">Lite</div>
   </div>
-  <p class="tagline">A file formatter you run locally. We never see your data.</p>
+  <p class="tagline">Two files. Stack. Dedupe. Export.</p>
   <div class="top-actions">
     <button type="button" id="btnUndo" disabled>Undo</button>
     <button type="button" id="btnRedo" disabled>Redo</button>
     <button type="button" id="btnHelp">How this works</button>
   </div>
 </header>
-<div class="litebar">Kitchen has more tools.</div>
 <div class="app">
   <aside class="rail">
     <section>
       <h2>Counter</h2>
+      <p class="rail-lead">Two files. Stack them, then dedupe.</p>
       <div id="fileList"></div>
       <div class="drop" id="dropZone">
-        Drop CSV files here
+        Drop up to two CSV files here
         <div style="margin-top:8px"><button type="button" class="btn primary" id="btnOpen">Open CSV</button></div>
       </div>
       <input type="file" id="fileInput" accept=".csv,text/csv,text/plain,.tsv,text/tab-separated-values" multiple hidden>
@@ -368,60 +294,11 @@ table.data tbody tr:hover td { background: #f7f3ea; }
         </select>
       </label>
     </section>
-    <section>
-      <h2>Recipes</h2>
-      <div id="recipeList">
-        <div class="recipe-item teaser">
-          <button type="button" class="pick teaser" data-kitchen="Stripe + PayPal + bank month ledger">
-            <span class="name">Stripe + PayPal + bank month ledger</span>
-            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
-          </button>
-        </div>
-        <div class="recipe-item teaser">
-          <button type="button" class="pick teaser" data-kitchen="Email list dedupe">
-            <span class="name">Email list dedupe</span>
-            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
-          </button>
-        </div>
-        <div class="recipe-item teaser">
-          <button type="button" class="pick teaser" data-kitchen="Survey export cleaner">
-            <span class="name">Survey export cleaner</span>
-            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
-          </button>
-        </div>
-        <div class="recipe-item teaser">
-          <button type="button" class="pick teaser" data-kitchen="Inventory SKU join">
-            <span class="name">Inventory SKU join</span>
-            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
-          </button>
-        </div>
-        <div class="recipe-item teaser">
-          <button type="button" class="pick teaser" data-kitchen="Donation export merge">
-            <span class="name">Donation export merge</span>
-            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
-          </button>
-        </div>
-        <div class="recipe-item teaser">
-          <button type="button" class="pick teaser" data-kitchen="Weekly timesheet stack">
-            <span class="name">Weekly timesheet stack</span>
-            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
-          </button>
-        </div>
-      </div>
-    </section>
   </aside>
   <main class="main">
-    <div class="toolbar" id="toolbar">
+    <div class="toolbar">
       <button type="button" id="btnStack" disabled>Stack</button>
-      <button type="button" class="teaser" data-kitchen="Join">Join <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
-      <button type="button" class="teaser" data-kitchen="Split">Split <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
       <button type="button" id="btnDedupe" disabled>Dedupe</button>
-      <button type="button" class="teaser" data-kitchen="Filter">Filter <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
-      <button type="button" class="teaser" data-kitchen="Columns">Columns <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
-      <button type="button" class="teaser" data-kitchen="Replace">Replace <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
-      <button type="button" class="teaser" data-kitchen="Dates">Dates <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
-      <button type="button" class="teaser" data-kitchen="Clean">Clean <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
-      <button type="button" class="teaser" data-kitchen="Sort">Sort <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
     </div>
     <div class="sheet-head">
       <h1 id="sheetName">No file open</h1>
@@ -431,7 +308,7 @@ table.data tbody tr:hover td { background: #f7f3ea; }
     <div class="sheet-wrap" id="sheetWrap">
       <div id="empty" class="empty">
         <h2>Drop a CSV on the counter</h2>
-        <p>Open up to two CSV/TSV files, stack them, dedupe, export. Files never leave this computer. Kitchen has more tools.</p>
+        <p>Open up to two CSV/TSV files, stack them, dedupe, export. Files never leave this computer.</p>
         <button type="button" class="btn primary" id="btnOpen2">Open CSV</button>
         <button type="button" class="btn" id="btnDemo">Load the stack demo</button>
       </div>
@@ -444,7 +321,7 @@ table.data tbody tr:hover td { background: #f7f3ea; }
 <aside class="panel" id="panel" hidden></aside>
 <div class="help" id="help" hidden>
   <h2>How this works</h2>
-  <p>Open up to two CSV/TSV files, stack them, dedupe, export. Files never leave this computer. Kitchen has more tools.</p>
+  <p>Open up to two CSV/TSV files, stack them, dedupe, export. Files never leave this computer.</p>
   <ol>
     <li>Open CSV or TSV files with the picker, drag-and-drop, or a synthetic demo. Lite holds two files on the counter.</li>
     <li>Stack unions columns and appends rows. Dedupe keeps the first or last row for each key.</li>
@@ -727,7 +604,12 @@ function toast(msg, err) {
 
 function renderFiles() {
   const host = document.getElementById("fileList");
-  if (!tables.length) { host.innerHTML = '<p class="meta" style="color:var(--muted);font-size:0.8rem;margin:0 0 8px">No files yet.</p>'; return; }
+  if (!tables.length) {
+    host.innerHTML =
+      '<div class="file-item slot"><span class="name">File 1</span><span class="meta">Empty</span></div>' +
+      '<div class="file-item slot"><span class="name">File 2</span><span class="meta">Empty</span></div>';
+    return;
+  }
   host.innerHTML = tables.map((t) =>
     '<div class="file-item' + (t.id === activeId ? " active" : "") + '">' +
       '<button type="button" class="pick" data-act="' + t.id + '">' +
@@ -812,9 +694,6 @@ function closeOverlays() {
 function openHelp() {
   document.getElementById("scrim").hidden = false;
   document.getElementById("help").hidden = false;
-}
-function openKitchenTeaser(title) {
-  openPanel(title, "This tool is in Kitchen, $19, one file, still offline, files never leave the machine.", "", null, null);
 }
 
 function openPanel(title, lead, bodyHtml, applyLabel, onApply) {
@@ -981,14 +860,6 @@ function boot() {
   document.getElementById("btnExport").onclick = openExport;
   document.getElementById("btnStack").onclick = openStack;
   document.getElementById("btnDedupe").onclick = openDedupe;
-  document.getElementById("toolbar").addEventListener("click", function (e) {
-    const b = e.target.closest("button.teaser");
-    if (b) openKitchenTeaser(b.getAttribute("data-kitchen") || "Kitchen");
-  });
-  document.getElementById("recipeList").addEventListener("click", function (e) {
-    const b = e.target.closest("button.teaser");
-    if (b) openKitchenTeaser(b.getAttribute("data-kitchen") || "Kitchen");
-  });
   document.getElementById("scrim").onclick = closeOverlays;
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeOverlays();
