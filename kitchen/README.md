@@ -7,8 +7,8 @@ Firefox, or Safari. Files stay on the machine. No install. No upload.
 
 | File | Role |
 |---|---|
-| `plainrow.html` | Paid Kitchen. Merge, join, split, clean. Cap: about 200,000 rows or 40 MB. |
-| `plainrow-lite.html` | Free lite. Same tools. Cap: 2 files and 500 rows. |
+| `plainrow.html` | Paid Kitchen. Join, stack, split, clean. Cap: about 200,000 rows or 40 MB. |
+| `plainrow-lite.html` | Free lite. Two-file stack and dedupe. Not a capped Kitchen. |
 | `recipes/` | Six Monday-job recipes (JSON). Load them from the app. |
 | `samples/` | Tiny synthetic Stripe, PayPal, and bank CSVs for a dry run. |
 | `LICENSE.txt` | Personal + one-seat commercial. No redistribution. |
@@ -19,14 +19,14 @@ Firefox, or Safari. Files stay on the machine. No install. No upload.
 
 Point the browser at the file. No server:
 
-    file:///workspace/plainrow/plainrow.html
+    file:///workspace/kitchen/plainrow.html
 
 On your machine that is wherever you saved the folder, for example
 `file:///Users/you/Downloads/plainrow/plainrow.html`.
 
 1. Double-click `plainrow.html` (or the lite file), or open it with Chrome, Edge, Firefox, or Safari.
 2. Drop CSV files, or use **Open CSV**.
-3. Or pick a synthetic demo from the menu.
+3. Or load the two-inventory demo, then **Join** on SKU.
 4. Pick a tool. Preview updates in place.
 5. **Export CSV** writes a file to your downloads folder.
 
@@ -34,8 +34,10 @@ Works offline. There is no CDN and no remote script.
 
 ## Tools
 
+Kitchen:
+
+- **Join** — key-join two tables (inner, left, right, or full). The paid motion.
 - **Stack** — concatenate tables; columns are unioned
-- **Join** — key-join two tables (inner, left, right, or full)
 - **Split** — one table per distinct value in a column
 - **Dedupe** — keep the first row per key column(s)
 - **Filter** — keep or drop rows by a column test
@@ -46,9 +48,11 @@ Works offline. There is no CDN and no remote script.
 - **Clean** — trim, drop empty rows or columns
 - **Import / export** — CSV (comma, tab, or semicolon in; comma out). Optional Excel BOM
 
+Lite is **two files**, **stack**, and **dedupe**. It is a smaller product,
+not Kitchen with a row cap.
+
 Hard cap (Kitchen): about **200,000 rows** or **40 MB** in memory.
-Lite: **2 files** and **500 rows**. Over the cap, you get a clear
-error. Nothing is silently truncated.
+Over the cap, you get a clear error. Nothing is silently truncated.
 
 ## Recipes
 
