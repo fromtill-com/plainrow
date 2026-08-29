@@ -164,7 +164,7 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
 .toolbar button { background: var(--surface); }
 .sheet-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
 .sheet-head h1 { font-family: var(--serif); font-size: 1.25rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.warns { color: var(--amber); font-size: 0.8rem; margin-bottom: 6px; }
+.warns { color: var(--amber); font-size: 0.8rem; margin-bottom: 6px; line-height: 1.45; }
 
 .sheet-wrap {
   flex: 1; min-height: 180px;
@@ -260,6 +260,60 @@ table.data tbody tr:hover td { background: #f7f3ea; }
   font-size: 0.88rem; box-shadow: var(--shadow);
 }
 .toast.err { background: var(--brick); }
+
+.join-forecast {
+  background: var(--pine-soft);
+  border: 1px solid #c5d9d2;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  margin-top: 4px;
+}
+.join-forecast.warn {
+  background: #f7eedc;
+  border-color: #e4d3ad;
+}
+.join-forecast.err {
+  background: #f8ecec;
+  border-color: #e0c4c4;
+  color: var(--brick);
+  font-weight: 650;
+}
+.join-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.join-stat {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 8px 7px;
+  text-align: center;
+}
+.join-stat b {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.join-stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+.join-forecast .join-hint {
+  margin: 0 0 4px;
+  color: #3c3832;
+}
+.join-forecast .join-hint:last-child { margin-bottom: 0; }
 
 @media (max-width: 860px) {
   .app { flex-direction: column; }
@@ -629,23 +683,149 @@ function stackTables(list, opts) {
   };
 }
 
-function joinTables(left, right, opts) {
-  const type = opts.type || "inner";
-  const aliases = opts.keyAliases || [];
-  const lk = resolveCol(left.headers, opts.leftKey, aliases);
-  const rk = resolveCol(right.headers, opts.rightKey, aliases);
-  if (lk < 0 || rk < 0) throw new Error("Could not find the join key in both files.");
-  const rHeads = [];
-  const rIdx = [];
+function joinKeyCell(row, idx) {
+  return String(row[idx] == null ? "" : row[idx]).trim();
+}
+function isLikelyKeyName(h) {
+  const n = normName(h);
+  return /^(sku|id|key|code|email|e-mail)$/.test(n) || /sku|_id$/.test(n);
+}
+function pickSharedKey(leftHeaders, rightHeaders) {
+  const shared = [];
+  leftHeaders.forEach((h) => {
+    if (rightHeaders.some((x) => normName(x) === normName(h))) shared.push(h);
+  });
+  if (!shared.length) return null;
+  return shared.find(isLikelyKeyName) || shared[0];
+}
+function rightJoinColumns(left, right, rk) {
+  const headers = [];
+  const idxs = [];
+  const prefixed = [];
+  const filePrefix = String(right.name || "right").replace(/\.csv$/i, "");
   right.headers.forEach((h, i) => {
     if (i === rk) return;
-    rHeads.push(left.headers.some((lh) => normName(lh) === normName(h)) ? right.name.replace(/\.csv$/i, "") + "." + h : h);
-    rIdx.push(i);
+    if (left.headers.some((lh) => normName(lh) === normName(h))) {
+      const out = filePrefix + "." + h;
+      headers.push(out);
+      prefixed.push({ original: h, prefixed: out });
+    } else {
+      headers.push(h);
+    }
+    idxs.push(i);
   });
+  return { headers: headers, idxs: idxs, prefixed: prefixed };
+}
+function joinForecast(left, right, opts) {
+  opts = opts || {};
+  const type = opts.type || "inner";
+  if (!left || !right) return { error: "Pick two files." };
+  if (left.id && right.id && left.id === right.id) return { error: "Pick two different files." };
+  const leftKey = opts.leftKey;
+  const rightKey = opts.rightKey;
+  if (!String(leftKey || "").trim() || !String(rightKey || "").trim()) {
+    return { error: "Pick a key column on both files." };
+  }
+  const aliases = opts.keyAliases || [];
+  const lk = resolveCol(left.headers, leftKey, aliases);
+  const rk = resolveCol(right.headers, rightKey, aliases);
+  if (lk < 0 || rk < 0) return { error: "Could not find the join key in both files." };
+  const leftVals = left.rows.map((row) => joinKeyCell(row, lk));
+  const rightVals = right.rows.map((row) => joinKeyCell(row, rk));
+  const leftFilled = leftVals.filter(Boolean);
+  const rightFilled = rightVals.filter(Boolean);
+  if (left.rows.length && !leftFilled.length) {
+    return { error: "Left key “" + left.headers[lk] + "” is blank in every row. Pick a column with values." };
+  }
+  if (right.rows.length && !rightFilled.length) {
+    return { error: "Right key “" + right.headers[rk] + "” is blank in every row. Pick a column with values." };
+  }
+  const rightSet = new Set(rightFilled);
+  const leftSet = new Set(leftFilled);
+  let match = 0;
+  let unmatchedLeft = 0;
+  let unmatchedRight = 0;
+  leftVals.forEach((k) => {
+    if (k && rightSet.has(k)) match++;
+    else unmatchedLeft++;
+  });
+  rightVals.forEach((k) => {
+    if (!(k && leftSet.has(k))) unmatchedRight++;
+  });
+  const cols = rightJoinColumns(left, right, rk);
+  return {
+    error: null,
+    type: type,
+    match: match,
+    unmatchedLeft: unmatchedLeft,
+    unmatchedRight: unmatchedRight,
+    leftName: left.name,
+    rightName: right.name,
+    leftKey: left.headers[lk],
+    rightKey: right.headers[rk],
+    prefixed: cols.prefixed,
+    rightHeaders: cols.headers,
+    rightIdxs: cols.idxs,
+    lk: lk,
+    rk: rk
+  };
+}
+function joinTypeHint(fc) {
+  const L = fc.leftName;
+  const R = fc.rightName;
+  const nL = fc.unmatchedLeft.toLocaleString();
+  const nR = fc.unmatchedRight.toLocaleString();
+  if (fc.type === "inner") {
+    if (!fc.match) return "Inner join would produce 0 rows. Unmatched rows on both sides are dropped.";
+    return "Inner join keeps only matches. " +
+      nL + " " + L + " row" + (fc.unmatchedLeft === 1 ? "" : "s") + " and " +
+      nR + " " + R + " row" + (fc.unmatchedRight === 1 ? "" : "s") + " are dropped.";
+  }
+  if (fc.type === "left") {
+    if (!fc.unmatchedRight) return "Left join keeps every " + L + " row. Every " + R + " row has a match.";
+    return "Left join keeps every " + L + " row. " + nR + " " + R + " row" + (fc.unmatchedRight === 1 ? " has" : "s have") + " no match and will be dropped.";
+  }
+  if (fc.type === "right") {
+    if (!fc.unmatchedLeft) return "Right join keeps every " + R + " row. Every " + L + " row has a match.";
+    return "Right join keeps every " + R + " row. " + nL + " " + L + " row" + (fc.unmatchedLeft === 1 ? " has" : "s have") + " no match and will be dropped.";
+  }
+  return "Full join keeps every row from both files. Unmatched cells are left blank.";
+}
+function joinPrefixHint(fc) {
+  if (!fc.prefixed.length) return "No right-hand columns were prefixed.";
+  return "Prefixed right-hand columns: " + fc.prefixed.map((p) => p.prefixed).join(", ") + ".";
+}
+function joinResultSummary(fc) {
+  const bits = [
+    fc.match.toLocaleString() + " match" + (fc.match === 1 ? "" : "es"),
+    fc.unmatchedLeft.toLocaleString() + " unmatched on " + fc.leftName,
+    fc.unmatchedRight.toLocaleString() + " unmatched on " + fc.rightName
+  ];
+  return "Join (" + fc.type + "): " + bits.join(", ") + ". " + joinPrefixHint(fc);
+}
+function joinForecastHtml(fc) {
+  if (fc.error) return esc(fc.error);
+  return '<div class="join-stats">' +
+    '<div class="join-stat"><b>' + fc.match.toLocaleString() + "</b><span>matches</span></div>" +
+    '<div class="join-stat"><b>' + fc.unmatchedLeft.toLocaleString() + "</b><span>unmatched left</span></div>" +
+    '<div class="join-stat"><b>' + fc.unmatchedRight.toLocaleString() + "</b><span>unmatched right</span></div>" +
+    "</div>" +
+    '<p class="join-hint">' + esc(joinTypeHint(fc)) + "</p>" +
+    '<p class="join-hint">' + esc(joinPrefixHint(fc)) + "</p>";
+}
+function joinTables(left, right, opts) {
+  const fc = joinForecast(left, right, opts);
+  if (fc.error) throw new Error(fc.error);
+  const type = (opts && opts.type) || "inner";
+  const lk = fc.lk;
+  const rk = fc.rk;
+  const rHeads = fc.rightHeaders;
+  const rIdx = fc.rightIdxs;
   const headers = left.headers.concat(rHeads);
   const index = new Map();
   right.rows.forEach((row) => {
-    const k = String(row[rk] == null ? "" : row[rk]).trim();
+    const k = joinKeyCell(row, rk);
+    if (!k) return;
     if (!index.has(k)) index.set(k, []);
     index.get(k).push(row);
   });
@@ -655,8 +835,8 @@ function joinTables(left, right, opts) {
   function project(rrow) { return rIdx.map((i) => rrow[i]); }
   if (type !== "right") {
     left.rows.forEach((lrow) => {
-      const k = String(lrow[lk] == null ? "" : lrow[lk]).trim();
-      const hits = index.get(k);
+      const k = joinKeyCell(lrow, lk);
+      const hits = k ? index.get(k) : null;
       if (hits && hits.length) {
         hits.forEach((rrow) => {
           matchedRight.add(rrow);
@@ -670,14 +850,15 @@ function joinTables(left, right, opts) {
   if (type === "right" || type === "full") {
     const lIndex = new Map();
     left.rows.forEach((row) => {
-      const k = String(row[lk] == null ? "" : row[lk]).trim();
+      const k = joinKeyCell(row, lk);
+      if (!k) return;
       if (!lIndex.has(k)) lIndex.set(k, []);
       lIndex.get(k).push(row);
     });
     if (type === "right") {
       right.rows.forEach((rrow) => {
-        const k = String(rrow[rk] == null ? "" : rrow[rk]).trim();
-        const hits = lIndex.get(k);
+        const k = joinKeyCell(rrow, rk);
+        const hits = k ? lIndex.get(k) : null;
         if (hits && hits.length) hits.forEach((lrow) => out.push(lrow.concat(project(rrow))));
         else out.push(left.headers.map(() => "").concat(project(rrow)));
       });
@@ -687,7 +868,13 @@ function joinTables(left, right, opts) {
       });
     }
   }
-  return { id: uid(), name: "joined", headers: headers, rows: out, warnings: [] };
+  return {
+    id: uid(),
+    name: "joined",
+    headers: headers,
+    rows: out,
+    warnings: [joinResultSummary(fc)]
+  };
 }
 
 function splitTable(table, colName) {
@@ -1178,10 +1365,17 @@ function openStack() {
 
 function openJoin() {
   if (tables.length < 2) { toast("Join needs two open files.", true); return; }
-  const opts = tables.map((t) => '<option value="' + t.id + '">' + esc(t.name) + "</option>").join("");
-  openPanel("Join on a key", "Match rows that share a key. Colliding column names from the second file get a prefix.",
+  const leftDefault = tables[0];
+  const rightDefault = tables.find((t) => t.id !== leftDefault.id) || tables[1];
+  const opts = tables.map((t) =>
+    '<option value="' + t.id + '"' + (t.id === leftDefault.id ? " selected" : "") + ">" + esc(t.name) + "</option>"
+  ).join("");
+  const optsRight = tables.map((t) =>
+    '<option value="' + t.id + '"' + (rightDefault && t.id === rightDefault.id ? " selected" : "") + ">" + esc(t.name) + "</option>"
+  ).join("");
+  openPanel("Join on a key", "Match rows that share a key. Counts update as you pick files and keys. Same-named columns from the right file get a file-name prefix.",
     '<div class="row-cols"><div class="field"><label>Left file</label><select id="jL">' + opts + "</select></div>" +
-    '<div class="field"><label>Right file</label><select id="jR">' + opts + "</select></div></div>" +
+    '<div class="field"><label>Right file</label><select id="jR">' + optsRight + "</select></div></div>" +
     '<div class="row-cols"><div class="field"><label>Left key</label><select id="jLK"></select></div>' +
     '<div class="field"><label>Right key</label><select id="jRK"></select></div></div>' +
     '<div class="field"><label>Join type</label><select id="jType">' +
@@ -1189,18 +1383,19 @@ function openJoin() {
       '<option value="left" selected>Left — all of left, matches from right</option>' +
       '<option value="right">Right — all of right, matches from left</option>' +
       '<option value="full">Full — everything from both</option>' +
-    "</select></div>",
+    "</select></div>" +
+    '<div id="jForecast" class="join-forecast" aria-live="polite"></div>',
     "Join",
     function () {
       const L = tables.find((t) => t.id === document.getElementById("jL").value);
       const R = tables.find((t) => t.id === document.getElementById("jR").value);
       if (!L || !R || L.id === R.id) throw new Error("Pick two different files.");
-      snapshot();
       const joined = joinTables(L, R, {
         type: document.getElementById("jType").value,
         leftKey: document.getElementById("jLK").value,
         rightKey: document.getElementById("jRK").value
       });
+      snapshot();
       tables.push(joined);
       activeId = joined.id;
       afterOp("Joined into " + joined.rows.length.toLocaleString() + " rows.");
@@ -1214,17 +1409,39 @@ function openJoin() {
     fill(document.getElementById("jLK"), L);
     fill(document.getElementById("jRK"), R);
     if (L && R) {
-      const share = L.headers.find((h) => R.headers.some((x) => normName(x) === normName(h)));
+      const share = pickSharedKey(L.headers, R.headers);
       if (share) {
         document.getElementById("jLK").value = L.headers.find((h) => normName(h) === normName(share));
         document.getElementById("jRK").value = R.headers.find((h) => normName(h) === normName(share));
       }
     }
   }
-  document.getElementById("jL").onchange = fillKeys;
-  document.getElementById("jR").onchange = fillKeys;
-  if (tables[1]) document.getElementById("jR").value = tables[1].id;
+  function updateForecast() {
+    const box = document.getElementById("jForecast");
+    const btn = document.getElementById("panelApply");
+    const L = tables.find((t) => t.id === document.getElementById("jL").value);
+    const R = tables.find((t) => t.id === document.getElementById("jR").value);
+    const fc = joinForecast(L, R, {
+      type: document.getElementById("jType").value,
+      leftKey: document.getElementById("jLK").value,
+      rightKey: document.getElementById("jRK").value
+    });
+    box.innerHTML = joinForecastHtml(fc);
+    if (fc.error) {
+      box.className = "join-forecast err";
+      if (btn) btn.disabled = true;
+      return;
+    }
+    box.className = "join-forecast" + (fc.match ? "" : " warn");
+    if (btn) btn.disabled = false;
+  }
+  document.getElementById("jL").onchange = function () { fillKeys(); updateForecast(); };
+  document.getElementById("jR").onchange = function () { fillKeys(); updateForecast(); };
+  document.getElementById("jLK").onchange = updateForecast;
+  document.getElementById("jRK").onchange = updateForecast;
+  document.getElementById("jType").onchange = updateForecast;
   fillKeys();
+  updateForecast();
 }
 
 function openSplit() {
@@ -2111,7 +2328,8 @@ const RECIPES = [
         "value": ""
       }
     ],
-    "id": "timesheet-stack",
+    "id": "timesheet-stack"
+  },
   {
     "name": "Roster week stack",
     "description": "Stack last-week and this-week roster files (columns: email, name, role), lowercase email, then keep the first row per email.",
@@ -2149,7 +2367,6 @@ const RECIPES = [
       }
     ],
     "id": "roster-week-stack"
-  }
   }
 ];
 
