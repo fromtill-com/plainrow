@@ -1,0 +1,21 @@
+PLAINROW KITCHEN — PRIVACY
+
+Plainrow does not collect, upload, or see your files.
+
+- The application is a single HTML file you open on your own computer.
+- All processing happens in your browser, on your machine.
+- There are no accounts, no sign-in, and no cloud conversion step.
+- There is no telemetry, no analytics, and no third-party scripts.
+- The file does not require a network connection after you have saved it.
+- Cookies are not set by Plainrow.
+
+If you bought the Software through a checkout page, that payment provider
+holds the email and payment details needed to deliver the download. That
+relationship is theirs, not a Plainrow account, and we do not receive your
+spreadsheets.
+
+We do not train models on buyer files. We never ask you to send a CSV
+for "support." If something breaks, describe the shape of the file
+(column names, row count), not the contents.
+
+A file formatter you run locally. We never see your data.

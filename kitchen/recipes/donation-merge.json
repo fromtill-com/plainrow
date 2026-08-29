@@ -1,0 +1,75 @@
+{
+  "name": "Donation export merge",
+  "description": "Rename two donation-platform exports and stack them into one gift list.",
+  "version": 1,
+  "steps": [
+    {
+      "op": "rename",
+      "fileMatch": "givebutter",
+      "map": {
+        "Donation ID": "gift_id",
+        "Donated At": "date",
+        "Amount": "amount",
+        "Donor Email": "email",
+        "Donor Name": "name",
+        "Campaign": "campaign"
+      }
+    },
+    {
+      "op": "add_column",
+      "fileMatch": "givebutter",
+      "name": "source",
+      "value": "givebutter"
+    },
+    {
+      "op": "rename",
+      "fileMatch": "donorbox",
+      "map": {
+        "id": "gift_id",
+        "created": "date",
+        "gross": "amount",
+        "email": "email",
+        "name": "name",
+        "form": "campaign"
+      }
+    },
+    {
+      "op": "add_column",
+      "fileMatch": "donorbox",
+      "name": "source",
+      "value": "donorbox"
+    },
+    {
+      "op": "stack",
+      "fileMatch": [
+        "givebutter",
+        "donorbox"
+      ],
+      "output": "donations"
+    },
+    {
+      "op": "date_normalize",
+      "fileMatch": "donations",
+      "column": "date"
+    },
+    {
+      "op": "lowercase",
+      "fileMatch": "donations",
+      "column": "email"
+    },
+    {
+      "op": "reorder",
+      "fileMatch": "donations",
+      "columns": [
+        "date",
+        "source",
+        "name",
+        "email",
+        "amount",
+        "campaign",
+        "gift_id"
+      ]
+    }
+  ],
+  "id": "donation-merge"
+}

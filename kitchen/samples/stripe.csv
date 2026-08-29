@@ -1,0 +1,6 @@
+id,created,amount,currency,description,type,customer_email
+ch_1001,2026-07-02,45.00,usd,Office supplies,charge,ada@example.com
+ch_1002,2026-07-03,120.00,usd,Consulting block,charge,ben@example.net
+ch_1003,2026-07-08,18.50,usd,Sticker pack,charge,cara@example.org
+ch_1004,2026-07-11,-18.50,usd,Sticker pack refund,refund,cara@example.org
+ch_1005,2026-07-15,75.00,usd,Workshop seat,charge,drew@example.com

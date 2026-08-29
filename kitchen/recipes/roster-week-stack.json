@@ -1,0 +1,38 @@
+{
+  "name": "Roster week stack",
+  "description": "Stack last-week and this-week roster files (columns: email, name, role), lowercase email, then keep the first row per email.",
+  "version": 1,
+  "steps": [
+    {
+      "op": "stack",
+      "fileMatch": [
+        "last",
+        "this"
+      ],
+      "output": "roster"
+    },
+    {
+      "op": "lowercase",
+      "column": "email",
+      "fileMatch": "roster"
+    },
+    {
+      "op": "dedupe",
+      "keep": "first",
+      "columns": [
+        "email"
+      ],
+      "fileMatch": "roster"
+    },
+    {
+      "op": "select_columns",
+      "columns": [
+        "email",
+        "name",
+        "role"
+      ],
+      "fileMatch": "roster"
+    }
+  ],
+  "id": "roster-week-stack"
+}

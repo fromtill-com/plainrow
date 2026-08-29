@@ -1,0 +1,137 @@
+{
+  "name": "Stripe + PayPal + bank month ledger",
+  "description": "Rename three payment exports onto a shared column set, tag the source, stack them, and normalize dates to YYYY-MM-DD.",
+  "version": 1,
+  "steps": [
+    {
+      "op": "rename",
+      "fileMatch": "stripe",
+      "map": {
+        "id": "txn_id",
+        "created": "date",
+        "amount": "amount",
+        "description": "memo",
+        "customer_email": "counterparty",
+        "type": "kind"
+      }
+    },
+    {
+      "op": "select_columns",
+      "fileMatch": "stripe",
+      "columns": [
+        "date",
+        "amount",
+        "memo",
+        "counterparty",
+        "kind",
+        "txn_id"
+      ]
+    },
+    {
+      "op": "add_column",
+      "fileMatch": "stripe",
+      "name": "source",
+      "value": "stripe"
+    },
+    {
+      "op": "rename",
+      "fileMatch": "paypal",
+      "map": {
+        "Transaction ID": "txn_id",
+        "Date": "date",
+        "Gross": "amount",
+        "Name": "counterparty",
+        "Type": "kind"
+      }
+    },
+    {
+      "op": "select_columns",
+      "fileMatch": "paypal",
+      "columns": [
+        "date",
+        "amount",
+        "counterparty",
+        "kind",
+        "txn_id"
+      ]
+    },
+    {
+      "op": "add_column",
+      "fileMatch": "paypal",
+      "name": "memo",
+      "value": ""
+    },
+    {
+      "op": "add_column",
+      "fileMatch": "paypal",
+      "name": "source",
+      "value": "paypal"
+    },
+    {
+      "op": "rename",
+      "fileMatch": "bank",
+      "map": {
+        "Date": "date",
+        "Description": "memo",
+        "Amount": "amount",
+        "Check Number": "txn_id"
+      }
+    },
+    {
+      "op": "select_columns",
+      "fileMatch": "bank",
+      "columns": [
+        "date",
+        "amount",
+        "memo",
+        "txn_id"
+      ]
+    },
+    {
+      "op": "add_column",
+      "fileMatch": "bank",
+      "name": "counterparty",
+      "value": ""
+    },
+    {
+      "op": "add_column",
+      "fileMatch": "bank",
+      "name": "kind",
+      "value": "bank"
+    },
+    {
+      "op": "add_column",
+      "fileMatch": "bank",
+      "name": "source",
+      "value": "bank"
+    },
+    {
+      "op": "stack",
+      "fileMatch": [
+        "stripe",
+        "paypal",
+        "bank"
+      ],
+      "output": "month_ledger"
+    },
+    {
+      "op": "reorder",
+      "fileMatch": "month_ledger",
+      "columns": [
+        "date",
+        "source",
+        "kind",
+        "amount",
+        "memo",
+        "counterparty",
+        "txn_id"
+      ]
+    },
+    {
+      "op": "date_normalize",
+      "fileMatch": "month_ledger",
+      "column": "date"
+    }
+  ],
+  "id": "month-ledger"
+}

@@ -1,0 +1,35 @@
+PLAINROW KITCHEN
+End User License Agreement
+Version 1.0 — August 2026
+
+This license is an agreement between you and Plainrow for the Plainrow Kitchen
+application and the files that ship with it (the "Software").
+
+1. GRANT
+   You may install and use the Software for personal purposes and for commercial
+   work at a single seat (one person). A virtual assistant, bookkeeper, or staff
+   member may use that one seat on client or employer files.
+
+   You may make backup copies for your own use.
+
+2. WHAT YOU MAY NOT DO
+   You may not redistribute, resell, sublicense, publish, or share the Software
+   (including the HTML application, recipes, or documentation) with anyone else.
+   You may not offer the Software as a hosted or shared service.
+   You may not remove or alter this license notice.
+
+3. OUTPUT YOU CREATE
+   Spreadsheets, CSVs, and other files you produce with the Software are yours.
+   This license does not claim any rights in your data.
+
+4. NO WARRANTY
+   The Software is provided "as is," without warranty of any kind, express or
+   implied, including merchantability, fitness for a particular purpose, and
+   non-infringement. Plainrow is not liable for lost data, lost profits, or any
+   indirect or consequential damages. Your statutory rights are not affected.
+
+5. TERMINATION
+   This license ends if you breach it. On termination you must delete your
+   copies of the Software. Sections 3 and 4 survive.
+
+Plainrow Kitchen — a file formatter you run locally.

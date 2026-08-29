@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plainrow Kitchen</title>
+<meta name="description" content="Offline CSV kitchen. Merge, join, split, dedupe, and clean spreadsheets in your browser. Files never leave this computer.">
+<style>
+:root {
+  --paper: #f3eee4;
+  --paper-2: #eae3d6;
+  --ink: #1c1915;
+  --muted: #6a6358;
+  --line: #d4cbbd;
+  --surface: #fffdf8;
+  --pine: #0f5c4c;
+  --pine-2: #0a4338;
+  --pine-soft: #e3f0eb;
+  --brick: #8f2d2d;
+  --amber: #8a5a12;
+  --shadow: 0 1px 0 rgba(28,25,21,.05), 0 10px 28px rgba(28,25,21,.07);
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --rail: 252px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at top, rgba(15,92,76,.05), transparent 42%),
+    repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(28,25,21,.015) 20px),
+    var(--paper);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3 { font-weight: 600; margin: 0; }
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.brand { display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; }
+.wordmark {
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+.wordmark::after {
+  content: "";
+  display: block;
+  width: 2.1em;
+  height: 2px;
+  margin-top: 5px;
+  background: var(--pine);
+}
+.edition {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pine);
+  font-weight: 650;
+}
+.tagline { margin: 0; color: var(--muted); font-size: 0.86rem; flex: 1; }
+.top-actions { display: flex; gap: 8px; }
+
+.litebar {
+  background: #214136;
+  color: #f3eee4;
+  text-align: center;
+  padding: 7px 16px;
+  font-size: 0.82rem;
+}
+
+.app { display: flex; flex: 1; min-height: 0; }
+.rail {
+  width: var(--rail);
+  flex-shrink: 0;
+  border-right: 1px solid var(--line);
+  background: var(--paper-2);
+  padding: 16px 14px 24px;
+  overflow: auto;
+}
+.rail section + section { margin-top: 22px; }
+.rail h2 {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.file-item, .recipe-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 8px 8px 10px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.file-item.active { border-color: var(--pine); box-shadow: 0 0 0 2px var(--pine-soft); }
+.file-item button.pick, .recipe-item button.pick {
+  flex: 1; text-align: left; background: none; border: 0; padding: 0;
+}
+.file-item .name, .recipe-item .name { display: block; font-weight: 600; font-size: 0.86rem; word-break: break-word; }
+.file-item .meta, .recipe-item .meta { display: block; color: var(--muted); font-size: 0.74rem; margin-top: 2px; }
+.icon-btn {
+  background: none; border: 0; color: var(--muted); padding: 2px 6px; border-radius: 4px;
+}
+.icon-btn:hover { background: var(--paper-2); color: var(--brick); }
+
+.drop {
+  border: 1px dashed #b7ad9d;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  background: rgba(255,253,248,.5);
+  margin: 8px 0;
+}
+.drop.over { border-color: var(--pine); background: var(--pine-soft); color: var(--pine-2); }
+.demo-label { display: block; font-size: 0.74rem; color: var(--muted); margin-top: 8px; }
+.demo-label select, .field select, .field input[type="text"], .field input[type="number"], .field textarea {
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.btn, .toolbar button, .top-actions button, .drop button, .sheet-head button, .panel .btn {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+}
+.btn:hover, .toolbar button:hover, .top-actions button:hover, .sheet-head button:hover { border-color: #b8ae9f; }
+.btn.primary, #btnExport, #btnOpen {
+  background: var(--pine);
+  color: #f6f3ec;
+  border-color: var(--pine-2);
+}
+.btn.primary:hover, #btnExport:hover, #btnOpen:hover { background: var(--pine-2); }
+.btn:disabled, .toolbar button:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.danger { color: var(--brick); border-color: #e0c4c4; }
+
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 12px 16px 0; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.toolbar button { background: var(--surface); }
+.sheet-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.sheet-head h1 { font-family: var(--serif); font-size: 1.25rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.warns { color: var(--amber); font-size: 0.8rem; margin-bottom: 6px; }
+
+.sheet-wrap {
+  flex: 1; min-height: 180px;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+table.data { border-collapse: collapse; min-width: 100%; font-family: var(--mono); font-size: 12.5px; }
+table.data th {
+  position: sticky; top: 0; z-index: 1;
+  background: #f4efe6;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 650;
+}
+table.data th:hover { color: var(--pine); }
+table.data td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #efe8dc;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+table.data td.rn, table.data th.rn {
+  color: var(--muted); width: 1%; text-align: right; cursor: default; font-variant-numeric: tabular-nums;
+}
+table.data tbody tr:hover td { background: #f7f3ea; }
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--muted);
+}
+.empty h2 { font-family: var(--serif); font-size: 1.6rem; color: var(--ink); margin-bottom: 8px; }
+.empty p { max-width: 420px; margin: 0 auto 16px; line-height: 1.5; }
+
+.pager { display: flex; align-items: center; gap: 10px; padding: 8px 2px 12px; font-size: 0.8rem; color: var(--muted); }
+.pager button { padding: 4px 8px; }
+
+.foot {
+  border-top: 1px solid var(--line);
+  padding: 7px 16px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.scrim { position: fixed; inset: 0; background: rgba(28,25,21,.28); z-index: 20; }
+.panel {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(400px, 100%);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  z-index: 21;
+  padding: 18px 18px 28px;
+  overflow: auto;
+  box-shadow: var(--shadow);
+}
+.panel h2 { font-family: var(--serif); font-size: 1.35rem; margin-bottom: 6px; }
+.panel .lead { color: var(--muted); font-size: 0.86rem; margin: 0 0 14px; line-height: 1.45; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 0.78rem; font-weight: 650; }
+.checks label { font-weight: 400; display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 0.84rem; }
+.row-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.panel-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.col-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.col-row input[type="text"] { flex: 1; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; }
+
+.help {
+  position: fixed; inset: 8vh 12vw; z-index: 22;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 22px 26px;
+  overflow: auto;
+}
+.help h2 { font-family: var(--serif); font-size: 1.6rem; margin-bottom: 8px; }
+.help p, .help li { color: #3c3832; line-height: 1.5; font-size: 0.92rem; }
+.help ol { padding-left: 1.2rem; }
+
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: #f3eee4;
+  padding: 10px 14px; border-radius: 8px;
+  z-index: 30; max-width: min(560px, 92vw);
+  font-size: 0.88rem; box-shadow: var(--shadow);
+}
+.toast.err { background: var(--brick); }
+
+@media (max-width: 860px) {
+  .app { flex-direction: column; }
+  .rail { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); max-height: 280px; }
+  .tagline { display: none; }
+  .help { inset: 4vh 4vw; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="wordmark">Plainrow</div>
+    <div class="edition" id="edition">Kitchen</div>
+  </div>
+  <p class="tagline">A file formatter you run locally. We never see your data.</p>
+  <div class="top-actions">
+    <button type="button" id="btnUndo" disabled>Undo</button>
+    <button type="button" id="btnRedo" disabled>Redo</button>
+    <button type="button" id="btnHelp">How this works</button>
+  </div>
+</header>
+<div id="litebar" class="litebar" hidden>Plainrow Lite — 2 files, 500 rows. The full Kitchen handles about 200,000 rows and 40 MB.</div>
+<div class="app">
+  <aside class="rail">
+    <section>
+      <h2>Counter</h2>
+      <div id="fileList"></div>
+      <div class="drop" id="dropZone">
+        Drop CSV files here
+        <div style="margin-top:8px"><button type="button" class="btn primary" id="btnOpen">Open CSV</button></div>
+      </div>
+      <input type="file" id="fileInput" accept=".csv,text/csv,text/plain,.tsv,text/tab-separated-values" multiple hidden>
+      <label class="demo-label">Try a synthetic demo
+        <select id="demoSelect">
+          <option value="">Choose a sample…</option>
+          <option value="payments">Stripe + PayPal + bank (March)</option>
+          <option value="emails">Email list with duplicates</option>
+          <option value="survey">Messy survey export</option>
+          <option value="inventory">Two inventories on SKU</option>
+          <option value="donations">Two donation exports</option>
+          <option value="timesheets">Two weekly timesheets</option>
+        </select>
+      </label>
+    </section>
+    <section>
+      <h2>Recipes</h2>
+      <div id="recipeList"></div>
+      <button type="button" class="btn" id="btnLoadRecipe" style="width:100%;margin-top:6px">Load recipe JSON</button>
+      <input type="file" id="recipeInput" accept=".json,application/json" hidden>
+    </section>
+  </aside>
+  <main class="main">
+    <div class="toolbar" id="toolbar"></div>
+    <div class="sheet-head">
+      <h1 id="sheetName">No file open</h1>
+      <button type="button" id="btnExport" disabled>Export CSV</button>
+    </div>
+    <div class="warns" id="warnings"></div>
+    <div class="sheet-wrap" id="sheetWrap">
+      <div id="empty" class="empty">
+        <h2>Drop a CSV on the counter</h2>
+        <p>Merge, join, split, dedupe, filter, rename, find-replace, and normalize dates. Nothing is uploaded. There is no account.</p>
+        <button type="button" class="btn primary" id="btnOpen2">Open CSV</button>
+        <button type="button" class="btn" id="btnDemo">Load the payment demo</button>
+      </div>
+      <div id="tableHost" hidden></div>
+    </div>
+    <div class="pager" id="pager"></div>
+  </main>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="panel" id="panel" hidden></aside>
+<div class="help" id="help" hidden>
+  <h2>How this works</h2>
+  <p>Plainrow Kitchen is one HTML file. Open it in Chrome, Edge, Firefox, or Safari. You do not install anything and you do not need a network after the file is on disk.</p>
+  <ol>
+    <li>Open one or more CSV (or TSV) files, or load a synthetic demo.</li>
+    <li>Use the toolbar: stack files, join on a key, split by a column, dedupe, filter, rename or reorder columns, find-replace, clean, sort, or normalize dates.</li>
+    <li>Recipes on the left run a Monday-job sequence for you. You can also load a recipe JSON.</li>
+    <li>Export writes a CSV back to your Downloads folder. A UTF-8 BOM is optional for Excel.</li>
+  </ol>
+  <p>Hard cap on the full Kitchen: about 200,000 rows or 40 MB in memory, whichever comes first. Lite is 2 files and 500 rows. Those limits exist so the browser stays usable.</p>
+  <p>Dates like 3/2/26, 02-Mar-2026, and 2026-03-02 are understood. Ambiguous day/month pairs default to month-first (US).</p>
+  <p>Your files never leave this computer. There is no telemetry.</p>
+  <div class="panel-actions"><button type="button" class="btn primary" id="btnHelpClose">Close</button></div>
+</div>
+<footer class="foot" id="foot"></footer>
+<div class="toast" id="toast" hidden></div>
+<script>
+
+const LITE = false;
+const MAX_ROWS = LITE ? 500 : 200000;
+const MAX_BYTES = LITE ? 1024 * 1024 : 40 * 1024 * 1024;
+const MAX_FILES = LITE ? 2 : 64;
+const PAGE = 50;
+const VERSION = "1.0";
+
+let tables = [];
+let activeId = null;
+let undoStack = [];
+let redoStack = [];
+let page = 1;
+let sortState = { col: null, dir: "asc" };
+let extraRecipes = [];
+let excelBom = true;
+
+function uid() {
+  return "t" + Math.random().toString(36).slice(2, 9);
+}
+function esc(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+function fmtBytes(n) {
+  if (n < 1024) return n + " B";
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+  return (n / (1024 * 1024)).toFixed(1) + " MB";
+}
+function approxSize(t) {
+  let n = t.headers.join(",").length;
+  for (const row of t.rows) n += row.join(",").length + 2;
+  return n;
+}
+function totalRows() {
+  return tables.reduce((n, t) => n + t.rows.length, 0);
+}
+function activeTable() {
+  return tables.find((t) => t.id === activeId) || null;
+}
+function cloneTable(t) {
+  return {
+    id: t.id,
+    name: t.name,
+    headers: t.headers.slice(),
+    rows: t.rows.map((r) => r.slice()),
+    warnings: t.warnings ? t.warnings.slice() : []
+  };
+}
+function snapshot() {
+  undoStack.push({
+    tables: tables.map(cloneTable),
+    activeId: activeId,
+    page: page
+  });
+  if (undoStack.length > 24) undoStack.shift();
+  redoStack = [];
+}
+function restore(s) {
+  tables = s.tables;
+  activeId = s.activeId;
+  page = s.page;
+}
+function doUndo() {
+  if (!undoStack.length) return;
+  redoStack.push({ tables: tables.map(cloneTable), activeId: activeId, page: page });
+  restore(undoStack.pop());
+  render();
+}
+function doRedo() {
+  if (!redoStack.length) return;
+  undoStack.push({ tables: tables.map(cloneTable), activeId: activeId, page: page });
+  restore(redoStack.pop());
+  render();
+}
+
+function detectDelim(text) {
+  let q = false, c = 0, t = 0, s = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      if (q && text[i + 1] === '"') { i++; continue; }
+      q = !q;
+    } else if (!q && (ch === "\n" || ch === "\r")) break;
+    else if (!q) {
+      if (ch === ",") c++;
+      else if (ch === "\t") t++;
+      else if (ch === ";") s++;
+    }
+  }
+  if (t > c && t >= s) return "\t";
+  if (s > c && s > t) return ";";
+  return ",";
+}
+
+function parseCSV(text) {
+  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+  const delim = detectDelim(text);
+  const rows = [];
+  let field = "";
+  let row = [];
+  let i = 0;
+  let inQuotes = false;
+  const n = text.length;
+  while (i < n) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
+      }
+      field += ch; i++; continue;
+    }
+    if (ch === '"') { inQuotes = true; i++; continue; }
+    if (ch === delim) { row.push(field); field = ""; i++; continue; }
+    if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      rows.push(row); row = [];
+      i++; continue;
+    }
+    field += ch; i++;
+  }
+  if (inQuotes) {
+    throw new Error("This file has an unclosed quote. Export again as CSV and retry.");
+  }
+  if (field.length || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
+  while (rows.length && rows[rows.length - 1].every((c) => String(c).trim() === "")) rows.pop();
+  if (!rows.length) throw new Error("That file is empty.");
+  const headers = rows[0].map((h, idx) => {
+    const s = String(h).trim();
+    return s || "column_" + (idx + 1);
+  });
+  const seen = Object.create(null);
+  for (let hi = 0; hi < headers.length; hi++) {
+    const key = headers[hi].toLowerCase();
+    if (seen[key] == null) seen[key] = 1;
+    else {
+      seen[key] += 1;
+      headers[hi] = headers[hi] + "_" + seen[key];
+    }
+  }
+  let uneven = 0;
+  const body = [];
+  for (let r = 1; r < rows.length; r++) {
+    const src = rows[r];
+    if (src.length !== headers.length) uneven++;
+    const next = [];
+    for (let c = 0; c < headers.length; c++) next.push(src[c] == null ? "" : String(src[c]));
+    body.push(next);
+  }
+  const warnings = [];
+  if (uneven) warnings.push(uneven + " row" + (uneven === 1 ? "" : "s") + " had a different number of fields and were padded or trimmed.");
+  return { headers: headers, rows: body, warnings: warnings, delim: delim };
+}
+
+function serializeCSV(headers, rows, bom) {
+  const all = [headers].concat(rows);
+  const lines = all.map((row) =>
+    row
+      .map((cell) => {
+        const s = cell == null ? "" : String(cell);
+        return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      })
+      .join(",")
+  );
+  const body = lines.join("\r\n") + "\r\n";
+  return bom ? "\uFEFF" + body : body;
+}
+
+const MONTHS = {
+  jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3, apr: 4, april: 4,
+  may: 5, jun: 6, june: 6, jul: 7, july: 7, aug: 8, august: 8, sep: 9,
+  sept: 9, september: 9, oct: 10, october: 10, nov: 11, november: 11, dec: 12, december: 12
+};
+
+function ymd(y, m, d) {
+  if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return null;
+  return dt;
+}
+function parseDate(raw, preferMDY) {
+  let s = String(raw == null ? "" : raw).trim();
+  if (!s) return null;
+  s = s.replace(/,\s*/g, " ");
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/);
+  if (m) return ymd(+m[1], +m[2], +m[3]);
+  m = s.match(/^(\d{4})[/.](\d{1,2})[/.](\d{1,2})(?:\s+.*)?$/);
+  if (m) return ymd(+m[1], +m[2], +m[3]);
+  m = s.match(/^(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{2,4})(?:\s+.*)?$/);
+  if (m && MONTHS[m[2].toLowerCase()]) {
+    let y = +m[3]; if (y < 100) y += y >= 70 ? 1900 : 2000;
+    return ymd(y, MONTHS[m[2].toLowerCase()], +m[1]);
+  }
+  m = s.match(/^([A-Za-z]{3,})\s+(\d{1,2})\s+(\d{2,4})(?:\s+.*)?$/);
+  if (m && MONTHS[m[1].toLowerCase()]) {
+    let y = +m[3]; if (y < 100) y += y >= 70 ? 1900 : 2000;
+    return ymd(y, MONTHS[m[1].toLowerCase()], +m[2]);
+  }
+  m = s.match(/^(\d{1,2})[.\-/]([A-Za-z]{3,})[.\-/](\d{2,4})(?:\s+.*)?$/);
+  if (m && MONTHS[m[2].toLowerCase()]) {
+    let y = +m[3]; if (y < 100) y += y >= 70 ? 1900 : 2000;
+    return ymd(y, MONTHS[m[2].toLowerCase()], +m[1]);
+  }
+  m = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})(?:\s+.*)?$/);
+  if (m) {
+    let a = +m[1], b = +m[2], y = +m[3];
+    if (y < 100) y += y >= 70 ? 1900 : 2000;
+    if (a > 12) return ymd(y, b, a);
+    if (b > 12) return ymd(y, a, b);
+    return preferMDY !== false ? ymd(y, a, b) : ymd(y, b, a);
+  }
+  return null;
+}
+function formatDate(dt, fmt) {
+  const y = dt.getUTCFullYear();
+  const m = String(dt.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(dt.getUTCDate()).padStart(2, "0");
+  if (fmt === "MM/DD/YYYY") return m + "/" + d + "/" + y;
+  if (fmt === "DD/MM/YYYY") return d + "/" + m + "/" + y;
+  return y + "-" + m + "-" + d;
+}
+function cmpNum(a) {
+  const s = String(a).replace(/[$£€,\s]/g, "");
+  if (s === "" || s === "-" || Number.isNaN(+s)) return null;
+  return +s;
+}
+function normName(s) {
+  return String(s || "").trim().toLowerCase();
+}
+function resolveCol(headers, name, aliases) {
+  const n = normName(name);
+  let i = headers.findIndex((h) => normName(h) === n);
+  if (i >= 0) return i;
+  const al = aliases || [];
+  for (let a = 0; a < al.length; a++) {
+    i = headers.findIndex((h) => normName(h) === normName(al[a]));
+    if (i >= 0) return i;
+  }
+  return -1;
+}
+
+function stackTables(list, opts) {
+  const sourceCol = opts && opts.sourceColumn;
+  const union = [];
+  const seen = Object.create(null);
+  list.forEach((t) => {
+    t.headers.forEach((h) => {
+      const k = normName(h);
+      if (!seen[k]) { seen[k] = h; union.push(h); }
+    });
+  });
+  if (sourceCol && !union.some((h) => normName(h) === normName(sourceCol))) union.push(sourceCol);
+  const rows = [];
+  list.forEach((t) => {
+    const idx = union.map((h) => {
+      if (sourceCol && normName(h) === normName(sourceCol)) return -2;
+      return resolveCol(t.headers, h);
+    });
+    t.rows.forEach((row) => {
+      rows.push(idx.map((i) => (i === -2 ? t.name : i < 0 ? "" : row[i])));
+    });
+  });
+  return {
+    id: uid(),
+    name: "stacked",
+    headers: union,
+    rows: rows,
+    warnings: []
+  };
+}
+
+function joinTables(left, right, opts) {
+  const type = opts.type || "inner";
+  const aliases = opts.keyAliases || [];
+  const lk = resolveCol(left.headers, opts.leftKey, aliases);
+  const rk = resolveCol(right.headers, opts.rightKey, aliases);
+  if (lk < 0 || rk < 0) throw new Error("Could not find the join key in both files.");
+  const rHeads = [];
+  const rIdx = [];
+  right.headers.forEach((h, i) => {
+    if (i === rk) return;
+    rHeads.push(left.headers.some((lh) => normName(lh) === normName(h)) ? right.name.replace(/\.csv$/i, "") + "." + h : h);
+    rIdx.push(i);
+  });
+  const headers = left.headers.concat(rHeads);
+  const index = new Map();
+  right.rows.forEach((row) => {
+    const k = String(row[rk] == null ? "" : row[rk]).trim();
+    if (!index.has(k)) index.set(k, []);
+    index.get(k).push(row);
+  });
+  const empty = rHeads.map(() => "");
+  const out = [];
+  const matchedRight = new Set();
+  function project(rrow) { return rIdx.map((i) => rrow[i]); }
+  if (type !== "right") {
+    left.rows.forEach((lrow) => {
+      const k = String(lrow[lk] == null ? "" : lrow[lk]).trim();
+      const hits = index.get(k);
+      if (hits && hits.length) {
+        hits.forEach((rrow) => {
+          matchedRight.add(rrow);
+          out.push(lrow.concat(project(rrow)));
+        });
+      } else if (type === "left" || type === "full") {
+        out.push(lrow.concat(empty));
+      }
+    });
+  }
+  if (type === "right" || type === "full") {
+    const lIndex = new Map();
+    left.rows.forEach((row) => {
+      const k = String(row[lk] == null ? "" : row[lk]).trim();
+      if (!lIndex.has(k)) lIndex.set(k, []);
+      lIndex.get(k).push(row);
+    });
+    if (type === "right") {
+      right.rows.forEach((rrow) => {
+        const k = String(rrow[rk] == null ? "" : rrow[rk]).trim();
+        const hits = lIndex.get(k);
+        if (hits && hits.length) hits.forEach((lrow) => out.push(lrow.concat(project(rrow))));
+        else out.push(left.headers.map(() => "").concat(project(rrow)));
+      });
+    } else {
+      right.rows.forEach((rrow) => {
+        if (!matchedRight.has(rrow)) out.push(left.headers.map(() => "").concat(project(rrow)));
+      });
+    }
+  }
+  return { id: uid(), name: "joined", headers: headers, rows: out, warnings: [] };
+}
+
+function splitTable(table, colName) {
+  const ci = resolveCol(table.headers, colName);
+  if (ci < 0) throw new Error("No column “" + colName + "”.");
+  const groups = new Map();
+  table.rows.forEach((row) => {
+    const k = String(row[ci] == null ? "" : row[ci]);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(row.slice());
+  });
+  if (groups.size > 80) {
+    throw new Error("That column has " + groups.size + " unique values. Split stops at 80 so you are not buried in tabs.");
+  }
+  const out = [];
+  groups.forEach((rows, k) => {
+    const label = k === "" ? "(blank)" : k;
+    out.push({
+      id: uid(),
+      name: (table.name.replace(/\.csv$/i, "") + " — " + label).slice(0, 80),
+      headers: table.headers.slice(),
+      rows: rows,
+      warnings: []
+    });
+  });
+  return out;
+}
+
+function dedupeTable(table, colNames, keep, aliases) {
+  const idxs = colNames.map((c) => resolveCol(table.headers, c, aliases)).filter((i) => i >= 0);
+  if (!idxs.length) throw new Error("Pick at least one column to match on.");
+  const seen = new Map();
+  const order = [];
+  table.rows.forEach((row) => {
+    const key = idxs.map((i) => String(row[i] == null ? "" : row[i]).trim().toLowerCase()).join("\u0001");
+    if (keep === "last") {
+      if (seen.has(key)) order[seen.get(key)] = null;
+      seen.set(key, order.length);
+      order.push(row.slice());
+    } else if (!seen.has(key)) {
+      seen.set(key, true);
+      order.push(row.slice());
+    }
+  });
+  const next = cloneTable(table);
+  next.rows = order.filter(Boolean);
+  return next;
+}
+
+function rowMatch(row, headers, rule) {
+  const i = resolveCol(headers, rule.col);
+  if (i < 0) return false;
+  const v = String(row[i] == null ? "" : row[i]);
+  const q = String(rule.value == null ? "" : rule.value);
+  const vl = rule.cs ? v : v.toLowerCase();
+  const ql = rule.cs ? q : q.toLowerCase();
+  switch (rule.op) {
+    case "eq": return vl === ql;
+    case "neq": return vl !== ql;
+    case "contains": return vl.indexOf(ql) !== -1;
+    case "not_contains": return vl.indexOf(ql) === -1;
+    case "starts": return vl.indexOf(ql) === 0;
+    case "ends": return vl.slice(-ql.length) === ql;
+    case "empty": return v.trim() === "";
+    case "not_empty": return v.trim() !== "";
+    case "gt": {
+      const n = cmpNum(v), m = cmpNum(q);
+      if (n == null || m == null) return v > q;
+      return n > m;
+    }
+    case "lt": {
+      const n = cmpNum(v), m = cmpNum(q);
+      if (n == null || m == null) return v < q;
+      return n < m;
+    }
+    default: return true;
+  }
+}
+
+function filterTable(table, rules, combinator) {
+  const active = rules.filter((r) => r.col);
+  if (!active.length) return cloneTable(table);
+  const next = cloneTable(table);
+  next.rows = table.rows.filter((row) => {
+    if (combinator === "or") return active.some((r) => rowMatch(row, table.headers, r));
+    return active.every((r) => rowMatch(row, table.headers, r));
+  });
+  return next;
+}
+
+function applyColumns(table, spec) {
+  const kept = spec.filter((s) => !s.drop);
+  const idxs = kept.map((s) => resolveCol(table.headers, s.old));
+  return {
+    id: table.id,
+    name: table.name,
+    headers: kept.map((s) => s.new || s.old),
+    rows: table.rows.map((row) => idxs.map((i) => (i < 0 ? "" : row[i]))),
+    warnings: table.warnings ? table.warnings.slice() : []
+  };
+}
+
+function replaceCI(s, find, repl) {
+  if (!find) return s;
+  const fl = find.toLowerCase();
+  const n = find.length;
+  let out = "", i = 0;
+  while (i < s.length) {
+    if (s.slice(i, i + n).toLowerCase() === fl) { out += repl; i += n; }
+    else { out += s[i]; i++; }
+  }
+  return out;
+}
+
+function findReplaceTable(table, cols, find, repl, opts) {
+  const idxs = cols.length
+    ? cols.map((c) => resolveCol(table.headers, c)).filter((i) => i >= 0)
+    : table.headers.map((_, i) => i);
+  let re = null;
+  if (opts.regex) {
+    try { re = new RegExp(find, opts.cs ? "g" : "gi"); }
+    catch (e) { throw new Error("That regular expression is not valid."); }
+  }
+  let hits = 0;
+  const rows = table.rows.map((row) => {
+    const next = row.slice();
+    idxs.forEach((i) => {
+      const s = String(next[i] == null ? "" : next[i]);
+      let out = s;
+      if (re) out = s.replace(re, repl);
+      else if (opts.whole) {
+        if (opts.cs ? s === find : s.toLowerCase() === find.toLowerCase()) out = repl;
+      } else if (opts.cs) {
+        if (find) out = s.split(find).join(repl);
+      } else out = replaceCI(s, find, repl);
+      if (out !== s) { hits++; next[i] = out; }
+    });
+    return next;
+  });
+  const next = cloneTable(table);
+  next.rows = rows;
+  return { table: next, hits: hits };
+}
+
+function dateNormalizeTable(table, col, fmt, preferMDY, aliases) {
+  const i = resolveCol(table.headers, col, aliases);
+  if (i < 0) throw new Error("No date column named “" + col + "”.");
+  let ok = 0, bad = 0;
+  const next = cloneTable(table);
+  next.rows = table.rows.map((row) => {
+    const copy = row.slice();
+    const raw = copy[i];
+    if (String(raw == null ? "" : raw).trim() === "") return copy;
+    const dt = parseDate(raw, preferMDY);
+    if (dt) { copy[i] = formatDate(dt, fmt); ok++; }
+    else bad++;
+    return copy;
+  });
+  if (bad) next.warnings = (next.warnings || []).concat([bad + " value" + (bad === 1 ? "" : "s") + " in “" + table.headers[i] + "” could not be read as a date and were left as-is."]);
+  next._dateStats = { ok: ok, bad: bad };
+  return next;
+}
+
+function sortTable(table, col, dir) {
+  const i = resolveCol(table.headers, col);
+  if (i < 0) return table;
+  const sign = dir === "desc" ? -1 : 1;
+  const rows = table.rows.slice();
+  const nonempty = rows.filter((r) => String(r[i] == null ? "" : r[i]).trim() !== "");
+  const allNum = nonempty.length && nonempty.every((r) => cmpNum(r[i]) != null);
+  const allDate = nonempty.length && nonempty.every((r) => parseDate(r[i], true));
+  rows.sort((a, b) => {
+    const av = a[i] == null ? "" : a[i];
+    const bv = b[i] == null ? "" : b[i];
+    const ae = String(av).trim() === "";
+    const be = String(bv).trim() === "";
+    if (ae && be) return 0;
+    if (ae) return 1;
+    if (be) return -1;
+    if (allDate) return sign * (parseDate(av, true) - parseDate(bv, true));
+    if (allNum) return sign * (cmpNum(av) - cmpNum(bv));
+    return sign * String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: "base" });
+  });
+  const next = cloneTable(table);
+  next.rows = rows;
+  return next;
+}
+
+function trimTable(table) {
+  const next = cloneTable(table);
+  next.headers = table.headers.map((h) => String(h).trim());
+  next.rows = table.rows.map((row) => row.map((c) => String(c == null ? "" : c).trim()));
+  return next;
+}
+function dropEmptyRows(table) {
+  const next = cloneTable(table);
+  next.rows = table.rows.filter((row) => row.some((c) => String(c == null ? "" : c).trim() !== ""));
+  return next;
+}
+function dropEmptyColumns(table) {
+  const keep = table.headers.map((_, i) => table.rows.some((row) => String(row[i] == null ? "" : row[i]).trim() !== ""));
+  if (keep.every(Boolean)) return cloneTable(table);
+  return {
+    id: table.id,
+    name: table.name,
+    headers: table.headers.filter((_, i) => keep[i]),
+    rows: table.rows.map((row) => row.filter((_, i) => keep[i])),
+    warnings: table.warnings ? table.warnings.slice() : []
+  };
+}
+function lowercaseCol(table, col, aliases) {
+  const i = resolveCol(table.headers, col, aliases);
+  if (i < 0) return cloneTable(table);
+  const next = cloneTable(table);
+  next.rows = table.rows.map((row) => {
+    const copy = row.slice();
+    copy[i] = String(copy[i] == null ? "" : copy[i]).toLowerCase();
+    return copy;
+  });
+  return next;
+}
+function harmonizeTable(table, aliases, columns) {
+  const headers = columns.slice();
+  const rows = table.rows.map((row) =>
+    columns.map((target) => {
+      const names = [target].concat((aliases && aliases[target]) || []);
+      const i = resolveCol(table.headers, target, names);
+      return i < 0 ? "" : row[i];
+    })
+  );
+  return { id: table.id, name: table.name, headers: headers, rows: rows, warnings: [] };
+}
+
+function replaceActive(next) {
+  const i = tables.findIndex((t) => t.id === activeId);
+  if (i < 0) {
+    tables.push(next);
+    activeId = next.id;
+  } else {
+    next.id = tables[i].id;
+    next.name = next.name || tables[i].name;
+    tables[i] = next;
+  }
+  page = 1;
+}
+
+function assertCanAdd(fileCount, rowCount, byteCount) {
+  if (fileCount > MAX_FILES) {
+    throw new Error(LITE
+      ? "Lite can open 2 files. Remove one, or use the full Kitchen."
+      : "Too many files open. Close some and try again.");
+  }
+  if (byteCount > MAX_BYTES) {
+    throw new Error(LITE
+      ? "Lite stops at about 1 MB. This file is " + fmtBytes(byteCount) + "."
+      : "This file is " + fmtBytes(byteCount) + ". Kitchen stops at about 40 MB so the browser stays responsive.");
+  }
+  if (rowCount > MAX_ROWS) {
+    throw new Error(LITE
+      ? "Lite holds 500 rows. This would be " + rowCount.toLocaleString() + ". Use the full Kitchen for larger sheets."
+      : "Kitchen stops at " + MAX_ROWS.toLocaleString() + " rows so the browser stays responsive. This would be " + rowCount.toLocaleString() + ".");
+  }
+}
+
+function ingestCSV(name, text, fileSize) {
+  const parsed = parseCSV(text);
+  const comingFiles = tables.length + 1;
+  const comingRows = totalRows() + parsed.rows.length;
+  assertCanAdd(comingFiles, comingRows, fileSize || text.length);
+  const t = {
+    id: uid(),
+    name: name || "untitled.csv",
+    headers: parsed.headers,
+    rows: parsed.rows,
+    warnings: parsed.warnings
+  };
+  tables.push(t);
+  activeId = t.id;
+  page = 1;
+  return t;
+}
+
+
+function toast(msg, err) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast" + (err ? " err" : "");
+  el.hidden = false;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { el.hidden = true; }, err ? 7000 : 3800);
+}
+
+const TOOLS = [
+  ["stack", "Stack"],
+  ["join", "Join"],
+  ["split", "Split"],
+  ["dedupe", "Dedupe"],
+  ["filter", "Filter"],
+  ["columns", "Columns"],
+  ["replace", "Replace"],
+  ["dates", "Dates"],
+  ["clean", "Clean"],
+  ["sort", "Sort"]
+];
+
+function renderToolbar() {
+  const bar = document.getElementById("toolbar");
+  bar.innerHTML = TOOLS.map(([id, label]) =>
+    '<button type="button" data-tool="' + id + '"' + (tables.length ? "" : " disabled") + ">" + label + "</button>"
+  ).join("");
+}
+
+function renderFiles() {
+  const host = document.getElementById("fileList");
+  if (!tables.length) { host.innerHTML = '<p class="meta" style="color:var(--muted);font-size:0.8rem;margin:0 0 8px">No files yet.</p>'; return; }
+  host.innerHTML = tables.map((t) =>
+    '<div class="file-item' + (t.id === activeId ? " active" : "") + '">' +
+      '<button type="button" class="pick" data-act="' + t.id + '">' +
+        '<span class="name">' + esc(t.name) + '</span>' +
+        '<span class="meta">' + t.rows.length.toLocaleString() + " rows · " + t.headers.length + " cols</span>" +
+      "</button>" +
+      '<button type="button" class="icon-btn" data-del="' + t.id + '" title="Remove">×</button>' +
+    "</div>"
+  ).join("");
+}
+
+function allRecipes() {
+  return RECIPES.concat(extraRecipes);
+}
+
+function renderRecipes() {
+  const host = document.getElementById("recipeList");
+  host.innerHTML = allRecipes().map((r) =>
+    '<div class="recipe-item">' +
+      '<button type="button" class="pick" data-recipe="' + esc(r.id) + '">' +
+        '<span class="name">' + esc(r.name) + "</span>" +
+        '<span class="meta">' + esc((r.steps || []).map((s) => s.op).join(" · ")) + "</span>" +
+      "</button>" +
+    "</div>"
+  ).join("");
+}
+
+function renderSheet() {
+  const t = activeTable();
+  const empty = document.getElementById("empty");
+  const host = document.getElementById("tableHost");
+  const name = document.getElementById("sheetName");
+  const warns = document.getElementById("warnings");
+  const pager = document.getElementById("pager");
+  document.getElementById("btnExport").disabled = !t;
+  if (!t) {
+    empty.hidden = false;
+    host.hidden = true;
+    host.innerHTML = "";
+    name.textContent = "No file open";
+    warns.textContent = "";
+    pager.innerHTML = "";
+    return;
+  }
+  empty.hidden = true;
+  host.hidden = false;
+  name.textContent = t.name;
+  warns.textContent = (t.warnings || []).join(" ");
+  const pages = Math.max(1, Math.ceil(t.rows.length / PAGE));
+  if (page > pages) page = pages;
+  const start = (page - 1) * PAGE;
+  const slice = t.rows.slice(start, start + PAGE);
+  let html = '<table class="data"><thead><tr><th class="rn">#</th>';
+  t.headers.forEach((h) => {
+    const mark = sortState.col === h ? (sortState.dir === "asc" ? " ↑" : " ↓") : "";
+    html += "<th data-sort=\"" + esc(h) + "\">" + esc(h) + mark + "</th>";
+  });
+  html += "</tr></thead><tbody>";
+  slice.forEach((row, i) => {
+    html += '<tr><td class="rn">' + (start + i + 1) + "</td>";
+    row.forEach((c) => { html += "<td title=\"" + esc(c) + "\">" + esc(c) + "</td>"; });
+    html += "</tr>";
+  });
+  if (!slice.length) html += '<tr><td class="rn"></td><td colspan="' + t.headers.length + '" style="color:var(--muted);padding:18px">No rows.</td></tr>';
+  html += "</tbody></table>";
+  host.innerHTML = html;
+  pager.innerHTML =
+    '<button type="button" id="pgPrev"' + (page <= 1 ? " disabled" : "") + ">Prev</button>" +
+    "<span>Rows " + (t.rows.length ? (start + 1) : 0) + "–" + (start + slice.length) + " of " + t.rows.length.toLocaleString() + "</span>" +
+    '<button type="button" id="pgNext"' + (page >= pages ? " disabled" : "") + ">Next</button>";
+}
+
+function renderFoot() {
+  const files = tables.length;
+  const rows = totalRows();
+  const bytes = tables.reduce((n, t) => n + approxSize(t), 0);
+  const cap = LITE
+    ? "Lite cap: 2 files · 500 rows"
+    : "Cap: " + MAX_ROWS.toLocaleString() + " rows · " + fmtBytes(MAX_BYTES);
+  document.getElementById("foot").textContent =
+    files + (files === 1 ? " file" : " files") + " · " +
+    rows.toLocaleString() + " rows in memory · " + fmtBytes(bytes) + " · " + cap +
+    " · v" + VERSION + " · offline";
+  document.getElementById("btnUndo").disabled = !undoStack.length;
+  document.getElementById("btnRedo").disabled = !redoStack.length;
+}
+
+function render() {
+  document.getElementById("edition").textContent = LITE ? "Lite" : "Kitchen";
+  document.title = LITE ? "Plainrow Lite" : "Plainrow Kitchen";
+  document.getElementById("litebar").hidden = !LITE;
+  renderToolbar();
+  renderFiles();
+  renderRecipes();
+  renderSheet();
+  renderFoot();
+}
+
+function closeOverlays() {
+  document.getElementById("panel").hidden = true;
+  document.getElementById("scrim").hidden = true;
+  document.getElementById("help").hidden = true;
+  document.getElementById("panel").innerHTML = "";
+}
+function openHelp() {
+  document.getElementById("scrim").hidden = false;
+  document.getElementById("help").hidden = false;
+}
+function openPanel(title, lead, bodyHtml, applyLabel, onApply) {
+  const p = document.getElementById("panel");
+  p.hidden = false;
+  document.getElementById("scrim").hidden = false;
+  p.innerHTML =
+    "<h2>" + esc(title) + "</h2>" +
+    (lead ? '<p class="lead">' + lead + "</p>" : "") +
+    bodyHtml +
+    '<div class="panel-actions">' +
+      (onApply ? '<button type="button" class="btn primary" id="panelApply">' + esc(applyLabel || "Apply") + "</button>" : "") +
+      '<button type="button" class="btn" id="panelClose">Close</button>' +
+    "</div>";
+  p.querySelector("#panelClose").onclick = closeOverlays;
+  if (onApply) p.querySelector("#panelApply").onclick = function () {
+    try { onApply(); }
+    catch (e) { toast(e.message || String(e), true); }
+  };
+}
+
+function fileChecks(selected) {
+  return tables.map((t) =>
+    '<label><input type="checkbox" value="' + t.id + '"' + (selected ? " checked" : "") + "> " + esc(t.name) +
+    " <span style=\"color:var(--muted)\">(" + t.rows.length + ")</span></label>"
+  ).join("");
+}
+function colSelect(id, table, picked) {
+  const t = table || activeTable();
+  if (!t) return "";
+  return '<select id="' + id + '">' + t.headers.map((h) =>
+    '<option value="' + esc(h) + '"' + (h === picked ? " selected" : "") + ">" + esc(h) + "</option>"
+  ).join("") + "</select>";
+}
+
+function selectedTablesFromPanel() {
+  const boxes = document.querySelectorAll("#panel input[type=checkbox]:checked");
+  const ids = Array.prototype.map.call(boxes, (b) => b.value);
+  const list = tables.filter((t) => ids.indexOf(t.id) !== -1);
+  if (list.length < 2) throw new Error("Pick at least two files.");
+  return list;
+}
+
+function afterOp(msg) {
+  closeOverlays();
+  render();
+  if (msg) toast(msg);
+}
+
+function openStack() {
+  if (tables.length < 2) { toast("Stack needs two or more open files.", true); return; }
+  openPanel("Stack files", "Union of columns, rows appended. Names that differ only by case are treated as the same column.",
+    '<div class="field checks"><label>Files</label>' + fileChecks(true) + "</div>" +
+    '<div class="field checks"><label><input type="checkbox" id="srcCol" checked> Add a Source column with the file name</label></div>',
+    "Stack",
+    function () {
+      const list = selectedTablesFromPanel();
+      const src = document.getElementById("srcCol").checked ? "source" : null;
+      snapshot();
+      const stacked = stackTables(list, { sourceColumn: src });
+      assertCanAdd(tables.length + 1, totalRows() + stacked.rows.length, 0);
+      tables.push(stacked);
+      activeId = stacked.id;
+      afterOp("Stacked " + list.length + " files into " + stacked.rows.length.toLocaleString() + " rows.");
+    });
+}
+
+function openJoin() {
+  if (tables.length < 2) { toast("Join needs two open files.", true); return; }
+  const opts = tables.map((t) => '<option value="' + t.id + '">' + esc(t.name) + "</option>").join("");
+  openPanel("Join on a key", "Match rows that share a key. Colliding column names from the second file get a prefix.",
+    '<div class="row-cols"><div class="field"><label>Left file</label><select id="jL">' + opts + "</select></div>" +
+    '<div class="field"><label>Right file</label><select id="jR">' + opts + "</select></div></div>" +
+    '<div class="row-cols"><div class="field"><label>Left key</label><select id="jLK"></select></div>' +
+    '<div class="field"><label>Right key</label><select id="jRK"></select></div></div>' +
+    '<div class="field"><label>Join type</label><select id="jType">' +
+      '<option value="inner">Inner — only matches</option>' +
+      '<option value="left" selected>Left — all of left, matches from right</option>' +
+      '<option value="right">Right — all of right, matches from left</option>' +
+      '<option value="full">Full — everything from both</option>' +
+    "</select></div>",
+    "Join",
+    function () {
+      const L = tables.find((t) => t.id === document.getElementById("jL").value);
+      const R = tables.find((t) => t.id === document.getElementById("jR").value);
+      if (!L || !R || L.id === R.id) throw new Error("Pick two different files.");
+      snapshot();
+      const joined = joinTables(L, R, {
+        type: document.getElementById("jType").value,
+        leftKey: document.getElementById("jLK").value,
+        rightKey: document.getElementById("jRK").value
+      });
+      tables.push(joined);
+      activeId = joined.id;
+      afterOp("Joined into " + joined.rows.length.toLocaleString() + " rows.");
+    });
+  function fillKeys() {
+    const L = tables.find((t) => t.id === document.getElementById("jL").value);
+    const R = tables.find((t) => t.id === document.getElementById("jR").value);
+    const fill = (sel, t) => {
+      sel.innerHTML = (t ? t.headers : []).map((h) => '<option value="' + esc(h) + '">' + esc(h) + "</option>").join("");
+    };
+    fill(document.getElementById("jLK"), L);
+    fill(document.getElementById("jRK"), R);
+    if (L && R) {
+      const share = L.headers.find((h) => R.headers.some((x) => normName(x) === normName(h)));
+      if (share) {
+        document.getElementById("jLK").value = L.headers.find((h) => normName(h) === normName(share));
+        document.getElementById("jRK").value = R.headers.find((h) => normName(h) === normName(share));
+      }
+    }
+  }
+  document.getElementById("jL").onchange = fillKeys;
+  document.getElementById("jR").onchange = fillKeys;
+  if (tables[1]) document.getElementById("jR").value = tables[1].id;
+  fillKeys();
+}
+
+function openSplit() {
+  const t = activeTable();
+  if (!t) return;
+  openPanel("Split by column", "Each unique value becomes its own file on the counter. The original stays.",
+    '<div class="field"><label>Column</label>' + colSelect("spCol", t) + "</div>",
+    "Split",
+    function () {
+      const parts = splitTable(t, document.getElementById("spCol").value);
+      assertCanAdd(tables.length + parts.length, totalRows(), 0);
+      snapshot();
+      parts.forEach((p) => tables.push(p));
+      activeId = parts[0].id;
+      afterOp("Split into " + parts.length + " files.");
+    });
+}
+
+function openDedupe() {
+  const t = activeTable();
+  if (!t) return;
+  const guess = t.headers.find((h) => /email|e-mail|id|sku/i.test(h)) || t.headers[0];
+  openPanel("Dedupe", "Rows that match on the checked columns are collapsed. Comparison is case-insensitive and trimmed.",
+    '<div class="field checks"><label>Match on</label>' + t.headers.map((h) =>
+      '<label><input type="checkbox" value="' + esc(h) + '"' + (h === guess ? " checked" : "") + "> " + esc(h) + "</label>"
+    ).join("") + "</div>" +
+    '<div class="field"><label>Keep</label><select id="dk"><option value="first">First row</option><option value="last">Last row</option></select></div>',
+    "Dedupe",
+    function () {
+      const cols = Array.prototype.map.call(document.querySelectorAll("#panel input[type=checkbox]:checked"), (b) => b.value);
+      snapshot();
+      const next = dedupeTable(t, cols, document.getElementById("dk").value);
+      const dropped = t.rows.length - next.rows.length;
+      replaceActive(next);
+      afterOp(dropped ? ("Removed " + dropped + " duplicate row" + (dropped === 1 ? "" : "s") + ".") : "No duplicates on those columns.");
+    });
+}
+
+function openFilter() {
+  const t = activeTable();
+  if (!t) return;
+  const ops = [["contains","contains"],["eq","equals"],["neq","is not"],["starts","starts with"],["ends","ends with"],["gt","greater than"],["lt","less than"],["empty","is empty"],["not_empty","is not empty"]];
+  function ruleRow() {
+    return '<div class="col-row rule">' +
+      '<select class="rc">' + t.headers.map((h) => '<option>' + esc(h) + "</option>").join("") + "</select>" +
+      '<select class="ro">' + ops.map((o) => '<option value="' + o[0] + '">' + o[1] + "</option>").join("") + "</select>" +
+      '<input type="text" class="rv" placeholder="value">' +
+      "</div>";
+  }
+  openPanel("Filter", "Keep rows that match. Numbers ignore $ and commas.",
+    '<div class="field"><label>Match</label><select id="comb"><option value="and">all rules (AND)</option><option value="or">any rule (OR)</option></select></div>' +
+    '<div id="rules">' + ruleRow() + "</div>" +
+    '<button type="button" class="btn" id="addRule">Add rule</button>',
+    "Filter",
+    function () {
+      const rules = Array.prototype.map.call(document.querySelectorAll("#panel .rule"), (el) => ({
+        col: el.querySelector(".rc").value,
+        op: el.querySelector(".ro").value,
+        value: el.querySelector(".rv").value
+      }));
+      snapshot();
+      const next = filterTable(t, rules, document.getElementById("comb").value);
+      replaceActive(next);
+      afterOp("Kept " + next.rows.length.toLocaleString() + " of " + t.rows.length.toLocaleString() + " rows.");
+    });
+  document.getElementById("addRule").onclick = function () {
+    document.getElementById("rules").insertAdjacentHTML("beforeend", ruleRow());
+  };
+}
+
+function openColumns() {
+  const t = activeTable();
+  if (!t) return;
+  const rows = t.headers.map((h, i) =>
+    '<div class="col-row" data-i="' + i + '">' +
+      '<button type="button" class="icon-btn up" title="Up">↑</button>' +
+      '<button type="button" class="icon-btn down" title="Down">↓</button>' +
+      '<input type="text" value="' + esc(h) + '">' +
+      '<label style="font-size:0.76rem;color:var(--muted);white-space:nowrap"><input type="checkbox" class="drop"> drop</label>' +
+    "</div>"
+  ).join("");
+  openPanel("Rename & reorder", "Change names, move columns, or drop them. Apply writes a new column order.",
+    '<div id="colSpec">' + rows + "</div>",
+    "Apply columns",
+    function () {
+      const spec = [];
+      document.querySelectorAll("#colSpec .col-row").forEach((el) => {
+        const old = t.headers[+el.getAttribute("data-i")];
+        spec.push({ old: old, new: el.querySelector("input[type=text]").value.trim() || old, drop: el.querySelector(".drop").checked });
+      });
+      if (!spec.some((s) => !s.drop)) throw new Error("Keep at least one column.");
+      snapshot();
+      replaceActive(applyColumns(t, spec));
+      afterOp("Columns updated.");
+    });
+  document.getElementById("colSpec").onclick = function (e) {
+    const row = e.target.closest(".col-row");
+    if (!row) return;
+    if (e.target.classList.contains("up") && row.previousElementSibling) row.parentNode.insertBefore(row, row.previousElementSibling);
+    if (e.target.classList.contains("down") && row.nextElementSibling) row.parentNode.insertBefore(row.nextElementSibling, row);
+  };
+}
+
+function openReplace() {
+  const t = activeTable();
+  if (!t) return;
+  openPanel("Find & replace", "Runs on the current file. Regular expressions use JavaScript syntax.",
+    '<div class="field"><label>Find</label><input type="text" id="rf"></div>' +
+    '<div class="field"><label>Replace with</label><input type="text" id="rr"></div>' +
+    '<div class="field checks"><label>Columns (none checked = all)</label>' +
+      t.headers.map((h) => '<label><input type="checkbox" value="' + esc(h) + '"> ' + esc(h) + "</label>").join("") +
+    "</div>" +
+    '<div class="field checks">' +
+      '<label><input type="checkbox" id="rcs"> Case sensitive</label>' +
+      '<label><input type="checkbox" id="rre"> Regular expression</label>' +
+      '<label><input type="checkbox" id="rwh"> Whole cell only</label>' +
+    "</div>",
+    "Replace",
+    function () {
+      const find = document.getElementById("rf").value;
+      if (find === "" && !document.getElementById("rre").checked) throw new Error("Type something to find.");
+      const cols = Array.prototype.map.call(document.querySelectorAll("#panel input[type=checkbox][value]:checked"), (b) => b.value);
+      snapshot();
+      const res = findReplaceTable(t, cols, find, document.getElementById("rr").value, {
+        cs: document.getElementById("rcs").checked,
+        regex: document.getElementById("rre").checked,
+        whole: document.getElementById("rwh").checked
+      });
+      replaceActive(res.table);
+      afterOp(res.hits ? ("Changed " + res.hits + " cell" + (res.hits === 1 ? "" : "s") + ".") : "Nothing matched.");
+    });
+}
+
+function openDates() {
+  const t = activeTable();
+  if (!t) return;
+  const guess = t.headers.find((h) => /date|time|posted|created|week/i.test(h)) || t.headers[0];
+  openPanel("Normalize dates", "Reads ISO, 3/2/26, 02-Mar-2026, and similar. Ambiguous pairs default to month/day/year.",
+    '<div class="field"><label>Column</label>' + colSelect("dCol", t, guess) + "</div>" +
+    '<div class="field"><label>Write as</label><select id="dFmt">' +
+      '<option value="YYYY-MM-DD">YYYY-MM-DD</option>' +
+      '<option value="MM/DD/YYYY">MM/DD/YYYY</option>' +
+      '<option value="DD/MM/YYYY">DD/MM/YYYY</option>' +
+    "</select></div>" +
+    '<div class="field"><label>If the pair is ambiguous</label><select id="dPref">' +
+      '<option value="mdy">Treat as month/day (US)</option>' +
+      '<option value="dmy">Treat as day/month</option>' +
+    "</select></div>",
+    "Normalize",
+    function () {
+      snapshot();
+      const next = dateNormalizeTable(t, document.getElementById("dCol").value, document.getElementById("dFmt").value, document.getElementById("dPref").value === "mdy");
+      replaceActive(next);
+      const s = next._dateStats || { ok: 0, bad: 0 };
+      afterOp("Normalized " + s.ok + " date" + (s.ok === 1 ? "" : "s") + (s.bad ? "; " + s.bad + " left unchanged." : "."));
+    });
+}
+
+function openClean() {
+  const t = activeTable();
+  if (!t) return;
+  openPanel("Clean", "Small tidy-ups that recipes also use.",
+    '<div class="field checks">' +
+      '<label><input type="checkbox" id="cTrim" checked> Trim spaces on every cell</label>' +
+      '<label><input type="checkbox" id="cRows" checked> Drop completely empty rows</label>' +
+      '<label><input type="checkbox" id="cCols"> Drop completely empty columns</label>' +
+    "</div>",
+    "Clean",
+    function () {
+      snapshot();
+      let next = cloneTable(t);
+      if (document.getElementById("cTrim").checked) next = trimTable(next);
+      if (document.getElementById("cRows").checked) next = dropEmptyRows(next);
+      if (document.getElementById("cCols").checked) next = dropEmptyColumns(next);
+      replaceActive(next);
+      afterOp("Cleaned. " + next.rows.length.toLocaleString() + " rows remain.");
+    });
+}
+
+function openSort() {
+  const t = activeTable();
+  if (!t) return;
+  openPanel("Sort", "Guesses numbers and dates. Empty cells sink to the bottom.",
+    '<div class="field"><label>Column</label>' + colSelect("sCol", t) + "</div>" +
+    '<div class="field"><label>Direction</label><select id="sDir"><option value="asc">Ascending</option><option value="desc">Descending</option></select></div>',
+    "Sort",
+    function () {
+      snapshot();
+      const col = document.getElementById("sCol").value;
+      const dir = document.getElementById("sDir").value;
+      replaceActive(sortTable(t, col, dir));
+      sortState = { col: col, dir: dir };
+      afterOp("Sorted by “" + col + "”.");
+    });
+}
+
+function openExport() {
+  const t = activeTable();
+  if (!t) return;
+  openPanel("Export CSV", "Downloads to this computer. Nothing is sent anywhere.",
+    '<div class="field checks">' +
+      '<label><input type="checkbox" id="eBom"' + (excelBom ? " checked" : "") + "> UTF-8 BOM (friendlier in Excel)</label>" +
+    "</div>" +
+    '<div class="field"><label>What to write</label><select id="eWhat">' +
+      '<option value="one">This file only — ' + esc(t.name) + "</option>" +
+      (tables.length > 1 ? '<option value="all">Each open file, one after another</option>' : "") +
+    "</select></div>",
+    "Download",
+    function () {
+      excelBom = document.getElementById("eBom").checked;
+      const what = document.getElementById("eWhat").value;
+      if (what === "all") {
+        tables.forEach((tb, i) => setTimeout(() => downloadTable(tb, excelBom), i * 350));
+        afterOp("Saving " + tables.length + " files…");
+      } else {
+        downloadTable(t, excelBom);
+        afterOp("Saved " + t.name.replace(/\.csv$/i, "") + ".csv");
+      }
+    });
+}
+
+function downloadTable(t, bom) {
+  const text = serializeCSV(t.headers, t.rows, bom);
+  const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (t.name.replace(/\.csv$/i, "") || "plainrow") + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function matchTables(working, match) {
+  if (match == null) return working.slice();
+  const keys = Array.isArray(match) ? match : [match];
+  return working.filter((t) => keys.some((k) => normName(t.name).indexOf(normName(k)) !== -1));
+}
+function applyToMatched(working, match, fn) {
+  const keys = match == null ? null : (Array.isArray(match) ? match : [match]);
+  return working.map((t) => {
+    if (keys && !keys.some((k) => normName(t.name).indexOf(normName(k)) !== -1)) return t;
+    return fn(t);
+  });
+}
+function renameMap(table, map) {
+  const next = cloneTable(table);
+  next.headers = table.headers.map((h) => {
+    if (map[h] != null) return map[h];
+    const k = Object.keys(map).find((old) => normName(old) === normName(h));
+    return k ? map[k] : h;
+  });
+  return next;
+}
+function selectColumns(table, columns) {
+  const next = cloneTable(table);
+  next.headers = columns.slice();
+  next.rows = table.rows.map((row) => columns.map((c) => {
+    const i = resolveCol(table.headers, c);
+    return i < 0 ? "" : row[i];
+  }));
+  return next;
+}
+function addColumn(table, name, value) {
+  if (resolveCol(table.headers, name) >= 0) return cloneTable(table);
+  const next = cloneTable(table);
+  next.headers = table.headers.concat([name]);
+  next.rows = table.rows.map((row) => row.concat([value == null ? "" : String(value)]));
+  return next;
+}
+
+function applyRecipe(recipe) {
+  if (!tables.length) throw new Error("Open a CSV first, or load a demo that matches this recipe.");
+  if (recipe.steps.some((s) => s.op === "join") && tables.length < 2) {
+    throw new Error("This recipe joins two files. Open a second CSV (or the two-inventory demo).");
+  }
+  snapshot();
+  let working = tables.map(cloneTable);
+  const aliases = recipe.columnAliases || {};
+  recipe.steps.forEach((step) => {
+    const op = step.op;
+    const match = step.fileMatch;
+    if (op === "harmonize") {
+      working = working.map((t) => harmonizeTable(t, aliases, step.columns));
+    } else if (op === "stack") {
+      const src = match ? matchTables(working, match) : working;
+      if (!src.length) throw new Error("Stack found no matching files.");
+      const stacked = stackTables(src, { sourceColumn: step.sourceColumn || null });
+      stacked.name = (step.output || "stacked") + ".csv";
+      if (match) {
+        const drop = new Set(src);
+        working = working.filter((t) => !drop.has(t)).concat([stacked]);
+      } else working = [stacked];
+    } else if (op === "rename" && step.map) {
+      working = applyToMatched(working, match, (t) => renameMap(t, step.map));
+    } else if (op === "select_columns" || op === "reorder") {
+      working = applyToMatched(working, match, (t) => selectColumns(t, step.columns));
+    } else if (op === "add_column") {
+      working = applyToMatched(working, match, (t) => addColumn(t, step.name, step.value));
+    } else if (op === "date_normalize" || op === "dateNormalize") {
+      working = applyToMatched(working, match, (t) => {
+        const al = aliases[step.column] || [];
+        const i = resolveCol(t.headers, step.column, al);
+        if (i < 0) return t;
+        return dateNormalizeTable(t, t.headers[i], step.output || "YYYY-MM-DD", step.preferMDY !== false);
+      });
+    } else if (op === "find_replace") {
+      working = applyToMatched(working, match, (t) => {
+        const cols = step.column ? [step.column] : [];
+        return findReplaceTable(t, cols, step.find, step.replace == null ? "" : step.replace, {
+          cs: step.ignoreCase === false,
+          regex: !!step.regex,
+          whole: !!step.whole
+        }).table;
+      });
+    } else if (op === "lowercase") {
+      working = applyToMatched(working, match, (t) => lowercaseCol(t, step.column, step.columnAliases || aliases[step.column]));
+    } else if (op === "filter") {
+      working = applyToMatched(working, match, (t) => filterTable(t, [{
+        col: step.column, op: step.operator || "eq", value: step.value
+      }], "and"));
+    } else if (op === "join") {
+      const L = step.leftMatch ? matchTables(working, step.leftMatch)[0] : working[0];
+      const R = step.rightMatch ? matchTables(working, step.rightMatch)[0] : working[1];
+      if (!L || !R) throw new Error("Join needs two matching files.");
+      const joined = joinTables(L, R, {
+        type: step.type || "left",
+        leftKey: step.leftKey,
+        rightKey: step.rightKey,
+        keyAliases: step.keyAliases || aliases.sku
+      });
+      joined.name = (step.output || "joined") + ".csv";
+      working = working.filter((t) => t !== L && t !== R).concat([joined]);
+    } else if (op === "dedupe") {
+      working = applyToMatched(working, match, (t) => dedupeTable(t, step.columns, step.keep || "first", step.columnAliases));
+    } else if (op === "trim") {
+      working = applyToMatched(working, match, trimTable);
+    } else if (op === "dropEmptyRows") {
+      working = applyToMatched(working, match, dropEmptyRows);
+    } else if (op === "dropEmptyColumns") {
+      working = applyToMatched(working, match, dropEmptyColumns);
+    } else if (op === "sort") {
+      working = applyToMatched(working, match, (t) => sortTable(t, step.column, step.dir || "asc"));
+    }
+  });
+  const rows = working.reduce((n, t) => n + t.rows.length, 0);
+  assertCanAdd(working.length, rows, 0);
+  working.forEach((t) => { t.id = uid(); });
+  tables = working;
+  activeId = working[0].id;
+  page = 1;
+}
+
+function openRecipe(recipe) {
+  const matches = [];
+  (recipe.steps || []).forEach((s) => {
+    if (s.fileMatch) matches.push(Array.isArray(s.fileMatch) ? s.fileMatch.join(", ") : s.fileMatch);
+    if (s.leftMatch) matches.push(s.leftMatch);
+    if (s.rightMatch) matches.push(s.rightMatch);
+  });
+  const uniq = [];
+  matches.forEach((m) => { if (uniq.indexOf(m) === -1) uniq.push(m); });
+  const hint = uniq.length
+    ? "Looks for file names containing: " + esc(uniq.join(", ")) + "."
+    : "Uses the files now on the counter.";
+  openPanel(recipe.name, esc(recipe.description || ""),
+    "<p class=\"lead\">" + hint + "</p>",
+    "Run recipe",
+    function () {
+      applyRecipe(recipe);
+      afterOp("Recipe finished: " + recipe.name + ".");
+    });
+}
+
+async function openFiles(fileList) {
+  const files = Array.prototype.slice.call(fileList || []);
+  if (!files.length) return;
+  let added = 0;
+  snapshot();
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    try {
+      if (f.size > MAX_BYTES) throw new Error("This file is " + fmtBytes(f.size) + ". Kitchen stops at about " + fmtBytes(MAX_BYTES) + " so the browser stays responsive.");
+      const text = await f.text();
+      ingestCSV(f.name, text, f.size);
+      added++;
+    } catch (e) {
+      toast(f.name + ": " + (e.message || e), true);
+    }
+  }
+  if (!added && undoStack.length) {
+    restore(undoStack.pop());
+  }
+  render();
+  if (added) toast("Opened " + added + " file" + (added === 1 ? "" : "s") + ".");
+}
+
+function loadDemo(key) {
+  const pack = DEMOS[key];
+  if (!pack) return;
+  snapshot();
+  tables = [];
+  activeId = null;
+  let n = 0;
+  try {
+    pack.forEach((f) => {
+      if (tables.length >= MAX_FILES) return;
+      ingestCSV(f.name, f.csv, f.csv.length);
+      n++;
+    });
+  } catch (e) {
+    toast(e.message || String(e), true);
+  }
+  render();
+  if (n < pack.length && LITE) toast("Lite opened the first " + n + " demo files (2-file cap).");
+  else if (n) toast("Loaded " + n + " synthetic file" + (n === 1 ? "" : "s") + ". Not real people or accounts.");
+}
+
+function boot() {
+  render();
+  document.getElementById("btnOpen").onclick = function () { document.getElementById("fileInput").click(); };
+  document.getElementById("btnOpen2").onclick = function () { document.getElementById("fileInput").click(); };
+  document.getElementById("fileInput").onchange = function (e) { openFiles(e.target.files); e.target.value = ""; };
+  document.getElementById("btnLoadRecipe").onclick = function () { document.getElementById("recipeInput").click(); };
+  document.getElementById("recipeInput").onchange = function (e) {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    f.text().then((txt) => {
+      const rec = JSON.parse(txt);
+      if (!rec || !rec.steps) throw new Error("That JSON is not a recipe.");
+      if (!rec.id) rec.id = "loaded-" + uid();
+      extraRecipes.push(rec);
+      render();
+      openRecipe(rec);
+    }).catch((err) => toast(err.message || "Could not read that recipe.", true));
+  };
+  document.getElementById("demoSelect").onchange = function (e) {
+    const v = e.target.value; e.target.value = "";
+    if (v) loadDemo(v);
+  };
+  document.getElementById("btnDemo").onclick = function () { loadDemo("payments"); };
+  document.getElementById("btnUndo").onclick = doUndo;
+  document.getElementById("btnRedo").onclick = doRedo;
+  document.getElementById("btnHelp").onclick = openHelp;
+  document.getElementById("btnHelpClose").onclick = closeOverlays;
+  document.getElementById("btnExport").onclick = openExport;
+  document.getElementById("scrim").onclick = closeOverlays;
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeOverlays();
+    const mod = e.metaKey || e.ctrlKey;
+    if (mod && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); }
+    if (mod && e.key.toLowerCase() === "y") { e.preventDefault(); doRedo(); }
+    if (mod && e.key.toLowerCase() === "s") { e.preventDefault(); if (activeTable()) openExport(); }
+  });
+  document.getElementById("toolbar").onclick = function (e) {
+    const b = e.target.closest("button[data-tool]");
+    if (!b || b.disabled) return;
+    const fn = {
+      stack: openStack, join: openJoin, split: openSplit, dedupe: openDedupe,
+      filter: openFilter, columns: openColumns, replace: openReplace,
+      dates: openDates, clean: openClean, sort: openSort
+    }[b.getAttribute("data-tool")];
+    if (fn) fn();
+  };
+  document.getElementById("fileList").onclick = function (e) {
+    const del = e.target.closest("[data-del]");
+    if (del) {
+      snapshot();
+      tables = tables.filter((t) => t.id !== del.getAttribute("data-del"));
+      if (!tables.some((t) => t.id === activeId)) activeId = tables[0] ? tables[0].id : null;
+      page = 1;
+      render();
+      return;
+    }
+    const pick = e.target.closest("[data-act]");
+    if (pick) { activeId = pick.getAttribute("data-act"); page = 1; render(); }
+  };
+  document.getElementById("recipeList").onclick = function (e) {
+    const b = e.target.closest("[data-recipe]");
+    if (!b) return;
+    const rec = allRecipes().find((r) => r.id === b.getAttribute("data-recipe"));
+    if (rec) openRecipe(rec);
+  };
+  document.getElementById("pager").onclick = function (e) {
+    if (e.target.id === "pgPrev" && page > 1) { page--; renderSheet(); }
+    if (e.target.id === "pgNext") { page++; renderSheet(); }
+  };
+  document.getElementById("tableHost").onclick = function (e) {
+    const th = e.target.closest("th[data-sort]");
+    if (!th || !activeTable()) return;
+    const col = th.getAttribute("data-sort");
+    const dir = sortState.col === col && sortState.dir === "asc" ? "desc" : "asc";
+    snapshot();
+    replaceActive(sortTable(activeTable(), col, dir));
+    sortState = { col: col, dir: dir };
+    render();
+  };
+  const drop = document.getElementById("dropZone");
+  const wrap = document.getElementById("sheetWrap");
+  function bindDrop(el) {
+    el.addEventListener("dragover", function (e) { e.preventDefault(); el.classList.add("over"); });
+    el.addEventListener("dragleave", function () { el.classList.remove("over"); });
+    el.addEventListener("drop", function (e) {
+      e.preventDefault();
+      el.classList.remove("over");
+      if (e.dataTransfer && e.dataTransfer.files) openFiles(e.dataTransfer.files);
+    });
+  }
+  bindDrop(drop);
+  bindDrop(wrap);
+  document.addEventListener("dragover", function (e) { e.preventDefault(); });
+  document.addEventListener("drop", function (e) {
+    if (e.target === document.documentElement || e.target === document.body) {
+      e.preventDefault();
+      if (e.dataTransfer && e.dataTransfer.files) openFiles(e.dataTransfer.files);
+    }
+  });
+}
+
+
+const RECIPES = [
+  {
+    "name": "Stripe + PayPal + bank month ledger",
+    "description": "Rename three payment exports onto a shared column set, tag the source, stack them, and normalize dates to YYYY-MM-DD.",
+    "version": 1,
+    "steps": [
+      {
+        "op": "rename",
+        "fileMatch": "stripe",
+        "map": {
+          "id": "txn_id",
+          "created": "date",
+          "amount": "amount",
+          "description": "memo",
+          "customer_email": "counterparty",
+          "type": "kind"
+        }
+      },
+      {
+        "op": "select_columns",
+        "fileMatch": "stripe",
+        "columns": [
+          "date",
+          "amount",
+          "memo",
+          "counterparty",
+          "kind",
+          "txn_id"
+        ]
+      },
+      {
+        "op": "add_column",
+        "fileMatch": "stripe",
+        "name": "source",
+        "value": "stripe"
+      },
+      {
+        "op": "rename",
+        "fileMatch": "paypal",
+        "map": {
+          "Transaction ID": "txn_id",
+          "Date": "date",
+          "Gross": "amount",
+          "Name": "counterparty",
+          "Type": "kind"
+        }
+      },
+      {
+        "op": "select_columns",
+        "fileMatch": "paypal",
+        "columns": [
+          "date",
+          "amount",
+          "counterparty",
+          "kind",
+          "txn_id"
+        ]
+      },
+      {
+        "op": "add_column",
+        "fileMatch": "paypal",
+        "name": "memo",
+        "value": ""
+      },
+      {
+        "op": "add_column",
+        "fileMatch": "paypal",
+        "name": "source",
+        "value": "paypal"
+      },
+      {
+        "op": "rename",
+        "fileMatch": "bank",
+        "map": {
+          "Date": "date",
+          "Description": "memo",
+          "Amount": "amount",
+          "Check Number": "txn_id"
+        }
+      },
+      {
+        "op": "select_columns",
+        "fileMatch": "bank",
+        "columns": [
+          "date",
+          "amount",
+          "memo",
+          "txn_id"
+        ]
+      },
+      {
+        "op": "add_column",
+        "fileMatch": "bank",
+        "name": "counterparty",
+        "value": ""
+      },
+      {
+        "op": "add_column",
+        "fileMatch": "bank",
+        "name": "kind",
+        "value": "bank"
+      },
+      {
+        "op": "add_column",
+        "fileMatch": "bank",
+        "name": "source",
+        "value": "bank"
+      },
+      {
+        "op": "stack",
+        "fileMatch": [
+          "stripe",
+          "paypal",
+          "bank"
+        ],
+        "output": "month_ledger"
+      },
+      {
+        "op": "reorder",
+        "fileMatch": "month_ledger",
+        "columns": [
+          "date",
+          "source",
+          "kind",
+          "amount",
+          "memo",
+          "counterparty",
+          "txn_id"
+        ]
+      },
+      {
+        "op": "date_normalize",
+        "fileMatch": "month_ledger",
+        "column": "date"
+      }
+    ],
+    "id": "month-ledger"
+  },
+  {
+    "name": "Email list dedupe",
+    "description": "Trim and lowercase the email column, then keep the first row per address.",
+    "version": 1,
+    "steps": [
+      {
+        "op": "find_replace",
+        "fileMatch": "email",
+        "column": "email",
+        "find": " ",
+        "replace": "",
+        "ignoreCase": false
+      },
+      {
+        "op": "lowercase",
+        "fileMatch": "email",
+        "column": "email"
+      },
+      {
+        "op": "filter",
+        "fileMatch": "email",
+        "column": "email",
+        "operator": "not_empty",
+        "value": ""
+      },
+      {
+        "op": "dedupe",
+        "fileMatch": "email",
+        "columns": [
+          "email"
+        ],
+        "keep": "first"
+      }
+    ],
+    "id": "email-dedupe"
+  },
+  {
+    "name": "Survey export cleaner",
+    "description": "Rename typical form-tool headers, drop blank emails, normalize submitted dates, and collapse whitespace in comments.",
+    "version": 1,
+    "steps": [
+      {
+        "op": "rename",
+        "fileMatch": "survey",
+        "map": {
+          "Respondent ID": "respondent_id",
+          "Submitted At": "submitted",
+          "Email Address": "email",
+          "How did you hear about us?": "source",
+          "Would you recommend us?": "recommend",
+          "Comments": "comments"
+        }
+      },
+      {
+        "op": "filter",
+        "fileMatch": "survey",
+        "column": "email",
+        "operator": "not_empty",
+        "value": ""
+      },
+      {
+        "op": "lowercase",
+        "fileMatch": "survey",
+        "column": "email"
+      },
+      {
+        "op": "date_normalize",
+        "fileMatch": "survey",
+        "column": "submitted"
+      },
+      {
+        "op": "find_replace",
+        "fileMatch": "survey",
+        "column": "comments",
+        "find": "  ",
+        "replace": " ",
+        "ignoreCase": false
+      }
+    ],
+    "id": "survey-cleaner"
+  },
+  {
+    "name": "Inventory SKU join",
+    "description": "Left-join warehouse counts onto the shop catalog using SKU.",
+    "version": 1,
+    "steps": [
+      {
+        "op": "rename",
+        "fileMatch": "catalog",
+        "map": {
+          "SKU": "sku",
+          "Product": "product",
+          "Price": "price"
+        }
+      },
+      {
+        "op": "rename",
+        "fileMatch": "warehouse",
+        "map": {
+          "SKU": "sku",
+          "On Hand": "on_hand",
+          "Bin": "bin"
+        }
+      },
+      {
+        "op": "join",
+        "leftMatch": "catalog",
+        "rightMatch": "warehouse",
+        "leftKey": "sku",
+        "rightKey": "sku",
+        "type": "left",
+        "output": "inventory_joined"
+      }
+    ],
+    "id": "inventory-sku-join"
+  },
+  {
+    "name": "Donation export merge",
+    "description": "Rename two donation-platform exports and stack them into one gift list.",
+    "version": 1,
+    "steps": [
+      {
+        "op": "rename",
+        "fileMatch": "givebutter",
+        "map": {
+          "Donation ID": "gift_id",
+          "Donated At": "date",
+          "Amount": "amount",
+          "Donor Email": "email",
+          "Donor Name": "name",
+          "Campaign": "campaign"
+        }
+      },
+      {
+        "op": "add_column",
+        "fileMatch": "givebutter",
+        "name": "source",
+        "value": "givebutter"
+      },
+      {
+        "op": "rename",
+        "fileMatch": "donorbox",
+        "map": {
+          "id": "gift_id",
+          "created": "date",
+          "gross": "amount",
+          "email": "email",
+          "name": "name",
+          "form": "campaign"
+        }
+      },
+      {
+        "op": "add_column",
+        "fileMatch": "donorbox",
+        "name": "source",
+        "value": "donorbox"
+      },
+      {
+        "op": "stack",
+        "fileMatch": [
+          "givebutter",
+          "donorbox"
+        ],
+        "output": "donations"
+      },
+      {
+        "op": "date_normalize",
+        "fileMatch": "donations",
+        "column": "date"
+      },
+      {
+        "op": "lowercase",
+        "fileMatch": "donations",
+        "column": "email"
+      },
+      {
+        "op": "reorder",
+        "fileMatch": "donations",
+        "columns": [
+          "date",
+          "source",
+          "name",
+          "email",
+          "amount",
+          "campaign",
+          "gift_id"
+        ]
+      }
+    ],
+    "id": "donation-merge"
+  },
+  {
+    "name": "Weekly timesheet stack",
+    "description": "Stack weekly time exports and normalize work dates.",
+    "version": 1,
+    "steps": [
+      {
+        "op": "rename",
+        "fileMatch": "week",
+        "map": {
+          "Work Date": "work_date",
+          "Staff": "staff",
+          "Project": "project",
+          "Hours": "hours",
+          "Notes": "notes"
+        }
+      },
+      {
+        "op": "stack",
+        "fileMatch": [
+          "week"
+        ],
+        "output": "timesheets"
+      },
+      {
+        "op": "date_normalize",
+        "fileMatch": "timesheets",
+        "column": "work_date"
+      },
+      {
+        "op": "filter",
+        "fileMatch": "timesheets",
+        "column": "hours",
+        "operator": "not_empty",
+        "value": ""
+      }
+    ],
+    "id": "timesheet-stack",
+  {
+    "name": "Roster week stack",
+    "description": "Stack last-week and this-week roster files (columns: email, name, role), lowercase email, then keep the first row per email.",
+    "version": 1,
+    "steps": [
+      {
+        "op": "stack",
+        "fileMatch": [
+          "last",
+          "this"
+        ],
+        "output": "roster"
+      },
+      {
+        "op": "lowercase",
+        "column": "email",
+        "fileMatch": "roster"
+      },
+      {
+        "op": "dedupe",
+        "keep": "first",
+        "columns": [
+          "email"
+        ],
+        "fileMatch": "roster"
+      },
+      {
+        "op": "select_columns",
+        "columns": [
+          "email",
+          "name",
+          "role"
+        ],
+        "fileMatch": "roster"
+      }
+    ],
+    "id": "roster-week-stack"
+  }
+  }
+];
+
+const DEMOS = {
+  "payments": [
+    {
+      "name": "stripe.csv",
+      "csv": "id,created,amount,currency,description,type,customer_email\nch_1001,2026-07-02,45.00,usd,Office supplies,charge,ada@example.com\nch_1002,2026-07-03,120.00,usd,Consulting block,charge,ben@example.net\nch_1003,2026-07-08,18.50,usd,Sticker pack,charge,cara@example.org\nch_1004,2026-07-11,-18.50,usd,Sticker pack refund,refund,cara@example.org\nch_1005,2026-07-15,75.00,usd,Workshop seat,charge,drew@example.com\n"
+    },
+    {
+      "name": "paypal.csv",
+      "csv": "Transaction ID,Date,Gross,Fee,Net,Name,Email,Type\nPP-9001,07/01/2026,32.00,-1.23,30.77,Eli Example,eli@example.com,Express Checkout\nPP-9002,07/04/2026,90.00,-2.91,87.09,Fay Example,fay@example.net,Mass Pay\nPP-9003,07/09/2026,12.00,-0.65,11.35,Gus Example,gus@example.org,Express Checkout\nPP-9004,07/16/2026,-12.00,0.00,-12.00,Gus Example,gus@example.org,Payment Refund\n"
+    },
+    {
+      "name": "bank.csv",
+      "csv": "Date,Description,Amount,Balance,Check Number\n2026-07-01,Opening balance,0.00,2400.00,\n2026-07-03,STRIPE TRANSFER,162.40,2562.40,\n2026-07-06,PAYPAL TRANSFER,118.21,2680.61,\n2026-07-10,CITY WATER,-42.18,2638.43,1044\n2026-07-14,ACH PAYROLL,-800.00,1838.43,\n2026-07-18,STRIPE TRANSFER,73.80,1912.23,\n"
+    }
+  ],
+  "emails": [
+    {
+      "name": "email-list.csv",
+      "csv": "email,first,last,tag\nada@example.com,Ada,Meridian,donor\nnia@example.net,Nia,Colfax,newsletter\nAda@example.com,Ada,Meridian,volunteer\nross@example.test,Ross,Kepler,donor\nnia@example.net,Nia,Colfax,event\nsol@example.org,Sol,Rivera,newsletter\n"
+    }
+  ],
+  "survey": [
+    {
+      "name": "survey-export.csv",
+      "csv": "Respondent ID,Submitted At,Email Address,How did you hear about us?,Would you recommend us?,Comments\nR-01,3/1/2026 9:14,ada@example.com,Friend,Yes,Great session\nR-02,3/1/2026 10:02,nia@example.net,Search,Yes,  A bit short  \nR-03,03/02/2026,,Flyer,No,\nR-04,2026-03-02 16:40,ross@example.test,Friend,Yes,Needed more handouts\n"
+    }
+  ],
+  "inventory": [
+    {
+      "name": "catalog.csv",
+      "csv": "SKU,Product,Price\nSKU-1001,Linen tea towel,18.00\nSKU-1002,Stoneware mug,14.00\nSKU-1003,Oak spoon,9.00\nSKU-1004,Cotton apron,28.00\nSKU-1005,Beeswax wrap,12.00\n"
+    },
+    {
+      "name": "warehouse.csv",
+      "csv": "SKU,On Hand,Bin\nSKU-1001,12,A-1\nSKU-1003,9,A-3\nSKU-1005,18,A-5\nSKU-1008,11,B-8\n"
+    }
+  ],
+  "donations": [
+    {
+      "name": "givebutter-export.csv",
+      "csv": "Donation ID,Donated At,Amount,Donor Email,Donor Name,Campaign\nGB-11,03/02/2026,250,ada@example.com,Ada Meridian,Spring gala\nGB-12,03/02/2026,75,nia@example.net,Nia Colfax,Spring gala\nGB-13,03/04/2026,1000,ross@example.test,Ross Kepler,Spring gala\n"
+    },
+    {
+      "name": "donorbox-export.csv",
+      "csv": "id,created,gross,email,name,form\nDB-21,2026-03-08,40,sol@example.org,Sol Rivera,March letter\nDB-22,2026-03-10,50,ada@example.com,Ada Meridian,March letter\nDB-23,12 Mar 2026,120,pax@example.net,Pax Linden,March letter\n"
+    }
+  ],
+  "timesheets": [
+    {
+      "name": "week-10.csv",
+      "csv": "Work Date,Staff,Project,Hours,Notes\n03/02/2026,Nia Colfax,Archive,6.5,\n03/03/2026,Ross Kepler,Intake,8,\n03/04/2026,Sol Rivera,Archive,4,Half day\n"
+    },
+    {
+      "name": "week-11.csv",
+      "csv": "Work Date,Staff,Project,Hours,Notes\n03/09/2026,Nia Colfax,Archive,7,\n03/10/2026,Ross Kepler,Intake,8,\n03/11/2026,Ada Meridian,Outreach,3,\n"
+    }
+  ]
+};
+
+boot();
+</script>
+</body>
+</html>

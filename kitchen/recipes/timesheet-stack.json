@@ -1,0 +1,38 @@
+{
+  "name": "Weekly timesheet stack",
+  "description": "Stack weekly time exports and normalize work dates.",
+  "version": 1,
+  "steps": [
+    {
+      "op": "rename",
+      "fileMatch": "week",
+      "map": {
+        "Work Date": "work_date",
+        "Staff": "staff",
+        "Project": "project",
+        "Hours": "hours",
+        "Notes": "notes"
+      }
+    },
+    {
+      "op": "stack",
+      "fileMatch": [
+        "week"
+      ],
+      "output": "timesheets"
+    },
+    {
+      "op": "date_normalize",
+      "fileMatch": "timesheets",
+      "column": "work_date"
+    },
+    {
+      "op": "filter",
+      "fileMatch": "timesheets",
+      "column": "hours",
+      "operator": "not_empty",
+      "value": ""
+    }
+  ],
+  "id": "timesheet-stack"
+}

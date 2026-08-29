@@ -1,0 +1,45 @@
+{
+  "name": "Survey export cleaner",
+  "description": "Rename typical form-tool headers, drop blank emails, normalize submitted dates, and collapse whitespace in comments.",
+  "version": 1,
+  "steps": [
+    {
+      "op": "rename",
+      "fileMatch": "survey",
+      "map": {
+        "Respondent ID": "respondent_id",
+        "Submitted At": "submitted",
+        "Email Address": "email",
+        "How did you hear about us?": "source",
+        "Would you recommend us?": "recommend",
+        "Comments": "comments"
+      }
+    },
+    {
+      "op": "filter",
+      "fileMatch": "survey",
+      "column": "email",
+      "operator": "not_empty",
+      "value": ""
+    },
+    {
+      "op": "lowercase",
+      "fileMatch": "survey",
+      "column": "email"
+    },
+    {
+      "op": "date_normalize",
+      "fileMatch": "survey",
+      "column": "submitted"
+    },
+    {
+      "op": "find_replace",
+      "fileMatch": "survey",
+      "column": "comments",
+      "find": "  ",
+      "replace": " ",
+      "ignoreCase": false
+    }
+  ],
+  "id": "survey-cleaner"
+}

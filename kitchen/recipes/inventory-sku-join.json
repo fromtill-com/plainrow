@@ -1,0 +1,35 @@
+{
+  "name": "Inventory SKU join",
+  "description": "Left-join warehouse counts onto the shop catalog using SKU.",
+  "version": 1,
+  "steps": [
+    {
+      "op": "rename",
+      "fileMatch": "catalog",
+      "map": {
+        "SKU": "sku",
+        "Product": "product",
+        "Price": "price"
+      }
+    },
+    {
+      "op": "rename",
+      "fileMatch": "warehouse",
+      "map": {
+        "SKU": "sku",
+        "On Hand": "on_hand",
+        "Bin": "bin"
+      }
+    },
+    {
+      "op": "join",
+      "leftMatch": "catalog",
+      "rightMatch": "warehouse",
+      "leftKey": "sku",
+      "rightKey": "sku",
+      "type": "left",
+      "output": "inventory_joined"
+    }
+  ],
+  "id": "inventory-sku-join"
+}

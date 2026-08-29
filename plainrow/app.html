@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plainrow Lite</title>
+<meta name="description" content="Offline CSV tool. Open two files, stack them, dedupe, export. Files never leave this computer.">
+<style>
+:root {
+  --paper: #f3eee4;
+  --paper-2: #eae3d6;
+  --ink: #1c1915;
+  --muted: #6a6358;
+  --line: #d4cbbd;
+  --surface: #fffdf8;
+  --pine: #0f5c4c;
+  --pine-2: #0a4338;
+  --pine-soft: #e3f0eb;
+  --brick: #8f2d2d;
+  --amber: #8a5a12;
+  --shadow: 0 1px 0 rgba(28,25,21,.05), 0 10px 28px rgba(28,25,21,.07);
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --rail: 252px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at top, rgba(15,92,76,.05), transparent 42%),
+    repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(28,25,21,.015) 20px),
+    var(--paper);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3 { font-weight: 600; margin: 0; }
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.brand { display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; }
+.wordmark {
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+.wordmark::after {
+  content: "";
+  display: block;
+  width: 2.1em;
+  height: 2px;
+  margin-top: 5px;
+  background: var(--pine);
+}
+.edition {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pine);
+  font-weight: 650;
+}
+.tagline { margin: 0; color: var(--muted); font-size: 0.86rem; flex: 1; }
+.top-actions { display: flex; gap: 8px; }
+
+.litebar {
+  background: #214136;
+  color: #f3eee4;
+  text-align: center;
+  padding: 7px 16px;
+  font-size: 0.82rem;
+}
+
+.app { display: flex; flex: 1; min-height: 0; }
+.rail {
+  width: var(--rail);
+  flex-shrink: 0;
+  border-right: 1px solid var(--line);
+  background: var(--paper-2);
+  padding: 16px 14px 24px;
+  overflow: auto;
+}
+.rail section + section { margin-top: 22px; }
+.rail h2 {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.file-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 8px 8px 10px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.file-item.active { border-color: var(--pine); box-shadow: 0 0 0 2px var(--pine-soft); }
+.file-item button.pick {
+  flex: 1; text-align: left; background: none; border: 0; padding: 0;
+}
+.file-item .name { display: block; font-weight: 600; font-size: 0.86rem; word-break: break-word; }
+.file-item .meta { display: block; color: var(--muted); font-size: 0.74rem; margin-top: 2px; }
+.icon-btn {
+  background: none; border: 0; color: var(--muted); padding: 2px 6px; border-radius: 4px;
+}
+.icon-btn:hover { background: var(--paper-2); color: var(--brick); }
+
+.recipe-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 8px 8px 10px;
+  margin-bottom: 6px;
+}
+.recipe-item.teaser {
+  background: #f6f1e8;
+  border-color: #cfc6b7;
+  opacity: 0.9;
+}
+.recipe-item.teaser:hover { opacity: 1; border-color: #b8ae9f; }
+.recipe-item button.pick {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.recipe-item .name { display: block; font-weight: 600; font-size: 0.86rem; word-break: break-word; }
+
+.toolbar button.teaser {
+  color: #3f3b36;
+  background: #f6f1e8;
+  border-color: #cfc6b7;
+  opacity: 0.9;
+}
+.toolbar button.teaser:hover { opacity: 1; border-color: #b8ae9f; }
+.k-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--pine-2);
+  background: var(--pine-soft);
+  border: 1px solid #c5d9d2;
+  border-radius: 999px;
+  padding: 1px 6px 1px 5px;
+  vertical-align: 1px;
+  line-height: 1.45;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.k-lock {
+  display: inline-block;
+  width: 7px;
+  height: 6px;
+  border: 1.35px solid currentColor;
+  border-radius: 1px 1px 1.5px 1.5px;
+  position: relative;
+  box-sizing: border-box;
+}
+.k-lock::before {
+  content: "";
+  position: absolute;
+  left: 0.55px;
+  top: -4px;
+  width: 2.5px;
+  height: 3.2px;
+  border: 1.35px solid currentColor;
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+}
+
+.drop {
+  border: 1px dashed #b7ad9d;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  background: rgba(255,253,248,.5);
+  margin: 8px 0;
+}
+.drop.over, .sheet-wrap.over { border-color: var(--pine); background: var(--pine-soft); color: var(--pine-2); }
+.demo-label { display: block; font-size: 0.74rem; color: var(--muted); margin-top: 8px; }
+.demo-label select, .field select, .field input[type="text"] {
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.btn, .toolbar button, .top-actions button, .drop button, .sheet-head button, .panel .btn {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+}
+.btn:hover, .toolbar button:hover, .top-actions button:hover, .sheet-head button:hover { border-color: #b8ae9f; }
+.btn.primary, #btnExport, #btnOpen {
+  background: var(--pine);
+  color: #f6f3ec;
+  border-color: var(--pine-2);
+}
+.btn.primary:hover, #btnExport:hover, #btnOpen:hover { background: var(--pine-2); }
+.btn:disabled, .toolbar button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 12px 16px 0; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.toolbar button { background: var(--surface); }
+.sheet-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.sheet-head h1 { font-family: var(--serif); font-size: 1.25rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.warns { color: var(--amber); font-size: 0.8rem; margin-bottom: 6px; }
+
+.sheet-wrap {
+  flex: 1; min-height: 180px;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+table.data { border-collapse: collapse; min-width: 100%; font-family: var(--mono); font-size: 12.5px; }
+table.data th {
+  position: sticky; top: 0; z-index: 1;
+  background: #f4efe6;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  font-weight: 650;
+}
+table.data td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #efe8dc;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+table.data td.rn, table.data th.rn {
+  color: var(--muted); width: 1%; text-align: right; cursor: default; font-variant-numeric: tabular-nums;
+}
+table.data tbody tr:hover td { background: #f7f3ea; }
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--muted);
+}
+.empty h2 { font-family: var(--serif); font-size: 1.6rem; color: var(--ink); margin-bottom: 8px; }
+.empty p { max-width: 420px; margin: 0 auto 16px; line-height: 1.5; }
+
+.pager { display: flex; align-items: center; gap: 10px; padding: 8px 2px 12px; font-size: 0.8rem; color: var(--muted); }
+.pager button { padding: 4px 8px; }
+
+.foot {
+  border-top: 1px solid var(--line);
+  padding: 7px 16px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.scrim { position: fixed; inset: 0; background: rgba(28,25,21,.28); z-index: 20; }
+.panel {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(400px, 100%);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  z-index: 21;
+  padding: 18px 18px 28px;
+  overflow: auto;
+  box-shadow: var(--shadow);
+}
+.panel h2 { font-family: var(--serif); font-size: 1.35rem; margin-bottom: 6px; }
+.panel .lead { color: var(--muted); font-size: 0.86rem; margin: 0 0 14px; line-height: 1.45; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 0.78rem; font-weight: 650; }
+.checks label { font-weight: 400; display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 0.84rem; }
+.panel-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+.help {
+  position: fixed; inset: 8vh 12vw; z-index: 22;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 22px 26px;
+  overflow: auto;
+}
+.help h2 { font-family: var(--serif); font-size: 1.6rem; margin-bottom: 8px; }
+.help p, .help li { color: #3c3832; line-height: 1.5; font-size: 0.92rem; }
+.help ol { padding-left: 1.2rem; }
+
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: #f3eee4;
+  padding: 10px 14px; border-radius: 8px;
+  z-index: 30; max-width: min(560px, 92vw);
+  font-size: 0.88rem; box-shadow: var(--shadow);
+}
+.toast.err { background: var(--brick); }
+
+@media (max-width: 860px) {
+  .app { flex-direction: column; }
+  .rail { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); max-height: 280px; }
+  .tagline { display: none; }
+  .help { inset: 4vh 4vw; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="wordmark">Plainrow</div>
+    <div class="edition">Lite</div>
+  </div>
+  <p class="tagline">A file formatter you run locally. We never see your data.</p>
+  <div class="top-actions">
+    <button type="button" id="btnUndo" disabled>Undo</button>
+    <button type="button" id="btnRedo" disabled>Redo</button>
+    <button type="button" id="btnHelp">How this works</button>
+  </div>
+</header>
+<div class="litebar">Kitchen has more tools.</div>
+<div class="app">
+  <aside class="rail">
+    <section>
+      <h2>Counter</h2>
+      <div id="fileList"></div>
+      <div class="drop" id="dropZone">
+        Drop CSV files here
+        <div style="margin-top:8px"><button type="button" class="btn primary" id="btnOpen">Open CSV</button></div>
+      </div>
+      <input type="file" id="fileInput" accept=".csv,text/csv,text/plain,.tsv,text/tab-separated-values" multiple hidden>
+      <label class="demo-label">Try a synthetic demo
+        <select id="demoSelect">
+          <option value="">Choose a sample…</option>
+          <option value="timesheets">Two weekly timesheets (stack)</option>
+          <option value="emails">Email list with duplicates</option>
+        </select>
+      </label>
+    </section>
+    <section>
+      <h2>Recipes</h2>
+      <div id="recipeList">
+        <div class="recipe-item teaser">
+          <button type="button" class="pick teaser" data-kitchen="Stripe + PayPal + bank month ledger">
+            <span class="name">Stripe + PayPal + bank month ledger</span>
+            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
+          </button>
+        </div>
+        <div class="recipe-item teaser">
+          <button type="button" class="pick teaser" data-kitchen="Email list dedupe">
+            <span class="name">Email list dedupe</span>
+            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
+          </button>
+        </div>
+        <div class="recipe-item teaser">
+          <button type="button" class="pick teaser" data-kitchen="Survey export cleaner">
+            <span class="name">Survey export cleaner</span>
+            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
+          </button>
+        </div>
+        <div class="recipe-item teaser">
+          <button type="button" class="pick teaser" data-kitchen="Inventory SKU join">
+            <span class="name">Inventory SKU join</span>
+            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
+          </button>
+        </div>
+        <div class="recipe-item teaser">
+          <button type="button" class="pick teaser" data-kitchen="Donation export merge">
+            <span class="name">Donation export merge</span>
+            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
+          </button>
+        </div>
+        <div class="recipe-item teaser">
+          <button type="button" class="pick teaser" data-kitchen="Weekly timesheet stack">
+            <span class="name">Weekly timesheet stack</span>
+            <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </aside>
+  <main class="main">
+    <div class="toolbar" id="toolbar">
+      <button type="button" id="btnStack" disabled>Stack</button>
+      <button type="button" class="teaser" data-kitchen="Join">Join <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
+      <button type="button" class="teaser" data-kitchen="Split">Split <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
+      <button type="button" id="btnDedupe" disabled>Dedupe</button>
+      <button type="button" class="teaser" data-kitchen="Filter">Filter <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
+      <button type="button" class="teaser" data-kitchen="Columns">Columns <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
+      <button type="button" class="teaser" data-kitchen="Replace">Replace <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
+      <button type="button" class="teaser" data-kitchen="Dates">Dates <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
+      <button type="button" class="teaser" data-kitchen="Clean">Clean <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
+      <button type="button" class="teaser" data-kitchen="Sort">Sort <span class="k-badge"><span class="k-lock" aria-hidden="true"></span>Kitchen</span></button>
+    </div>
+    <div class="sheet-head">
+      <h1 id="sheetName">No file open</h1>
+      <button type="button" id="btnExport" disabled>Export CSV</button>
+    </div>
+    <div class="warns" id="warnings"></div>
+    <div class="sheet-wrap" id="sheetWrap">
+      <div id="empty" class="empty">
+        <h2>Drop a CSV on the counter</h2>
+        <p>Open up to two CSV/TSV files, stack them, dedupe, export. Files never leave this computer. Kitchen has more tools.</p>
+        <button type="button" class="btn primary" id="btnOpen2">Open CSV</button>
+        <button type="button" class="btn" id="btnDemo">Load the stack demo</button>
+      </div>
+      <div id="tableHost" hidden></div>
+    </div>
+    <div class="pager" id="pager"></div>
+  </main>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="panel" id="panel" hidden></aside>
+<div class="help" id="help" hidden>
+  <h2>How this works</h2>
+  <p>Open up to two CSV/TSV files, stack them, dedupe, export. Files never leave this computer. Kitchen has more tools.</p>
+  <ol>
+    <li>Open CSV or TSV files with the picker, drag-and-drop, or a synthetic demo. Lite holds two files on the counter.</li>
+    <li>Stack unions columns and appends rows. Dedupe keeps the first or last row for each key.</li>
+    <li>Export writes a comma-separated file to this computer. A UTF-8 BOM is optional for Excel.</li>
+  </ol>
+  <p>Plainrow Lite is one HTML file. You do not install anything and you do not need a network after the file is on disk. There is no telemetry.</p>
+  <div class="panel-actions"><button type="button" class="btn primary" id="btnHelpClose">Close</button></div>
+</div>
+<footer class="foot" id="foot"></footer>
+<div class="toast" id="toast" hidden></div>
+<script>
+const MAX_FILES = 2;
+const PAGE = 50;
+const VERSION = "1.0";
+
+let tables = [];
+let activeId = null;
+let undoStack = [];
+let redoStack = [];
+let page = 1;
+let excelBom = true;
+
+function uid() {
+  return "t" + Math.random().toString(36).slice(2, 9);
+}
+function esc(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+function fmtBytes(n) {
+  if (n < 1024) return n + " B";
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+  return (n / (1024 * 1024)).toFixed(1) + " MB";
+}
+function approxSize(t) {
+  let n = t.headers.join(",").length;
+  for (const row of t.rows) n += row.join(",").length + 2;
+  return n;
+}
+function totalRows() {
+  return tables.reduce((n, t) => n + t.rows.length, 0);
+}
+function activeTable() {
+  return tables.find((t) => t.id === activeId) || null;
+}
+function cloneTable(t) {
+  return {
+    id: t.id,
+    name: t.name,
+    headers: t.headers.slice(),
+    rows: t.rows.map((r) => r.slice()),
+    warnings: t.warnings ? t.warnings.slice() : []
+  };
+}
+function snapshot() {
+  undoStack.push({
+    tables: tables.map(cloneTable),
+    activeId: activeId,
+    page: page
+  });
+  if (undoStack.length > 24) undoStack.shift();
+  redoStack = [];
+}
+function restore(s) {
+  tables = s.tables;
+  activeId = s.activeId;
+  page = s.page;
+}
+function doUndo() {
+  if (!undoStack.length) return;
+  redoStack.push({ tables: tables.map(cloneTable), activeId: activeId, page: page });
+  restore(undoStack.pop());
+  render();
+}
+function doRedo() {
+  if (!redoStack.length) return;
+  undoStack.push({ tables: tables.map(cloneTable), activeId: activeId, page: page });
+  restore(redoStack.pop());
+  render();
+}
+
+function detectDelim(text) {
+  let q = false, c = 0, t = 0, s = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      if (q && text[i + 1] === '"') { i++; continue; }
+      q = !q;
+    } else if (!q && (ch === "\n" || ch === "\r")) break;
+    else if (!q) {
+      if (ch === ",") c++;
+      else if (ch === "\t") t++;
+      else if (ch === ";") s++;
+    }
+  }
+  if (t > c && t >= s) return "\t";
+  if (s > c && s > t) return ";";
+  return ",";
+}
+
+function parseCSV(text) {
+  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+  const delim = detectDelim(text);
+  const rows = [];
+  let field = "";
+  let row = [];
+  let i = 0;
+  let inQuotes = false;
+  const n = text.length;
+  while (i < n) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
+      }
+      field += ch; i++; continue;
+    }
+    if (ch === '"') { inQuotes = true; i++; continue; }
+    if (ch === delim) { row.push(field); field = ""; i++; continue; }
+    if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      rows.push(row); row = [];
+      i++; continue;
+    }
+    field += ch; i++;
+  }
+  if (inQuotes) {
+    throw new Error("This file has an unclosed quote. Export again as CSV and retry.");
+  }
+  if (field.length || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
+  while (rows.length && rows[rows.length - 1].every((c) => String(c).trim() === "")) rows.pop();
+  if (!rows.length) throw new Error("That file is empty.");
+  const headers = rows[0].map((h, idx) => {
+    const s = String(h).trim();
+    return s || "column_" + (idx + 1);
+  });
+  const seen = Object.create(null);
+  for (let hi = 0; hi < headers.length; hi++) {
+    const key = headers[hi].toLowerCase();
+    if (seen[key] == null) seen[key] = 1;
+    else {
+      seen[key] += 1;
+      headers[hi] = headers[hi] + "_" + seen[key];
+    }
+  }
+  let uneven = 0;
+  const body = [];
+  for (let r = 1; r < rows.length; r++) {
+    const src = rows[r];
+    if (src.length !== headers.length) uneven++;
+    const next = [];
+    for (let c = 0; c < headers.length; c++) next.push(src[c] == null ? "" : String(src[c]));
+    body.push(next);
+  }
+  const warnings = [];
+  if (uneven) warnings.push(uneven + " row" + (uneven === 1 ? "" : "s") + " had a different number of fields and were padded or trimmed.");
+  return { headers: headers, rows: body, warnings: warnings, delim: delim };
+}
+
+function serializeCSV(headers, rows, bom) {
+  const all = [headers].concat(rows);
+  const lines = all.map((row) =>
+    row
+      .map((cell) => {
+        const s = cell == null ? "" : String(cell);
+        return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      })
+      .join(",")
+  );
+  const body = lines.join("\r\n") + "\r\n";
+  return bom ? "\uFEFF" + body : body;
+}
+
+function normName(s) {
+  return String(s || "").trim().toLowerCase();
+}
+function resolveCol(headers, name) {
+  const n = normName(name);
+  return headers.findIndex((h) => normName(h) === n);
+}
+
+function stackTables(list, opts) {
+  const sourceCol = opts && opts.sourceColumn;
+  const union = [];
+  const seen = Object.create(null);
+  list.forEach((t) => {
+    t.headers.forEach((h) => {
+      const k = normName(h);
+      if (!seen[k]) { seen[k] = h; union.push(h); }
+    });
+  });
+  if (sourceCol && !union.some((h) => normName(h) === normName(sourceCol))) union.push(sourceCol);
+  const rows = [];
+  list.forEach((t) => {
+    const idx = union.map((h) => {
+      if (sourceCol && normName(h) === normName(sourceCol)) return -2;
+      return resolveCol(t.headers, h);
+    });
+    t.rows.forEach((row) => {
+      rows.push(idx.map((i) => (i === -2 ? t.name : i < 0 ? "" : row[i])));
+    });
+  });
+  return {
+    id: uid(),
+    name: "stacked",
+    headers: union,
+    rows: rows,
+    warnings: []
+  };
+}
+
+function dedupeTable(table, colNames, keep) {
+  const idxs = colNames.map((c) => resolveCol(table.headers, c)).filter((i) => i >= 0);
+  if (!idxs.length) throw new Error("Pick at least one column to match on.");
+  const seen = new Map();
+  const order = [];
+  table.rows.forEach((row) => {
+    const key = idxs.map((i) => String(row[i] == null ? "" : row[i]).trim().toLowerCase()).join("\u0001");
+    if (keep === "last") {
+      if (seen.has(key)) order[seen.get(key)] = null;
+      seen.set(key, order.length);
+      order.push(row.slice());
+    } else if (!seen.has(key)) {
+      seen.set(key, true);
+      order.push(row.slice());
+    }
+  });
+  const next = cloneTable(table);
+  next.rows = order.filter(Boolean);
+  return next;
+}
+
+function replaceActive(next) {
+  const i = tables.findIndex((t) => t.id === activeId);
+  if (i < 0) {
+    tables.push(next);
+    activeId = next.id;
+  } else {
+    next.id = tables[i].id;
+    next.name = next.name || tables[i].name;
+    tables[i] = next;
+  }
+  page = 1;
+}
+
+function ingestCSV(name, text) {
+  if (tables.length >= MAX_FILES) {
+    throw new Error("Lite can open 2 files. Remove one from the counter.");
+  }
+  const parsed = parseCSV(text);
+  const t = {
+    id: uid(),
+    name: name || "untitled.csv",
+    headers: parsed.headers,
+    rows: parsed.rows,
+    warnings: parsed.warnings
+  };
+  tables.push(t);
+  activeId = t.id;
+  page = 1;
+  return t;
+}
+
+function toast(msg, err) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast" + (err ? " err" : "");
+  el.hidden = false;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { el.hidden = true; }, err ? 7000 : 3800);
+}
+
+function renderFiles() {
+  const host = document.getElementById("fileList");
+  if (!tables.length) { host.innerHTML = '<p class="meta" style="color:var(--muted);font-size:0.8rem;margin:0 0 8px">No files yet.</p>'; return; }
+  host.innerHTML = tables.map((t) =>
+    '<div class="file-item' + (t.id === activeId ? " active" : "") + '">' +
+      '<button type="button" class="pick" data-act="' + t.id + '">' +
+        '<span class="name">' + esc(t.name) + '</span>' +
+        '<span class="meta">' + t.rows.length.toLocaleString() + " rows · " + t.headers.length + " cols</span>" +
+      "</button>" +
+      '<button type="button" class="icon-btn" data-del="' + t.id + '" title="Remove">×</button>' +
+    "</div>"
+  ).join("");
+}
+
+function renderSheet() {
+  const t = activeTable();
+  const empty = document.getElementById("empty");
+  const host = document.getElementById("tableHost");
+  const name = document.getElementById("sheetName");
+  const warns = document.getElementById("warnings");
+  const pager = document.getElementById("pager");
+  document.getElementById("btnExport").disabled = !t;
+  document.getElementById("btnStack").disabled = tables.length < 2;
+  document.getElementById("btnDedupe").disabled = !t;
+  if (!t) {
+    empty.hidden = false;
+    host.hidden = true;
+    host.innerHTML = "";
+    name.textContent = "No file open";
+    warns.textContent = "";
+    pager.innerHTML = "";
+    return;
+  }
+  empty.hidden = true;
+  host.hidden = false;
+  name.textContent = t.name;
+  warns.textContent = (t.warnings || []).join(" ");
+  const pages = Math.max(1, Math.ceil(t.rows.length / PAGE));
+  if (page > pages) page = pages;
+  const start = (page - 1) * PAGE;
+  const slice = t.rows.slice(start, start + PAGE);
+  let html = '<table class="data"><thead><tr><th class="rn">#</th>';
+  t.headers.forEach((h) => {
+    html += "<th>" + esc(h) + "</th>";
+  });
+  html += "</tr></thead><tbody>";
+  slice.forEach((row, i) => {
+    html += '<tr><td class="rn">' + (start + i + 1) + "</td>";
+    row.forEach((c) => { html += "<td title=\"" + esc(c) + "\">" + esc(c) + "</td>"; });
+    html += "</tr>";
+  });
+  if (!slice.length) html += '<tr><td class="rn"></td><td colspan="' + t.headers.length + '" style="color:var(--muted);padding:18px">No rows.</td></tr>';
+  html += "</tbody></table>";
+  host.innerHTML = html;
+  pager.innerHTML =
+    '<button type="button" id="pgPrev"' + (page <= 1 ? " disabled" : "") + ">Prev</button>" +
+    "<span>Rows " + (t.rows.length ? (start + 1) : 0) + "–" + (start + slice.length) + " of " + t.rows.length.toLocaleString() + "</span>" +
+    '<button type="button" id="pgNext"' + (page >= pages ? " disabled" : "") + ">Next</button>";
+}
+
+function renderFoot() {
+  const files = tables.length;
+  const rows = totalRows();
+  const bytes = tables.reduce((n, t) => n + approxSize(t), 0);
+  document.getElementById("foot").textContent =
+    files + (files === 1 ? " file" : " files") + " · " +
+    rows.toLocaleString() + " rows in memory · " + fmtBytes(bytes) +
+    " · 2 files max · v" + VERSION + " · offline";
+  document.getElementById("btnUndo").disabled = !undoStack.length;
+  document.getElementById("btnRedo").disabled = !redoStack.length;
+}
+
+function render() {
+  renderFiles();
+  renderSheet();
+  renderFoot();
+}
+
+function closeOverlays() {
+  document.getElementById("panel").hidden = true;
+  document.getElementById("scrim").hidden = true;
+  document.getElementById("help").hidden = true;
+  document.getElementById("panel").innerHTML = "";
+}
+function openHelp() {
+  document.getElementById("scrim").hidden = false;
+  document.getElementById("help").hidden = false;
+}
+function openKitchenTeaser(title) {
+  openPanel(title, "This tool is in Kitchen, $19, one file, still offline, files never leave the machine.", "", null, null);
+}
+
+function openPanel(title, lead, bodyHtml, applyLabel, onApply) {
+  const p = document.getElementById("panel");
+  p.hidden = false;
+  document.getElementById("scrim").hidden = false;
+  p.innerHTML =
+    "<h2>" + esc(title) + "</h2>" +
+    (lead ? '<p class="lead">' + lead + "</p>" : "") +
+    bodyHtml +
+    '<div class="panel-actions">' +
+      (onApply ? '<button type="button" class="btn primary" id="panelApply">' + esc(applyLabel || "Apply") + "</button>" : "") +
+      '<button type="button" class="btn" id="panelClose">Close</button>' +
+    "</div>";
+  p.querySelector("#panelClose").onclick = closeOverlays;
+  if (onApply) p.querySelector("#panelApply").onclick = function () {
+    try { onApply(); }
+    catch (e) { toast(e.message || String(e), true); }
+  };
+}
+
+function fileChecks(selected) {
+  return tables.map((t) =>
+    '<label><input type="checkbox" value="' + t.id + '"' + (selected ? " checked" : "") + "> " + esc(t.name) +
+    " <span style=\"color:var(--muted)\">(" + t.rows.length + ")</span></label>"
+  ).join("");
+}
+
+function selectedTablesFromPanel() {
+  const boxes = document.querySelectorAll("#panel input[type=checkbox]:checked");
+  const ids = Array.prototype.map.call(boxes, (b) => b.value);
+  const list = tables.filter((t) => ids.indexOf(t.id) !== -1);
+  if (list.length < 2) throw new Error("Pick at least two files.");
+  return list;
+}
+
+function afterOp(msg) {
+  closeOverlays();
+  render();
+  if (msg) toast(msg);
+}
+
+function openStack() {
+  if (tables.length < 2) { toast("Stack needs two or more open files.", true); return; }
+  openPanel("Stack files", "Union of columns, rows appended. Names that differ only by case are treated as the same column.",
+    '<div class="field checks"><label>Files</label>' + fileChecks(true) + "</div>" +
+    '<div class="field checks"><label><input type="checkbox" id="srcCol" checked> Add a Source column with the file name</label></div>',
+    "Stack",
+    function () {
+      const list = selectedTablesFromPanel();
+      const src = document.getElementById("srcCol").checked ? "source" : null;
+      snapshot();
+      const stacked = stackTables(list, { sourceColumn: src });
+      tables.push(stacked);
+      activeId = stacked.id;
+      page = 1;
+      afterOp("Stacked " + list.length + " files into " + stacked.rows.length.toLocaleString() + " rows.");
+    });
+}
+
+function openDedupe() {
+  const t = activeTable();
+  if (!t) return;
+  const guess = t.headers.find((h) => /email|e-mail|id|sku/i.test(h)) || t.headers[0];
+  openPanel("Dedupe", "Rows that match on the checked columns are collapsed. Comparison is case-insensitive and trimmed.",
+    '<div class="field checks"><label>Match on</label>' + t.headers.map((h) =>
+      '<label><input type="checkbox" value="' + esc(h) + '"' + (h === guess ? " checked" : "") + "> " + esc(h) + "</label>"
+    ).join("") + "</div>" +
+    '<div class="field"><label>Keep</label><select id="dk"><option value="first">First row</option><option value="last">Last row</option></select></div>',
+    "Dedupe",
+    function () {
+      const cols = Array.prototype.map.call(document.querySelectorAll("#panel input[type=checkbox]:checked"), (b) => b.value);
+      snapshot();
+      const next = dedupeTable(t, cols, document.getElementById("dk").value);
+      const dropped = t.rows.length - next.rows.length;
+      replaceActive(next);
+      afterOp(dropped ? ("Removed " + dropped + " duplicate row" + (dropped === 1 ? "" : "s") + ".") : "No duplicates on those columns.");
+    });
+}
+
+function openExport() {
+  const t = activeTable();
+  if (!t) return;
+  openPanel("Export CSV", "Downloads to this computer. Nothing is sent anywhere.",
+    '<div class="field checks">' +
+      '<label><input type="checkbox" id="eBom"' + (excelBom ? " checked" : "") + "> UTF-8 BOM (friendlier in Excel)</label>" +
+    "</div>",
+    "Download",
+    function () {
+      excelBom = document.getElementById("eBom").checked;
+      downloadTable(t, excelBom);
+      afterOp("Saved " + t.name.replace(/\.csv$/i, "") + ".csv");
+    });
+}
+
+function downloadTable(t, bom) {
+  const text = serializeCSV(t.headers, t.rows, bom);
+  const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (t.name.replace(/\.csv$/i, "") || "plainrow") + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function openFiles(fileList) {
+  const files = Array.prototype.slice.call(fileList || []);
+  if (!files.length) return;
+  let added = 0;
+  snapshot();
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    try {
+      const text = await f.text();
+      ingestCSV(f.name, text);
+      added++;
+    } catch (e) {
+      toast(f.name + ": " + (e.message || e), true);
+    }
+  }
+  if (!added && undoStack.length) {
+    restore(undoStack.pop());
+  }
+  render();
+  if (added) toast("Opened " + added + " file" + (added === 1 ? "" : "s") + ".");
+}
+
+function loadDemo(key) {
+  const pack = DEMOS[key];
+  if (!pack) return;
+  snapshot();
+  tables = [];
+  activeId = null;
+  let n = 0;
+  try {
+    for (let i = 0; i < pack.length; i++) {
+      if (tables.length >= MAX_FILES) break;
+      ingestCSV(pack[i].name, pack[i].csv);
+      n++;
+    }
+  } catch (e) {
+    toast(e.message || String(e), true);
+  }
+  render();
+  if (n) toast("Loaded " + n + " synthetic file" + (n === 1 ? "" : "s") + ". Not real people or accounts.");
+}
+
+function boot() {
+  render();
+  document.getElementById("btnOpen").onclick = function () { document.getElementById("fileInput").click(); };
+  document.getElementById("btnOpen2").onclick = function () { document.getElementById("fileInput").click(); };
+  document.getElementById("fileInput").onchange = function (e) { openFiles(e.target.files); e.target.value = ""; };
+  document.getElementById("demoSelect").onchange = function (e) {
+    const v = e.target.value; e.target.value = "";
+    if (v) loadDemo(v);
+  };
+  document.getElementById("btnDemo").onclick = function () { loadDemo("timesheets"); };
+  document.getElementById("btnUndo").onclick = doUndo;
+  document.getElementById("btnRedo").onclick = doRedo;
+  document.getElementById("btnHelp").onclick = openHelp;
+  document.getElementById("btnHelpClose").onclick = closeOverlays;
+  document.getElementById("btnExport").onclick = openExport;
+  document.getElementById("btnStack").onclick = openStack;
+  document.getElementById("btnDedupe").onclick = openDedupe;
+  document.getElementById("toolbar").addEventListener("click", function (e) {
+    const b = e.target.closest("button.teaser");
+    if (b) openKitchenTeaser(b.getAttribute("data-kitchen") || "Kitchen");
+  });
+  document.getElementById("recipeList").addEventListener("click", function (e) {
+    const b = e.target.closest("button.teaser");
+    if (b) openKitchenTeaser(b.getAttribute("data-kitchen") || "Kitchen");
+  });
+  document.getElementById("scrim").onclick = closeOverlays;
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeOverlays();
+    const mod = e.metaKey || e.ctrlKey;
+    if (mod && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); }
+    if (mod && e.key.toLowerCase() === "y") { e.preventDefault(); doRedo(); }
+    if (mod && e.key.toLowerCase() === "s") { e.preventDefault(); if (activeTable()) openExport(); }
+  });
+  document.getElementById("fileList").onclick = function (e) {
+    const del = e.target.closest("[data-del]");
+    if (del) {
+      snapshot();
+      tables = tables.filter((t) => t.id !== del.getAttribute("data-del"));
+      if (!tables.some((t) => t.id === activeId)) activeId = tables[0] ? tables[0].id : null;
+      page = 1;
+      render();
+      return;
+    }
+    const pick = e.target.closest("[data-act]");
+    if (pick) { activeId = pick.getAttribute("data-act"); page = 1; render(); }
+  };
+  document.getElementById("pager").onclick = function (e) {
+    if (e.target.id === "pgPrev" && page > 1) { page--; renderSheet(); }
+    if (e.target.id === "pgNext") { page++; renderSheet(); }
+  };
+  const drop = document.getElementById("dropZone");
+  const wrap = document.getElementById("sheetWrap");
+  function bindDrop(el) {
+    el.addEventListener("dragover", function (e) { e.preventDefault(); el.classList.add("over"); });
+    el.addEventListener("dragleave", function () { el.classList.remove("over"); });
+    el.addEventListener("drop", function (e) {
+      e.preventDefault();
+      el.classList.remove("over");
+      if (e.dataTransfer && e.dataTransfer.files) openFiles(e.dataTransfer.files);
+    });
+  }
+  bindDrop(drop);
+  bindDrop(wrap);
+  document.addEventListener("dragover", function (e) { e.preventDefault(); });
+  document.addEventListener("drop", function (e) {
+    if (e.target === document.documentElement || e.target === document.body) {
+      e.preventDefault();
+      if (e.dataTransfer && e.dataTransfer.files) openFiles(e.dataTransfer.files);
+    }
+  });
+}
+
+const DEMOS = {
+  "timesheets": [
+    {
+      "name": "week-10.csv",
+      "csv": "Work Date,Staff,Project,Hours,Notes\n03/02/2026,Nia Colfax,Archive,6.5,\n03/03/2026,Ross Kepler,Intake,8,\n03/04/2026,Sol Rivera,Archive,4,Half day\n"
+    },
+    {
+      "name": "week-11.csv",
+      "csv": "Work Date,Staff,Project,Hours,Notes\n03/09/2026,Nia Colfax,Archive,7,\n03/10/2026,Ross Kepler,Intake,8,\n03/11/2026,Ada Meridian,Outreach,3,\n"
+    }
+  ],
+  "emails": [
+    {
+      "name": "email-list.csv",
+      "csv": "email,first,last,tag\nada@example.com,Ada,Meridian,donor\nnia@example.net,Nia,Colfax,newsletter\nAda@example.com,Ada,Meridian,volunteer\nross@example.test,Ross,Kepler,donor\nnia@example.net,Nia,Colfax,event\nsol@example.org,Sol,Rivera,newsletter\n"
+    }
+  ]
+};
+
+boot();
+</script>
+</body>
+</html>

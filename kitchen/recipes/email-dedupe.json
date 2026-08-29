@@ -1,0 +1,36 @@
+{
+  "name": "Email list dedupe",
+  "description": "Trim and lowercase the email column, then keep the first row per address.",
+  "version": 1,
+  "steps": [
+    {
+      "op": "find_replace",
+      "fileMatch": "email",
+      "column": "email",
+      "find": " ",
+      "replace": "",
+      "ignoreCase": false
+    },
+    {
+      "op": "lowercase",
+      "fileMatch": "email",
+      "column": "email"
+    },
+    {
+      "op": "filter",
+      "fileMatch": "email",
+      "column": "email",
+      "operator": "not_empty",
+      "value": ""
+    },
+    {
+      "op": "dedupe",
+      "fileMatch": "email",
+      "columns": [
+        "email"
+      ],
+      "keep": "first"
+    }
+  ],
+  "id": "email-dedupe"
+}
