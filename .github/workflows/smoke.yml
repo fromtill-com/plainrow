@@ -1,0 +1,22 @@
+name: smoke
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    name: Visual Lite and Kitchen fixtures
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Assert stack union, keep-first dedupe, inventory join, and Lite isolation
+        run: node tests/visual-smoke.test.js
