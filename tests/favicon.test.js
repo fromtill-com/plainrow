@@ -19,7 +19,7 @@ const pages = [
 
 for (const [rel, href] of pages) {
   const html = read(rel);
-  assert.match(html, new RegExp(`rel="icon"[^>]*href="${href}"`));
+  assert.match(html, /rel="icon"[^>]*href="\/favicon\.ico"/);
   assert.match(html, new RegExp(`rel="apple-touch-icon"[^>]*href="${href}"`));
   assert.match(html, new RegExp(`sizes="32x32"[^>]*href="${href}"`));
   assert.match(html, new RegExp(`sizes="192x192"[^>]*href="${href}"`));
@@ -34,5 +34,8 @@ const width = housePng.readUInt32BE(16);
 const height = housePng.readUInt32BE(20);
 assert.strictEqual(width, 512);
 assert.strictEqual(height, 512);
+
+const ico = fs.readFileSync(path.join(root, "favicon.ico"));
+assert.ok(ico.slice(0, 4).equals(Buffer.from([0, 0, 1, 0])), "favicon.ico must be an ICO");
 
 console.log("favicon.test.js ok");
