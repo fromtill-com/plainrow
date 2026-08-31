@@ -6,6 +6,10 @@
   <title>Dedupe CSV without uploading</title>
   <meta name="description" content="Remove duplicate CSV rows in your browser. Nothing is uploaded. Works offline.">
   <link rel="canonical" href="https://fromtill.com/plainrow/dedupe-csv-without-uploading/">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/plainrow/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/plainrow/logo.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/plainrow/logo.png">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -18,6 +22,33 @@
     <h1 class="product-name">Dedupe CSV without uploading</h1>
     <p class="lede">Remove duplicate CSV rows in your browser. The file never leaves your machine.</p>
     <p class="sub">Open the file, drop exact duplicate rows, download one. No account. No server. Offline once the page is loaded.</p>
+    <section class="example" aria-label="Example">
+      <h2>Example</h2>
+      <div class="example-grid">
+        <figure class="csv">
+          <figcaption>Input</figcaption>
+          <table>
+            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <tbody>
+              <tr><td>A-1</td><td>2</td></tr>
+              <tr><td>A-1</td><td>2</td></tr>
+              <tr><td>B-9</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <figure class="csv">
+          <figcaption>Result</figcaption>
+          <table>
+            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <tbody>
+              <tr><td>A-1</td><td>2</td></tr>
+              <tr><td>B-9</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </figure>
+      </div>
+      <p class="example-note">Exact duplicate rows drop. The first copy stays.</p>
+    </section>
     <div class="actions">
       <a class="btn primary" href="/plainrow/app.html">Try Lite</a>
     </div>

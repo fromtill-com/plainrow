@@ -6,6 +6,10 @@
   <title>Merge CSV without uploading</title>
   <meta name="description" content="Stack two CSV files in your browser. Nothing is uploaded. Works offline.">
   <link rel="canonical" href="https://fromtill.com/plainrow/merge-csv-without-uploading/">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/plainrow/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/plainrow/logo.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/plainrow/logo.png">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -18,6 +22,42 @@
     <h1 class="product-name">Merge CSV without uploading</h1>
     <p class="lede">Stack two CSV files in your browser and remove duplicate rows. The files never leave your machine.</p>
     <p class="sub">Open both files, stack them, download one. No account. No server. Offline once the page is loaded.</p>
+    <section class="example" aria-label="Example">
+      <h2>Example</h2>
+      <div class="example-grid">
+        <figure class="csv">
+          <figcaption>File A</figcaption>
+          <table>
+            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <tbody>
+              <tr><td>A-1</td><td>2</td></tr>
+              <tr><td>A-2</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <figure class="csv">
+          <figcaption>File B</figcaption>
+          <table>
+            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <tbody>
+              <tr><td>B-9</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <figure class="csv">
+          <figcaption>Result</figcaption>
+          <table>
+            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <tbody>
+              <tr><td>A-1</td><td>2</td></tr>
+              <tr><td>A-2</td><td>1</td></tr>
+              <tr><td>B-9</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </figure>
+      </div>
+      <p class="example-note">Both files stay on this computer. Lite stacks them in the tab.</p>
+    </section>
     <div class="actions">
       <a class="btn primary" href="/plainrow/app.html">Try Lite</a>
     </div>

@@ -308,6 +308,65 @@ ul, ol { margin: 0; padding: 0; }
   color: var(--ink);
 }
 
+.example { margin-top: 2rem; }
+
+.example h2 {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 650;
+  margin-bottom: 0.7rem;
+}
+
+.example-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  margin-top: 0.85rem;
+}
+
+.csv {
+  margin: 0;
+  padding: 0.85rem 0.9rem 0.95rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.csv figcaption {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 650;
+  margin-bottom: 0.55rem;
+}
+
+.csv table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+}
+
+.csv th,
+.csv td {
+  text-align: left;
+  padding: 0.28rem 0.2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.csv tbody tr:last-child td { border-bottom: 0; }
+
+.example-note {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  max-width: 34rem;
+}
+
 .colophon {
   padding: 0.85rem 0 1.4rem;
   border-top: 1px solid var(--line);
