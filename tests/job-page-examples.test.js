@@ -129,9 +129,14 @@ const aliases = [
 for (const rel of aliases) {
   const html = read(rel);
   assert.match(html, /rel="canonical" href="https:\/\/fromtill.com\/plainrow\/merge-csv-without-uploading\/"/, rel + " missing canonical");
-  assert.match(html, /http-equiv="refresh"/, rel + " missing refresh");
+  assert.match(html, /http-equiv="refresh" content="0;url=\/plainrow\/merge-csv-without-uploading\/"/, rel + " missing refresh");
   assert.match(html, /location\.replace\("\/plainrow\/merge-csv-without-uploading\/"\)/, rel + " missing hop");
+  assert.match(html, /<meta name="robots" content="noindex">/, rel + " missing noindex");
+  assert.match(html, /<title>Moved · Merge CSV without uploading<\/title>/, rel + " missing moved title");
+  assert.match(html, /href="\/plainrow\/merge-csv-without-uploading\/"/, rel + " missing hop link");
   assert.doesNotMatch(html, /<section class="example"/, rel + " still has its own example");
+  assert.doesNotMatch(html, /class="masthead"|class="product-name"|stylesheet/, rel + " still looks like a stub product page");
+  assert.doesNotMatch(html, /Merge two CSV files in JavaScript|Stack two CSV files in your browser/, rel + " still has a unique stub title");
   assert.doesNotMatch(html, /buy\.polar\.sh/, rel + " links buy.polar.sh");
   assert.doesNotMatch(html, /kitchen\/plainrow\.html/, rel + " links kitchen HTML");
 }
