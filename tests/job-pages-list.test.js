@@ -23,14 +23,10 @@ assert.match(product, />Support</);
 
 const jobHrefs = [
   "/plainrow/merge-csv-without-uploading/",
-  "/plainrow/merge-csv-in-browser/",
-  "/plainrow/stack-two-csv-files-in-browser/",
   "/plainrow/dedupe-csv-without-uploading/"
 ];
 const jobLabels = [
   "Merge CSV without uploading",
-  "Merge two CSV files in JavaScript",
-  "Stack two CSV files in your browser",
   "Dedupe CSV without uploading"
 ];
 
@@ -45,6 +41,16 @@ for (let i = 0; i < jobHrefs.length; i++) {
 
 assert.match(product, /<ul class="job-pages">/);
 assert.match(css, /\.job-pages\s*\{/);
+assert.doesNotMatch(
+  product,
+  /<ul class="job-pages">[\s\S]*merge-csv-in-browser[\s\S]*<\/ul>/,
+  "alias still listed on the product page"
+);
+assert.doesNotMatch(
+  product,
+  /<ul class="job-pages">[\s\S]*stack-two-csv-files-in-browser[\s\S]*<\/ul>/,
+  "stack alias still listed on the product page"
+);
 
 const blob = /<p class="fine">[\s\S]*Support[\s\S]*merge-csv-without-uploading[\s\S]*merge-csv-in-browser[\s\S]*stack-two-csv-files-in-browser[\s\S]*dedupe-csv-without-uploading[\s\S]*<\/p>/;
 assert.doesNotMatch(product, blob, "job-page links still jammed into the Support paragraph");
