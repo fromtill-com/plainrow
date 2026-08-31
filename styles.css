@@ -276,6 +276,19 @@ ul, ol { margin: 0; padding: 0; }
   margin-top: 2.4rem;
 }
 
+.job-pages {
+  list-style: disc;
+  margin: 0.85rem 0 0;
+  padding-left: 1.2rem;
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.job-pages li + li {
+  margin-top: 0.28rem;
+}
+
 .steps {
   margin-top: 2.4rem;
   padding-top: 1.4rem;
