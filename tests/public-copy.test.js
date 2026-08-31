@@ -41,19 +41,26 @@ assert.match(product, />Try Lite</);
 assert.match(product, /href="app\.html"/);
 assert.match(product, /How it works/);
 assert.match(product, /href="\/plainrow\/support\/"/);
-assert.doesNotMatch(product, />Download Lite</, "leave Download Lite to FRO-9");
+assert.match(product, />Download Lite</);
 assert.doesNotMatch(product, /not a switch/);
 
 const support = read("plainrow/support/index.html");
 assert.match(support, /two files: stack, dedupe, and export/i);
 assert.match(support, /href="\/plainrow\/app\.html"/);
 assert.match(support, /There is no paid product on this site/);
+assert.match(support, /mailto:till@fromtill\.com/);
+assert.match(support, />till@fromtill\.com</);
+assert.match(support, /We reply from that address/);
+assert.match(support, /column names and row count, never file contents/i);
 assert.doesNotMatch(support, /How do I join|Lite or Kitchen|14 days/i);
+assert.doesNotMatch(support, /<form|zendesk|intercom|crisp|drift|chat widget/i);
 
 const lite = read("plainrow/app.html");
 assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);
 assert.match(lite, /id="btnStack"/);
 assert.match(lite, /id="btnDedupe"/);
+assert.match(lite, /href="https:\/\/fromtill\.com\/plainrow\/support\/"/);
+assert.match(lite, /mailto:till@fromtill\.com/);
 assert.doesNotMatch(lite, /litebar|k-badge|data-kitchen|Kitchen has more tools/);
 
 const sitemap = read("sitemap.xml");
