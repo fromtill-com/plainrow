@@ -40,7 +40,14 @@ const home = read("index.html");
 assert.match(home, /href="\/plainrow\/"/);
 assert.match(home, /Lite is free/);
 assert.match(home, /Kitchen is \$19/);
+assert.match(home, /<h1 class="lede">Small offline tools\.<\/h1>/);
 assert.doesNotMatch(home, /Buy Kitchen|buy\.polar\.sh/, "keep the Polar buy on /plainrow/");
+
+const merge = read("plainrow/merge-csv-without-uploading/index.html");
+const mergeLede = merge.match(/<p class="lede">([\s\S]*?)<\/p>/);
+assert.ok(mergeLede, "merge page missing lede");
+assert.doesNotMatch(mergeLede[0], /duplicate/i, "merge lede should not promise dedupe");
+assert.match(mergeLede[0], /Stack two CSV files in your browser/);
 
 const product = read("plainrow/index.html");
 assert.match(product, />Try Lite</);
@@ -80,6 +87,8 @@ assert.match(lite, />Join</);
 assert.match(lite, />Split</);
 assert.match(lite, />Clean</);
 assert.match(lite, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
+assert.match(lite, /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/app\.html"/);
+assert.match(lite, /property="og:title" content="Plainrow Lite"/);
 assert.doesNotMatch(lite, /litebar|k-badge|data-kitchen|Kitchen has more tools/);
 assert.doesNotMatch(lite, /function openJoin|function openSplit|function openClean|joinTables|splitTable/);
 
