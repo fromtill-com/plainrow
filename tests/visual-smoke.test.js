@@ -98,16 +98,18 @@ const liteToolbar = liteHtml.match(/<div class="toolbar">[\s\S]*?<\/div>/);
 assert.ok(liteToolbar, "Lite toolbar exists");
 assert.match(liteToolbar[0], /id="btnStack"/);
 assert.match(liteToolbar[0], /id="btnDedupe"/);
-assert.match(liteToolbar[0], />Join</);
-assert.match(liteToolbar[0], />Split</);
-assert.match(liteToolbar[0], />Clean</);
-const buyJobs = [...liteToolbar[0].matchAll(/<a class="buy-job"[^>]*>/g)].map((m) => m[0]);
+const buyJobs = [...liteToolbar[0].matchAll(/<a class="buy-job"[^>]*>([^<]*)<\/a>/g)];
 assert.strictEqual(buyJobs.length, 3, "Join, Split, and Clean are three empty buy links");
-for (const tag of buyJobs) {
+assert.deepStrictEqual(
+  buyJobs.map((m) => m[1]),
+  ["Join · Kitchen · $19", "Split · Kitchen · $19", "Clean · Kitchen · $19"],
+  "Kitchen · $19 is on the face of Join, Split, and Clean, not only in title/aria-label"
+);
+for (const m of buyJobs) {
+  const tag = m[0].slice(0, m[0].indexOf(">") + 1);
   assert.ok(tag.includes(polarKitchen), "empty Kitchen job links Polar checkout");
   assert.ok(tag.includes('target="_blank"'), "empty Kitchen job opens a new tab");
   assert.ok(tag.includes('rel="noopener noreferrer"'), "empty Kitchen job has rel");
-  assert.ok(tag.includes("Buy Kitchen · $19"), "empty Kitchen job promotes Buy Kitchen · $19");
 }
 
 loadFunctions(liteSrc, [

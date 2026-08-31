@@ -30,9 +30,9 @@ assert.match(html, /id="btnStack"/);
 assert.match(html, /id="btnDedupe"/);
 assert.match(html, /id="btnExport"/);
 assert.match(html, /class="buy-job"/);
-assert.match(html, />Join</);
-assert.match(html, />Split</);
-assert.match(html, />Clean</);
+assert.match(html, />Join · Kitchen · \$19</);
+assert.match(html, />Split · Kitchen · \$19</);
+assert.match(html, />Clean · Kitchen · \$19</);
 assert.match(html, /href="https:\/\/buy\.polar\.sh\/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9"/);
 assert.doesNotMatch(html, /function openJoin|function openSplit|function openClean|joinTables|splitTable/);
 
