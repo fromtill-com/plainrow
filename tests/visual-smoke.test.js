@@ -21,7 +21,9 @@ const vm = require("vm");
 const root = path.join(__dirname, "..");
 
 function scriptFrom(html) {
-  return html.slice(html.indexOf("<script>") + 8, html.lastIndexOf("</script>"));
+  const start = html.indexOf("<script>");
+  const end = html.indexOf("</script>", start);
+  return html.slice(start + 8, end);
 }
 
 function extractFunction(src, name) {

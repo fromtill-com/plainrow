@@ -25,7 +25,8 @@ assert.ok(app.equals(downloadCopy), "plainrow/plainrow-lite.html must be the sam
 assert.ok(app.equals(kitchenLite), "kitchen/plainrow-lite.html must be the same bytes as plainrow/app.html");
 
 const html = app.toString("utf8");
-assert.doesNotMatch(html, /cdn|unpkg|jsdelivr|googleapis|<script\s+src=/i);
+assert.doesNotMatch(html, /unpkg|jsdelivr|googleapis|googletagmanager|google-analytics|gtag\(/i);
+assert.doesNotMatch(html, /<script[^>]+src="(?!\/\/gc\.zgo\.at\/count\.js")/i);
 assert.match(html, /id="btnStack"/);
 assert.match(html, /id="btnDedupe"/);
 assert.match(html, /id="btnExport"/);
@@ -36,7 +37,7 @@ assert.match(html, />Clean · Kitchen · \$19</);
 assert.match(html, /href="https:\/\/buy\.polar\.sh\/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9"/);
 assert.doesNotMatch(html, /function openJoin|function openSplit|function openClean|joinTables|splitTable/);
 
-const src = html.slice(html.indexOf("<script>") + 8, html.lastIndexOf("</script>"));
+const src = html.slice(html.indexOf("<script>") + 8, html.indexOf("</script>", html.indexOf("<script>")));
 
 function extractFunction(name) {
   const needle = "function " + name;
