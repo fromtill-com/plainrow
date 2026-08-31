@@ -72,16 +72,31 @@ assert.match(support, /href="\/plainrow\/app\.html"/);
 assert.match(support, /Lite is free/);
 assert.match(support, /Kitchen is \$19 via Polar/);
 assert.match(support, /<h2>Open a ticket<\/h2>/);
+assert.match(support, /<h2>Do files leave my machine\?<\/h2>/);
+assert.match(support, /<h2>What can Lite do\?<\/h2>/);
+assert.match(support, /<h2>What can Kitchen do\?<\/h2>/);
+assert.match(support, /<h2>How do I buy Kitchen\?<\/h2>/);
 assert.match(support, /mailto:till@fromtill\.com/);
 assert.match(support, />till@fromtill\.com</);
 assert.match(support, /We reply from that address/);
 assert.match(support, /column names and row count, never file contents/i);
 assert.match(support, /never ask for CSV contents/i);
 assert.match(support, /paid offline HTML file: join, stack, split, clean/i);
-assert.doesNotMatch(support, /<script/i, "ticket address must be readable without JS");
+assert.match(support, /property="og:title" content="Plainrow support"/);
+assert.match(support, /type="application\/ld\+json"/);
+assert.match(support, />Email till@fromtill\.com</);
+assert.match(support, />Try Lite</);
+assert.doesNotMatch(support, /buy\.polar\.sh/, "support Polar checkout belongs with a buy control");
+const supportVisible = support
+  .replace(/<script[\s\S]*?<\/script>/gi, " ")
+  .replace(/<style[\s\S]*?<\/style>/gi, " ");
+assert.match(supportVisible, /mailto:till@fromtill\.com/, "ticket address must be readable without JS");
+assert.match(supportVisible, />till@fromtill\.com</, "ticket address text must be readable without JS");
 assert.doesNotMatch(support, /There is no paid product|nothing to refund/i);
 assert.doesNotMatch(support, /How do I join/i);
 assert.doesNotMatch(support, /<form|zendesk|intercom|crisp|drift|chat widget/i);
+assert.doesNotMatch(support, /google-analytics|googletagmanager|gtag\(/i);
+assert.doesNotMatch(support, /14-day|testimonial|as seen in/i);
 
 const lite = read("plainrow/app.html");
 assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);

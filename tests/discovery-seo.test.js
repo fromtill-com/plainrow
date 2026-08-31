@@ -35,6 +35,7 @@ const pages = [
   "index.html",
   "plainrow/index.html",
   "plainrow/app.html",
+  "plainrow/support/index.html",
   "plainrow/merge-csv-without-uploading/index.html",
   "plainrow/dedupe-csv-without-uploading/index.html",
   "plainrow/join-csv-without-uploading/index.html",
@@ -60,6 +61,60 @@ assert.match(
   "Lite missing canonical"
 );
 assert.match(lite, /property="og:url" content="https:\/\/fromtill\.com\/plainrow\/app\.html"/);
+
+const support = read("plainrow/support/index.html");
+assert.match(
+  support,
+  /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/support\/"/,
+  "support missing canonical"
+);
+assert.match(support, /property="og:title" content="Plainrow support"/);
+assert.match(support, /property="og:url" content="https:\/\/fromtill\.com\/plainrow\/support\/"/);
+assert.match(support, /property="og:image" content="https:\/\/fromtill\.com\/plainrow\/logo\.png"/);
+assert.match(
+  support,
+  /property="og:description" content="Email till@fromtill.com. Lite is free. Kitchen is \$19 via Polar. Answers and how files stay on your machine. Nothing is uploaded."/
+);
+const supportLd = jsonLd(support, "plainrow/support/index.html");
+assert.strictEqual(supportLd["@type"], "FAQPage", "support JSON-LD should be FAQPage");
+assert.ok(Array.isArray(supportLd.mainEntity) && supportLd.mainEntity.length >= 5, "support FAQPage missing questions");
+const supportVisible = visibleCopy(support);
+const supportText = support
+  .replace(/<script[\s\S]*?<\/script>/gi, " ")
+  .replace(/<style[\s\S]*?<\/style>/gi, " ")
+  .replace(/<[^>]+>/g, "")
+  .replace(/\s+/g, " ");
+const requiredFaqs = [
+  "Open a ticket",
+  "Do files leave my machine",
+  "What can Lite do",
+  "What can Kitchen do",
+  "How do I buy Kitchen"
+];
+const faqNames = supportLd.mainEntity.map((q) => String(q.name || ""));
+for (const phrase of requiredFaqs) {
+  assert.ok(
+    faqNames.some((name) => name.replace(/\?$/, "") === phrase),
+    "support FAQPage missing question: " + phrase
+  );
+}
+for (const question of supportLd.mainEntity) {
+  assert.strictEqual(question["@type"], "Question", "support FAQ is not Question");
+  const name = String(question.name || "").trim();
+  assert.ok(name, "support Question missing name");
+  assert.ok(
+    supportVisible.toLowerCase().includes(name.replace(/\?$/, "").toLowerCase()),
+    "support Question is not on the page: " + name
+  );
+  const answer = question.acceptedAnswer;
+  assert.ok(answer && answer["@type"] === "Answer", "support Question missing Answer");
+  const text = String(answer.text || "").trim();
+  assert.ok(text, "support Answer missing text");
+  assert.ok(
+    supportText.toLowerCase().includes(text.toLowerCase()),
+    "support Answer is not on the page: " + text
+  );
+}
 
 const jobPages = [
   "plainrow/merge-csv-without-uploading/index.html",
