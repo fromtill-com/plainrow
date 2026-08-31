@@ -59,5 +59,10 @@ assert.doesNotMatch(
   home,
   /merge-csv-without-uploading|merge-csv-in-browser|stack-two-csv-files-in-browser|dedupe-csv-without-uploading|join-csv-without-uploading|split-csv-in-browser|clean-csv-without-uploading/
 );
+assert.doesNotMatch(
+  product,
+  /filter-csv|dates-csv|replace-csv|sort-csv|recipe-json/,
+  "do not invent extra Kitchen job URLs"
+);
 
 console.log("job-pages-list.test.js ok");
