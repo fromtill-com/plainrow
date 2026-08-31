@@ -43,12 +43,21 @@ assert.match(home, /href="\/plainrow\/"/);
 assert.match(home, />Open</);
 assert.match(home, /Lite is free/);
 assert.match(home, /Kitchen is \$19/);
+assert.match(home, /Kitchen is \$19: join, stack, split, clean\./);
+assert.doesNotMatch(home, /filter, columns, replace|more than two files/);
 assert.match(home, /<h1 class="lede">Small offline tools\.<\/h1>/);
 assert.match(home, /<ul class="catalog">/);
 assert.match(home, /<ul class="catalog">[\s\S]*>Buy Kitchen · \$19</);
 assert.match(home, new RegExp('href="' + polarEsc + '"'));
 assert.match(home, /target="_blank"/);
 assert.match(home, /rel="noopener noreferrer"/);
+const houseCatalog = home.match(/<ul class="catalog">[\s\S]*?<\/ul>/);
+assert.ok(houseCatalog, "house missing catalog");
+assert.strictEqual((houseCatalog[0].match(/<li>/g) || []).length, 1, "house stays one card");
+assert.match(houseCatalog[0], /<span class="item-name">Plainrow<\/span>/);
+assert.match(houseCatalog[0], />Open</);
+assert.match(houseCatalog[0], />Buy Kitchen · \$19</);
+assert.doesNotMatch(home, /<span class="item-name">Kitchen</);
 assert.doesNotMatch(home, /polar\.sh\/plainrow/);
 assert.doesNotMatch(home, /Try Lite|Download Lite/);
 assert.doesNotMatch(home, /<div class="actions">/, "house stays a catalog, not a product pitch");
@@ -70,9 +79,19 @@ assert.match(product, /id="buyKitchen"/);
 assert.match(product, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
 assert.match(product, /target="_blank"/);
 assert.match(product, />Buy Kitchen · \$19</);
-assert.match(product, /paid offline HTML file: join, stack, split, clean/i);
+assert.match(
+  product,
+  /Kitchen is the paid offline HTML file\. Polar delivers the zip\. \$19 one-time\. Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean\. Lite stays two files, stack, dedupe, export\./
+);
+assert.strictEqual(
+  (product.match(/Filter, columns, replace, dates, sort, recipes, and more than two files/g) || []).length,
+  1,
+  "one Kitchen sentence on /plainrow/"
+);
 assert.match(product, /Lite stays two files, stack, dedupe, export/);
 assert.match(product, /Polar delivers the zip/);
+assert.doesNotMatch(product, /paid offline HTML file: join, stack, split, clean\./);
+assert.doesNotMatch(product, /Kitchen is \$19: join, stack, split, clean\./);
 assert.doesNotMatch(product, /not a switch/);
 assert.doesNotMatch(product, /There is no paid product|nothing to refund/i);
 
@@ -102,7 +121,11 @@ assert.match(support, />till@fromtill\.com</);
 assert.match(support, /We reply from that address/);
 assert.match(support, /column names and row count, never file contents/i);
 assert.match(support, /never ask for CSV contents/i);
-assert.match(support, /paid offline HTML file: join, stack, split, clean/i);
+assert.match(
+  support,
+  /Kitchen is the paid offline HTML file\. Polar delivers the zip\. \$19 one-time\. Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean\. Lite stays two files, stack, dedupe, export\./
+);
+assert.doesNotMatch(support, /paid offline HTML file: join, stack, split, clean\./);
 const supportActions = support.match(/<div class="actions">[\s\S]*?<\/div>/);
 assert.ok(supportActions, "support missing .actions");
 assert.match(supportActions[0], />Email till@fromtill\.com</);
@@ -125,11 +148,23 @@ assert.match(lite, /class="buy-job"/);
 assert.match(lite, />Join · Kitchen · \$19</);
 assert.match(lite, />Split · Kitchen · \$19</);
 assert.match(lite, />Clean · Kitchen · \$19</);
+const liteToolbar = lite.match(/<div class="toolbar">[\s\S]*?<\/div>/);
+assert.ok(liteToolbar, "Lite toolbar exists");
+assert.match(
+  liteToolbar[0],
+  /class="toolbar-note">Kitchen also does filter, columns, replace, dates, sort, recipes, and more than two files\./
+);
+assert.strictEqual(
+  (lite.match(/Kitchen also does filter, columns, replace, dates, sort, recipes, and more than two files\./g) || []).length,
+  1,
+  "one Kitchen sentence on Lite"
+);
 assert.match(lite, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
 assert.match(lite, /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/app\.html"/);
 assert.match(lite, /property="og:title" content="Plainrow Lite"/);
 assert.doesNotMatch(lite, /litebar|k-badge|data-kitchen|Kitchen has more tools/);
 assert.doesNotMatch(lite, /function openJoin|function openSplit|function openClean|joinTables|splitTable/);
+assert.doesNotMatch(lite, /recipeInput|btnLoadRecipe|Load recipe JSON|function openFilter|function openDates/);
 
 const sitemap = read("sitemap.xml");
 assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/support\//);
