@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Join CSV without uploading</title>
-  <meta name="description" content="Inner join two CSVs on a shared key in your browser. Nothing is uploaded. Works offline.">
+  <meta name="description" content="Left join two CSVs on a shared key in the browser. Nothing is uploaded. Unmatched catalog keys are kept. Warehouse-only keys are dropped.">
   <link rel="canonical" href="https://fromtill.com/plainrow/join-csv-without-uploading/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="From Till">
   <meta property="og:title" content="Join CSV without uploading">
-  <meta property="og:description" content="Inner join two CSVs on a shared key in your browser. Nothing is uploaded. Works offline.">
+  <meta property="og:description" content="Left join two CSVs on a shared key in the browser. Nothing is uploaded. Unmatched catalog keys are kept. Warehouse-only keys are dropped.">
   <meta property="og:url" content="https://fromtill.com/plainrow/join-csv-without-uploading/">
   <meta property="og:image" content="https://fromtill.com/plainrow/logo.png">
   <meta name="twitter:card" content="summary">
@@ -18,22 +18,22 @@
     "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "Join CSV without uploading",
-    "description": "Inner join two CSVs on a shared key in your browser. Nothing is uploaded. Works offline.",
+    "description": "Left join two CSVs on a shared key in the browser. Nothing is uploaded. Unmatched catalog keys are kept. Warehouse-only keys are dropped.",
     "url": "https://fromtill.com/plainrow/join-csv-without-uploading/",
     "step": [
       {
         "@type": "HowToStep",
-        "name": "Open both files",
-        "text": "Open both files."
+        "name": "Open catalog.csv and warehouse.csv.",
+        "text": "Open catalog.csv and warehouse.csv."
       },
       {
         "@type": "HowToStep",
-        "name": "Pick the key",
-        "text": "Pick the key."
+        "name": "Left join on SKU.",
+        "text": "Left join on SKU."
       },
       {
         "@type": "HowToStep",
-        "name": "Download one table with columns from each",
+        "name": "Download one table with columns from each.",
         "text": "Download one table with columns from each."
       }
     ]
@@ -53,49 +53,54 @@
   <main class="sheet product">
     <p class="crumb"><a href="/">Tools</a> / <a href="/plainrow/">Plainrow</a> / join without uploading</p>
     <h1 class="product-name">Join CSV without uploading</h1>
-    <p class="lede">Inner join two CSV files on a shared key in your browser. The result is wider, not taller. The files never leave your machine.</p>
-    <p class="sub">Open both files, pick the key, download one table with columns from each. No account. No server. Offline once the page is loaded.</p>
+    <p class="lede">Left join two CSVs on a shared key in the browser. Unmatched catalog keys stay (empty right-side cells). Warehouse-only keys never appear. Files never leave the machine.</p>
+    <p class="sub">Open catalog.csv and warehouse.csv. Left join on SKU. Download one table with columns from each. No account. Offline once loaded.</p>
+    <ol>
+      <li>Open catalog.csv and warehouse.csv.</li>
+      <li>Left join on SKU.</li>
+      <li>Download one table with columns from each.</li>
+    </ol>
     <section class="example" aria-label="Example">
       <h2>Example</h2>
       <div class="example-grid">
         <figure class="csv">
-          <figcaption>File A</figcaption>
+          <figcaption>catalog.csv</figcaption>
           <table>
-            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <thead><tr><th>SKU</th><th>Product</th><th>Price</th></tr></thead>
             <tbody>
-              <tr><td>A-1</td><td>2</td></tr>
-              <tr><td>A-2</td><td>1</td></tr>
+              <tr><td>SKU-1001</td><td>Linen tea towel</td><td>18.00</td></tr>
+              <tr><td>SKU-1002</td><td>Stoneware mug</td><td>14.00</td></tr>
             </tbody>
           </table>
         </figure>
         <figure class="csv">
-          <figcaption>File B</figcaption>
+          <figcaption>warehouse.csv</figcaption>
           <table>
-            <thead><tr><th>sku</th><th>price</th></tr></thead>
+            <thead><tr><th>SKU</th><th>On Hand</th><th>Bin</th></tr></thead>
             <tbody>
-              <tr><td>A-1</td><td>9</td></tr>
-              <tr><td>A-2</td><td>3</td></tr>
+              <tr><td>SKU-1001</td><td>12</td><td>A-1</td></tr>
+              <tr><td>SKU-1008</td><td>11</td><td>B-8</td></tr>
             </tbody>
           </table>
         </figure>
         <figure class="csv">
           <figcaption>Result</figcaption>
           <table>
-            <thead><tr><th>sku</th><th>qty</th><th>price</th></tr></thead>
+            <thead><tr><th>SKU</th><th>Product</th><th>Price</th><th>On Hand</th><th>Bin</th></tr></thead>
             <tbody>
-              <tr><td>A-1</td><td>2</td><td>9</td></tr>
-              <tr><td>A-2</td><td>1</td><td>3</td></tr>
+              <tr><td>SKU-1001</td><td>Linen tea towel</td><td>18.00</td><td>12</td><td>A-1</td></tr>
+              <tr><td>SKU-1002</td><td>Stoneware mug</td><td>14.00</td><td></td><td></td></tr>
             </tbody>
           </table>
         </figure>
       </div>
-      <p class="example-note">Kitchen joins on a column you pick. Files stay on this computer.</p>
+      <p class="example-note">After a left Join on SKU, SKU-1002 (Stoneware mug) still has a price and an empty On Hand, while warehouse-only SKU-1008 (11 in B-8) never appears.</p>
     </section>
     <div class="actions">
-      <a class="btn primary" href="/plainrow/app.html">Try Lite</a>
-      <a class="btn" href="https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9" target="_blank" rel="noopener noreferrer">Buy Kitchen · $19</a>
+      <a class="btn primary" href="https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9" target="_blank" rel="noopener noreferrer">Buy Kitchen · $19</a>
+      <a class="btn" href="/plainrow/app.html">Try Lite</a>
     </div>
-    <p class="fine">Lite shows Join, Split, and Clean as buy labels. Kitchen is the zip that actually runs them. <a href="/plainrow/support/">Support</a>.</p>
+    <p class="fine">Kitchen runs the join. Lite is stack and dedupe only. <a href="/plainrow/support/">Support</a>.</p>
   </main>
   <footer class="colophon">fromtill.com</footer>
 <script data-goatcounter="https://fromtill.goatcounter.com/count"
