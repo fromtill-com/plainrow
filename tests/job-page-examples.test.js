@@ -33,20 +33,37 @@ function tbodyRowCount(figureHtml) {
 
 const polarKitchen =
   "https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9";
+const polarEsc = polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-const realPages = [
+const jobPages = [
   "plainrow/merge-csv-without-uploading/index.html",
-  "plainrow/dedupe-csv-without-uploading/index.html"
+  "plainrow/dedupe-csv-without-uploading/index.html",
+  "plainrow/join-csv-without-uploading/index.html",
+  "plainrow/split-csv-in-browser/index.html",
+  "plainrow/clean-csv-without-uploading/index.html"
 ];
 
-for (const rel of realPages) {
+for (const rel of jobPages) {
   const html = read(rel);
+  const actions = html.match(/<div class="actions">[\s\S]*?<\/div>/);
+  assert.ok(actions, rel + " missing .actions");
   assert.match(html, /<section class="example"/, rel + " missing example section");
-  assert.match(html, />Try Lite</, rel + " missing Try Lite");
+  assert.match(
+    actions[0],
+    /class="btn primary"[^>]*href="\/plainrow\/app\.html"[^>]*>Try Lite</,
+    rel + " missing Try Lite in .actions"
+  );
+  assert.match(actions[0], />Buy Kitchen · \$19</, rel + " missing Buy Kitchen · $19 in .actions");
+  assert.match(
+    actions[0],
+    new RegExp('href="' + polarEsc + '"'),
+    rel + " missing Polar checkout"
+  );
+  assert.match(actions[0], /target="_blank"/, rel + " missing target=_blank");
+  assert.match(actions[0], /rel="noopener noreferrer"/, rel + " missing rel");
   assert.doesNotMatch(html, /<img\b/i, rel + " has an img");
   assert.doesNotMatch(html, /polarcdn/i, rel + " mentions polarcdn");
   assert.doesNotMatch(html, /kitchen\/plainrow\.html/, rel + " links kitchen/plainrow.html");
-  assert.doesNotMatch(html, /buy\.polar\.sh/, rel + " links buy.polar.sh");
 }
 
 const kitchenPages = [
@@ -57,23 +74,11 @@ const kitchenPages = [
 
 for (const rel of kitchenPages) {
   const html = read(rel);
-  assert.match(html, /<section class="example"/, rel + " missing example section");
-  assert.match(html, />Buy Kitchen · \$19</, rel + " missing Buy Kitchen · $19");
   assert.match(
     html,
-    new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'),
-    rel + " missing Polar checkout"
+    /Lite shows Join, Split, and Clean as buy labels\. Kitchen is the zip that actually runs them\./,
+    rel + " missing honest Lite/Kitchen line"
   );
-  assert.match(html, /target="_blank"/, rel + " missing target=_blank");
-  assert.match(html, /rel="noopener noreferrer"/, rel + " missing rel");
-  assert.doesNotMatch(
-    html,
-    /class="btn primary"[^>]*>\s*Try Lite\s*</,
-    rel + " has Try Lite as a .btn.primary"
-  );
-  assert.doesNotMatch(html, /<img\b/i, rel + " has an img");
-  assert.doesNotMatch(html, /polarcdn/i, rel + " mentions polarcdn");
-  assert.doesNotMatch(html, /kitchen\/plainrow\.html/, rel + " links kitchen/plainrow.html");
 }
 
 const stack = read("plainrow/merge-csv-without-uploading/index.html");
