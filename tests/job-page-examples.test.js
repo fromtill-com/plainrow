@@ -25,20 +25,12 @@ function tbodyA1Count(figureHtml) {
   return (m[1].match(/>A-1</g) || []).length;
 }
 
-const jobPages = [
+const realPages = [
   "plainrow/merge-csv-without-uploading/index.html",
-  "plainrow/merge-csv-in-browser/index.html",
-  "plainrow/stack-two-csv-files-in-browser/index.html",
   "plainrow/dedupe-csv-without-uploading/index.html"
 ];
 
-const stackPages = [
-  "plainrow/merge-csv-without-uploading/index.html",
-  "plainrow/merge-csv-in-browser/index.html",
-  "plainrow/stack-two-csv-files-in-browser/index.html"
-];
-
-for (const rel of jobPages) {
+for (const rel of realPages) {
   const html = read(rel);
   assert.match(html, /<section class="example"/, rel + " missing example section");
   assert.match(html, />Try Lite</, rel + " missing Try Lite");
@@ -48,14 +40,12 @@ for (const rel of jobPages) {
   assert.doesNotMatch(html, /buy\.polar\.sh/, rel + " links buy.polar.sh");
 }
 
-for (const rel of stackPages) {
-  const html = read(rel);
-  assert.match(html, /<figcaption>File A<\/figcaption>/, rel + " missing File A");
-  assert.match(html, /<figcaption>File B<\/figcaption>/, rel + " missing File B");
-  assert.match(html, /<figcaption>Result<\/figcaption>/, rel + " missing Result");
-  assert.match(html, />A-1</, rel + " missing A-1");
-  assert.match(html, />B-9</, rel + " missing B-9");
-}
+const stack = read("plainrow/merge-csv-without-uploading/index.html");
+assert.match(stack, /<figcaption>File A<\/figcaption>/);
+assert.match(stack, /<figcaption>File B<\/figcaption>/);
+assert.match(stack, /<figcaption>Result<\/figcaption>/);
+assert.match(stack, />A-1</);
+assert.match(stack, />B-9</);
 
 const dedupe = read("plainrow/dedupe-csv-without-uploading/index.html");
 assert.match(dedupe, /<figcaption>Input<\/figcaption>/);
@@ -66,5 +56,25 @@ assert.strictEqual(tbodyA1Count(figureByCaption(dedupe, "Result")), 1, "dedupe r
 const css = read("styles.css");
 assert.match(css, /\.example-grid/);
 assert.match(css, /\.csv table/);
+
+const aliases = [
+  "plainrow/merge-csv-in-browser/index.html",
+  "plainrow/stack-two-csv-files-in-browser/index.html"
+];
+for (const rel of aliases) {
+  const html = read(rel);
+  assert.match(html, /rel="canonical" href="https:\/\/fromtill.com\/plainrow\/merge-csv-without-uploading\/"/, rel + " missing canonical");
+  assert.match(html, /http-equiv="refresh"/, rel + " missing refresh");
+  assert.match(html, /location\.replace\("\/plainrow\/merge-csv-without-uploading\/"\)/, rel + " missing hop");
+  assert.doesNotMatch(html, /<section class="example"/, rel + " still has its own example");
+  assert.doesNotMatch(html, /buy\.polar\.sh/, rel + " links buy.polar.sh");
+  assert.doesNotMatch(html, /kitchen\/plainrow\.html/, rel + " links kitchen HTML");
+}
+
+const sitemap = read("sitemap.xml");
+assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/merge-csv-without-uploading\//);
+assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/dedupe-csv-without-uploading\//);
+assert.doesNotMatch(sitemap, /merge-csv-in-browser/);
+assert.doesNotMatch(sitemap, /stack-two-csv-files-in-browser/);
 
 console.log("job-page-examples.test.js ok");
