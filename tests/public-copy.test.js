@@ -75,8 +75,13 @@ const lite = read("plainrow/app.html");
 assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);
 assert.match(lite, /id="btnStack"/);
 assert.match(lite, /id="btnDedupe"/);
+assert.match(lite, /class="buy-job"/);
+assert.match(lite, />Join</);
+assert.match(lite, />Split</);
+assert.match(lite, />Clean</);
+assert.match(lite, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
 assert.doesNotMatch(lite, /litebar|k-badge|data-kitchen|Kitchen has more tools/);
-assert.doesNotMatch(lite, /buy\.polar\.sh|\$19/);
+assert.doesNotMatch(lite, /function openJoin|function openSplit|function openClean|joinTables|splitTable/);
 
 const sitemap = read("sitemap.xml");
 assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/support\//);

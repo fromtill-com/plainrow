@@ -29,6 +29,12 @@ assert.doesNotMatch(html, /cdn|unpkg|jsdelivr|googleapis|<script\s+src=/i);
 assert.match(html, /id="btnStack"/);
 assert.match(html, /id="btnDedupe"/);
 assert.match(html, /id="btnExport"/);
+assert.match(html, /class="buy-job"/);
+assert.match(html, />Join</);
+assert.match(html, />Split</);
+assert.match(html, />Clean</);
+assert.match(html, /href="https:\/\/buy\.polar\.sh\/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9"/);
+assert.doesNotMatch(html, /function openJoin|function openSplit|function openClean|joinTables|splitTable/);
 
 const src = html.slice(html.indexOf("<script>") + 8, html.lastIndexOf("</script>"));
 
