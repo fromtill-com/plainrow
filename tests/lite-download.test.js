@@ -16,7 +16,9 @@ assert.match(product, />Try Lite</);
 assert.match(product, />Download Lite</);
 assert.match(product, /href="plainrow-lite.html"/);
 assert.match(product, /download="plainrow-lite.html"/);
-assert.doesNotMatch(product, /polar|buy now|github\.io/i);
+assert.match(product, />Buy Kitchen · \$19</);
+assert.match(product, /href="https:\/\/buy\.polar\.sh\/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9"/);
+assert.doesNotMatch(product, /github\.io|buy now/i);
 assert.doesNotMatch(sitemap, /plainrow-lite\.html/);
 
 assert.ok(app.equals(downloadCopy), "plainrow/plainrow-lite.html must be the same bytes as plainrow/app.html");

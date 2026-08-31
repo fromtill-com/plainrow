@@ -10,6 +10,9 @@ function read(rel) {
   return fs.readFileSync(path.join(root, rel), "utf8");
 }
 
+const polarKitchen =
+  "https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9";
+
 const publicPages = [
   "index.html",
   "plainrow/index.html",
@@ -22,39 +25,58 @@ const publicPages = [
   "lite/index.html"
 ];
 
-const kitchenPitch = /Kitchen \(join|\$19|checkout is live|Join on a key|Kitchen only|Kitchen is the full engine|Kitchen's cap|when checkout is live/i;
-const buyPath = /polar|buy now|github\.io/i;
+const fakeCheckout = /github\.io|polar\.sh\/plainrow(?![A-Za-z0-9_-])/i;
+const hostedKitchen = /href=["'][^"']*kitchen\/plainrow\.html|plainrow\/kitchen\//i;
 
 for (const rel of publicPages) {
   const html = read(rel);
-  assert.doesNotMatch(html, kitchenPitch, rel + " still pitches Kitchen or a checkout that is not live");
-  assert.doesNotMatch(html, buyPath, rel + " has a buy path or GitHub Pages");
+  assert.doesNotMatch(html, fakeCheckout, rel + " invents GitHub Pages or polar.sh/plainrow");
+  assert.doesNotMatch(html, hostedKitchen, rel + " hosts Kitchen HTML on the public tree");
+  assert.doesNotMatch(html, /when checkout is live/i, rel + " still says checkout is not live");
+  assert.doesNotMatch(html, /disabled Kitchen|Kitchen has more tools/i, rel + " pitches a disabled Kitchen inside Lite");
 }
 
 const home = read("index.html");
 assert.match(home, /href="\/plainrow\/"/);
-assert.match(home, /Stack two CSVs/);
-assert.doesNotMatch(home, /disabled Kitchen|Kitchen has more tools/i);
+assert.match(home, /Lite is free/);
+assert.match(home, /Kitchen is \$19/);
+assert.doesNotMatch(home, /Buy Kitchen|buy\.polar\.sh/, "keep the Polar buy on /plainrow/");
 
 const product = read("plainrow/index.html");
 assert.match(product, />Try Lite</);
 assert.match(product, /href="app\.html"/);
+assert.match(product, />Download Lite</);
+assert.match(product, /href="plainrow-lite\.html"/);
 assert.match(product, /How it works/);
 assert.match(product, /href="\/plainrow\/support\/"/);
-assert.doesNotMatch(product, />Download Lite</, "leave Download Lite to FRO-9");
+assert.match(product, /id="buyKitchen"/);
+assert.match(product, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
+assert.match(product, /target="_blank"/);
+assert.match(product, />Buy Kitchen · \$19</);
+assert.match(product, /paid offline HTML file: join, stack, split, clean/i);
+assert.match(product, /Lite stays two files, stack, dedupe, export/);
+assert.match(product, /Polar delivers the zip/);
 assert.doesNotMatch(product, /not a switch/);
+assert.doesNotMatch(product, /There is no paid product|nothing to refund/i);
 
 const support = read("plainrow/support/index.html");
 assert.match(support, /two files: stack, dedupe, and export/i);
 assert.match(support, /href="\/plainrow\/app\.html"/);
-assert.match(support, /There is no paid product on this site/);
-assert.doesNotMatch(support, /How do I join|Lite or Kitchen|14 days/i);
+assert.match(support, /Lite is free/);
+assert.match(support, /Kitchen is \$19 via Polar/);
+assert.match(support, /till@fromtill\.com/);
+assert.match(support, /never ask for CSV contents/i);
+assert.match(support, /paid offline HTML file: join, stack, split, clean/i);
+assert.doesNotMatch(support, /There is no paid product|nothing to refund/i);
+assert.doesNotMatch(support, /How do I join/i);
+assert.doesNotMatch(support, /<form|zendesk|intercom|crisp|drift|chat widget/i);
 
 const lite = read("plainrow/app.html");
 assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);
 assert.match(lite, /id="btnStack"/);
 assert.match(lite, /id="btnDedupe"/);
 assert.doesNotMatch(lite, /litebar|k-badge|data-kitchen|Kitchen has more tools/);
+assert.doesNotMatch(lite, /buy\.polar\.sh|\$19/);
 
 const sitemap = read("sitemap.xml");
 assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/support\//);
