@@ -90,8 +90,28 @@ const robots = read("robots.txt");
 assert.doesNotMatch(robots, /59f32e29a92e4537b944974ec760e8fd/, "IndexNow key must not be listed as a sitemap in robots");
 
 const sitemap = read("sitemap.xml");
+assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/plainrow-lite\.html/);
+assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/app\.html/);
 assert.doesNotMatch(sitemap, /59f32e29a92e4537b944974ec760e8fd/, "IndexNow key file must not be in sitemap");
 assert.doesNotMatch(sitemap, /polar\.sh/, "sitemap must not include polar");
 assert.doesNotMatch(sitemap, /\/kitchen\//, "sitemap must not include kitchen HTML");
+assert.doesNotMatch(sitemap, /merge-csv-in-browser|stack-two-csv-files-in-browser/);
+assert.match(sitemap, /<lastmod>2026-08-31<\/lastmod>/);
+
+const polarKitchen =
+  "https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9";
+const llms = read("llms.txt");
+assert.match(llms, /^# From Till\n/);
+assert.match(llms, /https:\/\/fromtill\.com\/plainrow\/app\.html/);
+assert.match(llms, /stack/i);
+assert.match(llms, /dedupe/i);
+assert.match(llms, /Nothing is uploaded/);
+assert.match(llms, /\$19 one-time/);
+assert.match(llms, /join, stack, split, clean/i);
+assert.match(llms, new RegExp(polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+assert.match(llms, /till@fromtill\.com/);
+assert.doesNotMatch(llms, /kitchen\/plainrow\.html|github\.io/i);
+assert.doesNotMatch(llms, /google-analytics|googletagmanager|gtag\(/i);
+assert.doesNotMatch(llms, /14-day|14 day|testimonial|customers/i);
 
 console.log("discovery-seo.test.js ok");
