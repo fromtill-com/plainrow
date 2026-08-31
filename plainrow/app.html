@@ -184,9 +184,9 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
 .btn:disabled, .toolbar button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 12px 16px 0; }
-.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; align-items: center; }
 .toolbar button { background: var(--surface); }
-.toolbar-note { margin: 0 0 10px; color: var(--muted); font-size: 0.78rem; line-height: 1.4; }
+.toolbar-note { margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
 .toolbar a.buy-job {
   display: inline-flex;
   align-items: center;
@@ -345,8 +345,8 @@ table.data tbody tr:hover td { background: #f7f3ea; }
       <a class="buy-job" href="https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9" target="_blank" rel="noopener noreferrer" title="Buy Kitchen · $19">Join · Kitchen · $19</a>
       <a class="buy-job" href="https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9" target="_blank" rel="noopener noreferrer" title="Buy Kitchen · $19">Split · Kitchen · $19</a>
       <a class="buy-job" href="https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9" target="_blank" rel="noopener noreferrer" title="Buy Kitchen · $19">Clean · Kitchen · $19</a>
+      <span class="toolbar-note">Kitchen also does filter, columns, replace, dates, sort, recipes, and more than two files.</span>
     </div>
-    <p class="toolbar-note">Kitchen also adds filter, dates, recipes, and more than two files.</p>
     <div class="sheet-head">
       <h1 id="sheetName">No file open</h1>
       <button type="button" id="btnExport" disabled>Export CSV</button>
@@ -374,7 +374,6 @@ table.data tbody tr:hover td { background: #f7f3ea; }
     <li>Stack unions columns and appends rows. Dedupe keeps the first or last row for each key.</li>
     <li>Export writes a comma-separated file to this computer. A UTF-8 BOM is optional for Excel.</li>
   </ol>
-  <p>Kitchen also adds filter, dates, recipes, and more than two files.</p>
   <p>Plainrow Lite is one HTML file. You do not install anything and you do not need a network after the file is on disk. There is no telemetry.</p>
   <div class="panel-actions"><button type="button" class="btn primary" id="btnHelpClose">Close</button></div>
 </div>

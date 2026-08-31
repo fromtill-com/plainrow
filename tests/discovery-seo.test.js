@@ -164,7 +164,7 @@ assert.match(llms, /stack/i);
 assert.match(llms, /dedupe/i);
 assert.match(llms, /Nothing is uploaded/);
 assert.match(llms, /\$19 one-time/);
-assert.match(llms, /join, stack, split, clean, plus filter, dates, recipes, and more than two files/i);
+assert.match(llms, /Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean/);
 assert.match(llms, new RegExp(polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 assert.match(llms, /till@fromtill\.com/);
 assert.doesNotMatch(llms, /kitchen\/plainrow\.html|github\.io/i);

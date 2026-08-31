@@ -2,12 +2,12 @@
 
 > Small offline tools. They run in your browser. Files stay on this computer.
 
-Plainrow Lite is free: stack two CSVs, remove duplicate rows. Kitchen is $19 one-time: join, stack, split, clean, plus filter, dates, recipes, and more than two files. Polar delivers the zip. Nothing is uploaded.
+Plainrow Lite is free: stack two CSVs, remove duplicate rows. Kitchen is the paid offline HTML file. Polar delivers the zip. $19 one-time. Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean. Nothing is uploaded.
 
 ## Tools
 
 - [Plainrow Lite](https://fromtill.com/plainrow/app.html): free. Stack and dedupe in the browser.
-- [Buy Kitchen](https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9): $19 one-time. Join, stack, split, clean, plus filter, dates, recipes, and more than two files.
+- [Buy Kitchen](https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9): $19 one-time. Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean.
 
 ## Support
 
