@@ -227,7 +227,7 @@ ul, ol { margin: 0; padding: 0; }
 }
 
 .product .lede {
-  max-width: 28ch;
+  max-width: 38ch;
   font-size: clamp(1.2rem, 2.6vw, 1.45rem);
   font-weight: 500;
   color: var(--ink);
