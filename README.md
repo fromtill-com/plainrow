@@ -8,3 +8,6 @@ House site files at the repo root match what is published to https://fromtill.co
 Org: https://github.com/fromtill-com
 
 Linear-to-Cursor smoke test: ok
+
+Visual CI fixtures (recorded 2026-08-30 from a real Lite and Kitchen run):
+Lite stack demo → 6 rows × 6 cols. Kitchen inventory left-join on SKU → 5 rows × 5 cols.
