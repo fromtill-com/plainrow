@@ -285,6 +285,11 @@ ul, ol { margin: 0; padding: 0; }
   font-size: 0.92rem;
 }
 .job-pages li + li { margin-top: 0.28rem; }
+.job-tier {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-family: inherit;
+}
 
 .steps {
   margin-top: 2.4rem;
