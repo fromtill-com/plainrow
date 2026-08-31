@@ -85,6 +85,30 @@ assert.ok(liteBytes.equals(kitchenLiteBytes), "plainrow/app.html must be byte-id
 assert.doesNotMatch(liteHtml, /\bjoinTables\b/, "Lite must not contain joinTables");
 assert.doesNotMatch(liteHtml, /recipeInput|btnLoadRecipe|Load recipe JSON|extraRecipes/, "Lite must not load recipe JSON");
 assert.doesNotMatch(liteHtml, /\bLITE\b/, "Lite must not carry a LITE flag");
+assert.doesNotMatch(
+  liteHtml,
+  /function openJoin|function openSplit|function openClean|function splitTable|function trimTable|function dropEmptyRows|function joinForecast/,
+  "Lite must not implement Join, Split, or Clean"
+);
+assert.doesNotMatch(liteHtml, /localStorage|unlocked|data-kitchen|k-badge|litebar/, "Lite must not restore the locked Kitchen teaser");
+
+const polarKitchen =
+  "https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9";
+const liteToolbar = liteHtml.match(/<div class="toolbar">[\s\S]*?<\/div>/);
+assert.ok(liteToolbar, "Lite toolbar exists");
+assert.match(liteToolbar[0], /id="btnStack"/);
+assert.match(liteToolbar[0], /id="btnDedupe"/);
+assert.match(liteToolbar[0], />Join</);
+assert.match(liteToolbar[0], />Split</);
+assert.match(liteToolbar[0], />Clean</);
+const buyJobs = [...liteToolbar[0].matchAll(/<a class="buy-job"[^>]*>/g)].map((m) => m[0]);
+assert.strictEqual(buyJobs.length, 3, "Join, Split, and Clean are three empty buy links");
+for (const tag of buyJobs) {
+  assert.ok(tag.includes(polarKitchen), "empty Kitchen job links Polar checkout");
+  assert.ok(tag.includes('target="_blank"'), "empty Kitchen job opens a new tab");
+  assert.ok(tag.includes('rel="noopener noreferrer"'), "empty Kitchen job has rel");
+  assert.ok(tag.includes("Buy Kitchen · $19"), "empty Kitchen job promotes Buy Kitchen · $19");
+}
 
 loadFunctions(liteSrc, [
   "uid",
