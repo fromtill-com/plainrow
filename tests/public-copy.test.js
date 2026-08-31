@@ -36,12 +36,22 @@ for (const rel of publicPages) {
   assert.doesNotMatch(html, /disabled Kitchen|Kitchen has more tools/i, rel + " pitches a disabled Kitchen inside Lite");
 }
 
+const polarEsc = polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const home = read("index.html");
 assert.match(home, /href="\/plainrow\/"/);
+assert.match(home, />Open</);
 assert.match(home, /Lite is free/);
 assert.match(home, /Kitchen is \$19/);
 assert.match(home, /<h1 class="lede">Small offline tools\.<\/h1>/);
-assert.doesNotMatch(home, /Buy Kitchen|buy\.polar\.sh/, "keep the Polar buy on /plainrow/");
+assert.match(home, /<ul class="catalog">/);
+assert.match(home, /<ul class="catalog">[\s\S]*>Buy Kitchen · \$19</);
+assert.match(home, new RegExp('href="' + polarEsc + '"'));
+assert.match(home, /target="_blank"/);
+assert.match(home, /rel="noopener noreferrer"/);
+assert.doesNotMatch(home, /polar\.sh\/plainrow/);
+assert.doesNotMatch(home, /Try Lite|Download Lite/);
+assert.doesNotMatch(home, /<div class="actions">/, "house stays a catalog, not a product pitch");
 
 const merge = read("plainrow/merge-csv-without-uploading/index.html");
 const mergeLede = merge.match(/<p class="lede">([\s\S]*?)<\/p>/);
@@ -69,6 +79,8 @@ assert.doesNotMatch(product, /There is no paid product|nothing to refund/i);
 const support = read("plainrow/support/index.html");
 assert.match(support, /two files: stack, dedupe, and export/i);
 assert.match(support, /href="\/plainrow\/app\.html"/);
+assert.match(support, />Try Lite</);
+assert.match(support, />Email till@fromtill\.com</);
 assert.match(support, /Lite is free/);
 assert.match(support, /Kitchen is \$19 via Polar/);
 assert.match(support, /<h2>Open a ticket<\/h2>/);
@@ -78,10 +90,19 @@ assert.match(support, /We reply from that address/);
 assert.match(support, /column names and row count, never file contents/i);
 assert.match(support, /never ask for CSV contents/i);
 assert.match(support, /paid offline HTML file: join, stack, split, clean/i);
-assert.doesNotMatch(support, /<script/i, "ticket address must be readable without JS");
+const supportActions = support.match(/<div class="actions">[\s\S]*?<\/div>/);
+assert.ok(supportActions, "support missing .actions");
+assert.match(supportActions[0], />Email till@fromtill\.com</);
+assert.match(supportActions[0], />Try Lite</);
+assert.match(supportActions[0], />Buy Kitchen · \$19</);
+assert.match(supportActions[0], new RegExp('href="' + polarEsc + '"'));
+assert.match(supportActions[0], /target="_blank"/);
+assert.match(supportActions[0], /rel="noopener noreferrer"/);
+assert.match(support, /mailto:till@fromtill\.com/, "ticket address must be readable without JS");
 assert.doesNotMatch(support, /There is no paid product|nothing to refund/i);
 assert.doesNotMatch(support, /How do I join/i);
 assert.doesNotMatch(support, /<form|zendesk|intercom|crisp|drift|chat widget/i);
+assert.doesNotMatch(support, /polar\.sh\/plainrow/);
 
 const lite = read("plainrow/app.html");
 assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);
