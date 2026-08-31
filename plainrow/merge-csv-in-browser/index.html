@@ -6,6 +6,10 @@
   <title>Merge two CSV files in JavaScript</title>
   <meta name="description" content="Merge two CSV files in the browser with JavaScript. Nothing is uploaded. No server. Works offline.">
   <link rel="canonical" href="https://fromtill.com/plainrow/merge-csv-in-browser/">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/plainrow/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/plainrow/logo.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/plainrow/logo.png">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -18,6 +22,42 @@
     <h1 class="product-name">Merge two CSV files in JavaScript</h1>
     <p class="lede">Merge two CSV files in the browser. No Node, no upload, no server. FileReader reads both files locally; keep one header, stack the rows, download one file.</p>
     <p class="sub">Nothing leaves the machine. Offline once the page is loaded. No account.</p>
+    <section class="example" aria-label="Example">
+      <h2>Example</h2>
+      <div class="example-grid">
+        <figure class="csv">
+          <figcaption>File A</figcaption>
+          <table>
+            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <tbody>
+              <tr><td>A-1</td><td>2</td></tr>
+              <tr><td>A-2</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <figure class="csv">
+          <figcaption>File B</figcaption>
+          <table>
+            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <tbody>
+              <tr><td>B-9</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <figure class="csv">
+          <figcaption>Result</figcaption>
+          <table>
+            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <tbody>
+              <tr><td>A-1</td><td>2</td></tr>
+              <tr><td>A-2</td><td>1</td></tr>
+              <tr><td>B-9</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </figure>
+      </div>
+      <p class="example-note">FileReader reads both files in the page. Nothing is posted.</p>
+    </section>
     <div class="actions">
       <a class="btn primary" href="/plainrow/app.html">Try Lite</a>
     </div>
