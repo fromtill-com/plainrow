@@ -31,10 +31,9 @@ assert.match(html, /id="btnStack"/);
 assert.match(html, /id="btnDedupe"/);
 assert.match(html, /id="btnExport"/);
 assert.match(html, /class="buy-job"/);
-assert.match(html, /class="buy-job-label">Kitchen · \$19</);
 assert.match(
   html,
-  /class="buy-job-set">filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files/
+  />Kitchen · \$19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files</
 );
 assert.doesNotMatch(html, />Join · Kitchen · \$19</);
 assert.doesNotMatch(html, />Split · Kitchen · \$19</);

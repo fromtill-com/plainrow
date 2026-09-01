@@ -100,12 +100,11 @@ const liteToolbar = liteHtml.match(/<div class="toolbar">[\s\S]*?<\/div>/);
 assert.ok(liteToolbar, "Lite toolbar exists");
 assert.match(liteToolbar[0], /id="btnStack"/);
 assert.match(liteToolbar[0], /id="btnDedupe"/);
-const buyJobs = [...liteToolbar[0].matchAll(/<a class="buy-job"[^>]*>([\s\S]*?)<\/a>/g)];
+const buyJobs = [...liteToolbar[0].matchAll(/<a class="buy-job"[^>]*>([^<]*)<\/a>/g)];
 assert.strictEqual(buyJobs.length, 1, "one Kitchen · $19 buy control");
-assert.match(buyJobs[0][1], /class="buy-job-label">Kitchen · \$19</);
-assert.match(
+assert.strictEqual(
   buyJobs[0][1],
-  /class="buy-job-set">filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files/
+  "Kitchen · $19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files"
 );
 assert.doesNotMatch(liteToolbar[0], /Join · Kitchen · \$19|toolbar-note/);
 for (const m of buyJobs) {
