@@ -35,44 +35,73 @@ const polarKitchen =
   "https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9";
 const polarEsc = polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-const jobPages = [
+const liteJobPages = [
   "plainrow/merge-csv-without-uploading/index.html",
-  "plainrow/dedupe-csv-without-uploading/index.html",
+  "plainrow/dedupe-csv-without-uploading/index.html"
+];
+
+const kitchenJobPages = [
   "plainrow/join-csv-without-uploading/index.html",
   "plainrow/split-csv-in-browser/index.html",
   "plainrow/clean-csv-without-uploading/index.html"
 ];
 
-for (const rel of jobPages) {
-  const html = read(rel);
-  const actions = html.match(/<div class="actions">[\s\S]*?<\/div>/);
+function assertSharedJobActions(rel, html, actions) {
   assert.ok(actions, rel + " missing .actions");
   assert.match(html, /<section class="example"/, rel + " missing example section");
+  assert.match(actions, />Try Lite</, rel + " missing Try Lite in .actions");
+  assert.match(actions, />Buy Kitchen · \$19</, rel + " missing Buy Kitchen · $19 in .actions");
   assert.match(
-    actions[0],
-    /class="btn primary"[^>]*href="\/plainrow\/app\.html"[^>]*>Try Lite</,
-    rel + " missing Try Lite in .actions"
-  );
-  assert.match(actions[0], />Buy Kitchen · \$19</, rel + " missing Buy Kitchen · $19 in .actions");
-  assert.match(
-    actions[0],
+    actions,
     new RegExp('href="' + polarEsc + '"'),
     rel + " missing Polar checkout"
   );
-  assert.match(actions[0], /target="_blank"/, rel + " missing target=_blank");
-  assert.match(actions[0], /rel="noopener noreferrer"/, rel + " missing rel");
+  assert.match(actions, /target="_blank"/, rel + " missing target=_blank");
+  assert.match(actions, /rel="noopener noreferrer"/, rel + " missing rel");
   assert.doesNotMatch(html, /<img\b/i, rel + " has an img");
   assert.doesNotMatch(html, /polarcdn/i, rel + " mentions polarcdn");
   assert.doesNotMatch(html, /kitchen\/plainrow\.html/, rel + " links kitchen/plainrow.html");
 }
 
-const kitchenPages = [
-  "plainrow/join-csv-without-uploading/index.html",
-  "plainrow/split-csv-in-browser/index.html",
-  "plainrow/clean-csv-without-uploading/index.html"
-];
+for (const rel of liteJobPages) {
+  const html = read(rel);
+  const actions = html.match(/<div class="actions">[\s\S]*?<\/div>/);
+  assertSharedJobActions(rel, html, actions && actions[0]);
+  assert.match(
+    actions[0],
+    /class="btn primary"[^>]*href="\/plainrow\/app\.html"[^>]*>Try Lite</,
+    rel + " should lead with Try Lite"
+  );
+  assert.match(
+    actions[0],
+    /class="btn"[^>]*href="https:\/\/buy\.polar\.sh/,
+    rel + " Buy Kitchen should stay secondary"
+  );
+}
 
-for (const rel of kitchenPages) {
+for (const rel of kitchenJobPages) {
+  const html = read(rel);
+  const actions = html.match(/<div class="actions">[\s\S]*?<\/div>/);
+  assertSharedJobActions(rel, html, actions && actions[0]);
+  assert.match(
+    actions[0],
+    new RegExp(
+      '^\\s*<div class="actions">\\s*' +
+        '<a class="btn primary" href="' +
+        polarEsc +
+        '" target="_blank" rel="noopener noreferrer">Buy Kitchen · \\$19</a>\\s*' +
+        '<a class="btn" href="/plainrow/app\\.html">Try Lite</a>'
+    ),
+    rel + " should lead with Buy Kitchen · $19, Try Lite second"
+  );
+  assert.doesNotMatch(
+    actions[0],
+    /class="btn primary"[^>]*href="\/plainrow\/app\.html"/,
+    rel + " Try Lite must not be primary"
+  );
+}
+
+for (const rel of kitchenJobPages) {
   const html = read(rel);
   assert.match(
     html,
@@ -95,11 +124,13 @@ assert.strictEqual(tbodyA1Count(figureByCaption(dedupe, "Input")), 2, "dedupe in
 assert.strictEqual(tbodyA1Count(figureByCaption(dedupe, "Result")), 1, "dedupe result tbody should have one A-1");
 
 const join = read("plainrow/join-csv-without-uploading/index.html");
-assert.match(join, /<figcaption>File A<\/figcaption>/);
-assert.match(join, /<figcaption>File B<\/figcaption>/);
+assert.match(join, /<figcaption>catalog.csv<\/figcaption>/);
+assert.match(join, /<figcaption>warehouse.csv<\/figcaption>/);
 assert.match(join, /<figcaption>Result<\/figcaption>/);
 const joinResult = figureByCaption(join, "Result");
-assert.match(joinResult, /<th>price<\/th>/, "join result must have a price column");
+assert.match(joinResult, /<th>Price<\/th>/, "join result must have a Price column");
+assert.match(joinResult, /SKU-1002/, "join result keeps unmatched catalog SKU");
+assert.doesNotMatch(joinResult, /SKU-1008/, "join result drops warehouse-only SKU");
 
 const split = read("plainrow/split-csv-in-browser/index.html");
 const splitInput = figureByCaption(split, "Input");
