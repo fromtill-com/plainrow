@@ -125,6 +125,17 @@ loadFunctions(liteSrc, [
   "dedupeTable"
 ]);
 const liteDemos = vm.runInThisContext("(" + extractConstObject(liteSrc, "DEMOS") + ")");
+const liteEmpty = liteHtml.slice(liteHtml.indexOf('id="empty"'), liteHtml.indexOf('id="tableHost"'));
+assert.match(liteEmpty, /Stack two CSV files/);
+assert.match(liteEmpty, /two weekly timesheets/);
+assert.doesNotMatch(liteEmpty, /Drop a CSV on the counter/);
+assert.ok(
+  liteEmpty.indexOf('id="btnDemo"') < liteEmpty.indexOf('id="btnOpen2"'),
+  "empty primary is Load the stack demo"
+);
+assert.match(liteHtml, /loadDemo\("timesheets", \{ thenStack: true \}\)/);
+assert.match(liteHtml, /Two weekly timesheets — week 10 and week 11\. Stack them\./);
+
 assert.ok(liteDemos.timesheets && liteDemos.timesheets.length === 2, "Lite stack demo is two timesheet files");
 assert.ok(liteDemos.emails && liteDemos.emails.length === 1, "Lite email demo is one file");
 
