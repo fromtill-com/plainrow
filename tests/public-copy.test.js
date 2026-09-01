@@ -152,6 +152,11 @@ assert.doesNotMatch(support, /polar\.sh\/plainrow/);
 
 const lite = read("plainrow/app.html");
 assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);
+const liteEmpty = lite.slice(lite.indexOf('id="empty"'), lite.indexOf('id="tableHost"'));
+assert.match(liteEmpty, /Stack two CSV files/);
+assert.doesNotMatch(liteEmpty, /Drop a CSV on the counter/);
+assert.match(liteEmpty, /Load the stack demo/);
+assert.strictEqual((liteEmpty.match(/Open CSV/g) || []).length, 1);
 assert.match(lite, /id="btnStack"/);
 assert.match(lite, /id="btnDedupe"/);
 assert.match(lite, /class="buy-job"/);

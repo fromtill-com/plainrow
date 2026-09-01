@@ -245,7 +245,8 @@ table.data tbody tr:hover td { background: #f7f3ea; }
   color: var(--muted);
 }
 .empty h2 { font-family: var(--serif); font-size: 1.6rem; color: var(--ink); margin-bottom: 8px; }
-.empty p { max-width: 420px; margin: 0 auto 16px; line-height: 1.5; }
+.empty p { max-width: 460px; margin: 0 auto 16px; line-height: 1.5; }
+.empty .empty-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 
 .pager { display: flex; align-items: center; gap: 10px; padding: 8px 2px 12px; font-size: 0.8rem; color: var(--muted); }
 .pager button { padding: 4px 8px; }
@@ -352,10 +353,12 @@ table.data tbody tr:hover td { background: #f7f3ea; }
     <div class="warns" id="warnings"></div>
     <div class="sheet-wrap" id="sheetWrap">
       <div id="empty" class="empty">
-        <h2>Drop a CSV on the counter</h2>
-        <p>Open up to two CSV/TSV files, stack them, dedupe, export. Files never leave this computer.</p>
-        <button type="button" class="btn primary" id="btnOpen2">Open CSV</button>
-        <button type="button" class="btn" id="btnDemo">Load the stack demo</button>
+        <h2>Stack two CSV files</h2>
+        <p>Start with two weekly timesheets, then Stack them. Dedupe and export stay on the toolbar. Files never leave this computer.</p>
+        <div class="empty-actions">
+          <button type="button" class="btn primary" id="btnDemo">Load the stack demo</button>
+          <button type="button" class="btn" id="btnOpen2">Open CSV</button>
+        </div>
       </div>
       <div id="tableHost" hidden></div>
     </div>
@@ -366,10 +369,10 @@ table.data tbody tr:hover td { background: #f7f3ea; }
 <aside class="panel" id="panel" hidden></aside>
 <div class="help" id="help" hidden>
   <h2>How this works</h2>
-  <p>Open up to two CSV/TSV files, stack them, dedupe, export. Files never leave this computer.</p>
+  <p>Open two CSV/TSV files, stack them, dedupe, export. Files never leave this computer.</p>
   <ol>
-    <li>Open CSV or TSV files with the picker, drag-and-drop, or a synthetic demo. Lite holds two files on the counter.</li>
-    <li>Stack unions columns and appends rows. Dedupe keeps the first or last row for each key.</li>
+    <li>Open two CSV or TSV files with the picker, drag-and-drop, or load the stack demo — two weekly timesheets, not a copy of one file.</li>
+    <li>Stack is the first toolbar button: union of columns, rows appended. Dedupe keeps the first or last row for each key.</li>
     <li>Export writes a comma-separated file to this computer. A UTF-8 BOM is optional for Excel.</li>
   </ol>
   <p>Plainrow Lite is one HTML file. You do not install anything and you do not need a network after the file is on disk. There is no telemetry.</p>
@@ -868,7 +871,7 @@ async function openFiles(fileList) {
   if (added) toast("Opened " + added + " file" + (added === 1 ? "" : "s") + ".");
 }
 
-function loadDemo(key) {
+function loadDemo(key, opts) {
   const pack = DEMOS[key];
   if (!pack) return;
   snapshot();
@@ -885,6 +888,12 @@ function loadDemo(key) {
     toast(e.message || String(e), true);
   }
   render();
+  const thenStack = opts && opts.thenStack && tables.length >= 2;
+  if (thenStack) {
+    toast("Two weekly timesheets — week 10 and week 11. Stack them.");
+    openStack();
+    return;
+  }
   if (n) toast("Loaded " + n + " synthetic file" + (n === 1 ? "" : "s") + ". Not real people or accounts.");
 }
 
@@ -897,7 +906,7 @@ function boot() {
     const v = e.target.value; e.target.value = "";
     if (v) loadDemo(v);
   };
-  document.getElementById("btnDemo").onclick = function () { loadDemo("timesheets"); };
+  document.getElementById("btnDemo").onclick = function () { loadDemo("timesheets", { thenStack: true }); };
   document.getElementById("btnUndo").onclick = doUndo;
   document.getElementById("btnRedo").onclick = doRedo;
   document.getElementById("btnHelp").onclick = openHelp;

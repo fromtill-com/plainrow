@@ -19,4 +19,4 @@ jobs:
           node-version: "20"
 
       - name: Assert stack union, keep-first dedupe, inventory join, and Lite isolation
-        run: node tests/visual-smoke.test.js
+        run: node tests/visual-smoke.test.js && node tests/lite-first-run.test.js
