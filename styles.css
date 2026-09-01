@@ -220,6 +220,23 @@ ul, ol { margin: 0; padding: 0; }
   color: var(--pine-2);
 }
 
+.catalog .kitchen-buy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.65rem 1rem;
+  padding: 0 0.2rem 1.15rem;
+  margin-top: -0.25rem;
+}
+
+.catalog .kitchen-set {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--ink);
+  max-width: 28rem;
+}
+
 .product-name {
   font-family: var(--serif);
   font-size: clamp(2.1rem, 5vw, 2.8rem);
@@ -401,6 +418,10 @@ ul, ol { margin: 0; padding: 0; }
     grid-column: 2;
     align-self: start;
     margin-top: 0.35rem;
+  }
+
+  .catalog .kitchen-buy {
+    padding-left: 2rem;
   }
 
   .lede { max-width: none; }

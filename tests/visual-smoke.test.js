@@ -100,18 +100,19 @@ const liteToolbar = liteHtml.match(/<div class="toolbar">[\s\S]*?<\/div>/);
 assert.ok(liteToolbar, "Lite toolbar exists");
 assert.match(liteToolbar[0], /id="btnStack"/);
 assert.match(liteToolbar[0], /id="btnDedupe"/);
-const buyJobs = [...liteToolbar[0].matchAll(/<a class="buy-job"[^>]*>([^<]*)<\/a>/g)];
-assert.strictEqual(buyJobs.length, 3, "Join, Split, and Clean are three empty buy links");
-assert.deepStrictEqual(
-  buyJobs.map((m) => m[1]),
-  ["Join · Kitchen · $19", "Split · Kitchen · $19", "Clean · Kitchen · $19"],
-  "Kitchen · $19 is on the face of Join, Split, and Clean, not only in title/aria-label"
+const buyJobs = [...liteToolbar[0].matchAll(/<a class="buy-job"[^>]*>([\s\S]*?)<\/a>/g)];
+assert.strictEqual(buyJobs.length, 1, "one Kitchen · $19 buy control");
+assert.match(buyJobs[0][1], /class="buy-job-label">Kitchen · \$19</);
+assert.match(
+  buyJobs[0][1],
+  /class="buy-job-set">filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files/
 );
+assert.doesNotMatch(liteToolbar[0], /Join · Kitchen · \$19|toolbar-note/);
 for (const m of buyJobs) {
   const tag = m[0].slice(0, m[0].indexOf(">") + 1);
-  assert.ok(tag.includes(polarKitchen), "empty Kitchen job links Polar checkout");
-  assert.ok(tag.includes('target="_blank"'), "empty Kitchen job opens a new tab");
-  assert.ok(tag.includes('rel="noopener noreferrer"'), "empty Kitchen job has rel");
+  assert.ok(tag.includes(polarKitchen), "Kitchen control links Polar checkout");
+  assert.ok(tag.includes('target="_blank"'), "Kitchen control opens a new tab");
+  assert.ok(tag.includes('rel="noopener noreferrer"'), "Kitchen control has rel");
 }
 
 loadFunctions(liteSrc, [

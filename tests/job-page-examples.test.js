@@ -76,7 +76,7 @@ for (const rel of kitchenPages) {
   const html = read(rel);
   assert.match(
     html,
-    /Lite shows Join, Split, and Clean as buy labels\. Kitchen is the zip that actually runs them\./,
+    /Lite names Kitchen · \$19 on the toolbar: filter, columns, replace, dates, sort, recipes, join, stack, split, clean\. Kitchen is the zip that actually runs them\./,
     rel + " missing honest Lite/Kitchen line"
   );
 }
