@@ -90,7 +90,8 @@ const requiredFaqs = [
   "Do files leave my machine",
   "What can Lite do",
   "What can Kitchen do",
-  "How do I buy Kitchen"
+  "How do I buy Kitchen",
+  "I paid. What arrives"
 ];
 const faqNames = supportLd.mainEntity.map((q) => String(q.name || ""));
 for (const phrase of requiredFaqs) {

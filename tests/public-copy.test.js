@@ -117,6 +117,12 @@ assert.match(support, /<h2>Do files leave my machine\?<\/h2>/);
 assert.match(support, /<h2>What can Lite do\?<\/h2>/);
 assert.match(support, /<h2>What can Kitchen do\?<\/h2>/);
 assert.match(support, /<h2>How do I buy Kitchen\?<\/h2>/);
+assert.match(support, /<h2>I paid\. What arrives\?<\/h2>/);
+assert.match(
+  support,
+  /A zip\. Unzip it\. Open the offline HTML file from disk\. Files never leave the machine\. Filter, columns, replace, dates, sort, recipes, join, stack, split, and clean\. More than two files\. For a broken download or a refund, email[\s\S]*till@fromtill\.com[\s\S]*column names and row count, never file contents\./
+);
+assert.doesNotMatch(support, /kitchen\/plainrow\.html/);
 assert.match(support, /property="og:title" content="Plainrow support"/);
 assert.match(support, /type="application\/ld\+json"/);
 const supportVisible = support
