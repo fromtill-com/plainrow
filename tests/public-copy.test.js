@@ -43,24 +43,34 @@ assert.match(home, /href="\/plainrow\/"/);
 assert.match(home, />Open</);
 assert.match(home, /Lite is free/);
 assert.match(home, /Kitchen is \$19/);
-assert.match(home, /Kitchen is \$19: join, stack, split, clean\./);
-assert.doesNotMatch(home, /filter, columns, replace|more than two files/);
+assert.match(home, /Kitchen is \$19: filter, columns, replace, dates, sort, recipes, join, stack, split, clean\./);
+assert.doesNotMatch(home, /Kitchen is \$19: join, stack, split, clean\./);
 assert.match(home, /<h1 class="lede">Small offline tools\.<\/h1>/);
 assert.match(home, /<ul class="catalog">/);
-assert.match(home, /<ul class="catalog">[\s\S]*>Buy Kitchen · \$19</);
+assert.match(home, /<ul class="catalog">[\s\S]*>Buy Kitchen · \$19 · filter/);
 assert.match(home, new RegExp('href="' + polarEsc + '"'));
 assert.match(home, /target="_blank"/);
 assert.match(home, /rel="noopener noreferrer"/);
 const houseCatalog = home.match(/<ul class="catalog">[\s\S]*?<\/ul>/);
 assert.ok(houseCatalog, "house missing catalog");
 assert.strictEqual((houseCatalog[0].match(/<li>/g) || []).length, 1, "house stays one card");
+assert.strictEqual((home.match(/>Open</g) || []).length, 1, "house stays one Open");
 assert.match(houseCatalog[0], /<span class="item-name">Plainrow<\/span>/);
 assert.match(houseCatalog[0], />Open</);
-assert.match(houseCatalog[0], />Buy Kitchen · \$19</);
+assert.match(houseCatalog[0], /class="btn primary kitchen-buy"/);
+assert.match(
+  houseCatalog[0],
+  />Buy Kitchen · \$19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files</
+);
+assert.doesNotMatch(houseCatalog[0], /class="fine"|toolbar-note/, "Kitchen tools are on the Buy Kitchen control");
 assert.doesNotMatch(home, /<span class="item-name">Kitchen</);
+assert.doesNotMatch(home, /<span class="item-name">Filter/);
 assert.doesNotMatch(home, /polar\.sh\/plainrow/);
 assert.doesNotMatch(home, /Try Lite|Download Lite/);
 assert.doesNotMatch(home, /<div class="actions">/, "house stays a catalog, not a product pitch");
+const css = read("styles.css");
+assert.match(css, /\.catalog \.kitchen-buy \{[\s\S]*?font-weight: 650/);
+assert.match(css, /\.catalog \.kitchen-buy \{[\s\S]*?white-space: normal/);
 
 const merge = read("plainrow/merge-csv-without-uploading/index.html");
 const mergeLede = merge.match(/<p class="lede">([\s\S]*?)<\/p>/);
@@ -145,17 +155,27 @@ assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);
 assert.match(lite, /id="btnStack"/);
 assert.match(lite, /id="btnDedupe"/);
 assert.match(lite, /class="buy-job"/);
-assert.match(lite, />Join · Kitchen · \$19</);
-assert.match(lite, />Split · Kitchen · \$19</);
-assert.match(lite, />Clean · Kitchen · \$19</);
+assert.match(
+  lite,
+  />Kitchen · \$19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files</
+);
+assert.doesNotMatch(lite, />Join · Kitchen · \$19</);
+assert.doesNotMatch(lite, />Split · Kitchen · \$19</);
+assert.doesNotMatch(lite, />Clean · Kitchen · \$19</);
 const liteToolbar = lite.match(/<div class="toolbar">[\s\S]*?<\/div>/);
 assert.ok(liteToolbar, "Lite toolbar exists");
+assert.strictEqual(
+  (liteToolbar[0].match(/<a class="buy-job"/g) || []).length,
+  1,
+  "one Kitchen · $19 control on Lite"
+);
 assert.match(
   liteToolbar[0],
-  /class="toolbar-note">Kitchen also does filter, columns, replace, dates, sort, recipes, and more than two files\./
+  />Kitchen · \$19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files</
 );
+assert.doesNotMatch(lite, /toolbar-note|Kitchen also does|buy-job-set|buy-job-label/, "Kitchen tools are not a Lite whisper");
 assert.strictEqual(
-  (lite.match(/Kitchen also does filter, columns, replace, dates, sort, recipes, and more than two files\./g) || []).length,
+  (lite.match(/filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files/g) || []).length,
   1,
   "one Kitchen sentence on Lite"
 );
