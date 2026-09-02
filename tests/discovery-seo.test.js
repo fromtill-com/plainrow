@@ -154,6 +154,14 @@ assert.doesNotMatch(sitemap, /polar\.sh/, "sitemap must not include polar");
 assert.doesNotMatch(sitemap, /\/kitchen\//, "sitemap must not include kitchen HTML");
 assert.doesNotMatch(sitemap, /merge-csv-in-browser|stack-two-csv-files-in-browser/);
 assert.match(sitemap, /<lastmod>2026-08-31<\/lastmod>/);
+assert.match(
+  sitemap,
+  /<loc>https:\/\/fromtill\.com\/plainrow\/<\/loc>\s*<lastmod>2026-09-02<\/lastmod>/
+);
+assert.match(
+  sitemap,
+  /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-02<\/lastmod>/
+);
 
 const polarKitchen =
   "https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9";
