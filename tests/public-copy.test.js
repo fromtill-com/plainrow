@@ -115,21 +115,36 @@ assert.doesNotMatch(product, /not a switch/);
 assert.doesNotMatch(product, /There is no paid product|nothing to refund/i);
 const productActions = product.match(/<div class="actions">[\s\S]*?<\/div>/);
 assert.ok(productActions, "product missing .actions");
-assert.match(productActions[0], /class="btn primary"[^>]*>Try Lite</);
 assert.match(
   productActions[0],
-  /<a class="btn primary" id="buyKitchen" href="https:\/\/buy\.polar\.sh\/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9"[^>]*>Buy Kitchen · \$19</
+  new RegExp(
+    '^\\s*<div class="actions">\\s*' +
+      '<a class="btn primary" id="buyKitchen" href="' +
+      polarEsc +
+      '" target="_blank" rel="noopener noreferrer">Buy Kitchen · \\$19</a>\\s*' +
+      '<a class="btn" href="app\\.html">Try Lite</a>'
+  ),
+  "product should lead with Buy Kitchen · $19, Try Lite second"
+);
+assert.doesNotMatch(
+  productActions[0],
+  /class="btn primary"[^>]*>Try Lite</,
+  "Try Lite must not be primary on /plainrow/"
 );
 assert.match(productActions[0], /id="downloadLite"/);
 assert.doesNotMatch(productActions[0], /id="downloadLite"[^>]*primary|class="btn primary"[^>]*id="downloadLite"/);
 assert.ok(
-  productActions[0].indexOf("Buy Kitchen") < productActions[0].indexOf("Download Lite"),
-  "Buy Kitchen must not sit behind Download Lite"
+  productActions[0].indexOf("Buy Kitchen") < productActions[0].indexOf("Try Lite"),
+  "Buy Kitchen must lead Try Lite"
+);
+assert.ok(
+  productActions[0].indexOf("Try Lite") < productActions[0].indexOf("Download Lite"),
+  "Try Lite must not sit behind Download Lite"
 );
 assert.strictEqual(
   (productActions[0].match(/class="btn primary"/g) || []).length,
-  2,
-  "Try Lite and Buy Kitchen are both primary"
+  1,
+  "Buy Kitchen is the only primary CTA on /plainrow/"
 );
 
 const support = read("plainrow/support/index.html");
@@ -175,6 +190,16 @@ assert.ok(supportActions, "support missing .actions");
 assert.match(supportActions[0], />Email till@fromtill\.com</);
 assert.match(supportActions[0], />Try Lite</);
 assert.match(supportActions[0], />Buy Kitchen · \$19</);
+assert.match(supportActions[0], /class="btn primary"[^>]*>Email till@fromtill\.com</);
+assert.doesNotMatch(
+  supportActions[0],
+  /class="btn primary"[^>]*>Try Lite</,
+  "Try Lite must not be primary on support"
+);
+assert.ok(
+  supportActions[0].indexOf("Buy Kitchen") < supportActions[0].indexOf("Try Lite"),
+  "support must not lead with Try Lite before Buy Kitchen"
+);
 assert.match(supportActions[0], new RegExp('href="' + polarEsc + '"'));
 assert.match(supportActions[0], /target="_blank"/);
 assert.match(supportActions[0], /rel="noopener noreferrer"/);
