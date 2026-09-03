@@ -89,6 +89,15 @@ assert.match(product, /id="buyKitchen"/);
 assert.match(product, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
 assert.match(product, /target="_blank"/);
 assert.match(product, />Buy Kitchen · \$19</);
+const productLede = product.match(/<p class="lede">([\s\S]*?)<\/p>/);
+assert.ok(productLede, "product missing lede");
+assert.match(productLede[0], /two files/);
+assert.match(productLede[0], /stack/i);
+assert.match(productLede[0], /duplicate rows/);
+assert.match(
+  productLede[0],
+  /Kitchen is \$19: filter, columns, replace, dates, sort, recipes, join, stack, split, clean, more than two files/
+);
 assert.match(
   product,
   /Kitchen is the paid offline HTML file\. Polar delivers the zip\. \$19 one-time\. Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean\. Lite stays two files, stack, dedupe, export\./
@@ -104,6 +113,24 @@ assert.doesNotMatch(product, /paid offline HTML file: join, stack, split, clean\
 assert.doesNotMatch(product, /Kitchen is \$19: join, stack, split, clean\./);
 assert.doesNotMatch(product, /not a switch/);
 assert.doesNotMatch(product, /There is no paid product|nothing to refund/i);
+const productActions = product.match(/<div class="actions">[\s\S]*?<\/div>/);
+assert.ok(productActions, "product missing .actions");
+assert.match(productActions[0], /class="btn primary"[^>]*>Try Lite</);
+assert.match(
+  productActions[0],
+  /<a class="btn primary" id="buyKitchen" href="https:\/\/buy\.polar\.sh\/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9"[^>]*>Buy Kitchen · \$19</
+);
+assert.match(productActions[0], /id="downloadLite"/);
+assert.doesNotMatch(productActions[0], /id="downloadLite"[^>]*primary|class="btn primary"[^>]*id="downloadLite"/);
+assert.ok(
+  productActions[0].indexOf("Buy Kitchen") < productActions[0].indexOf("Download Lite"),
+  "Buy Kitchen must not sit behind Download Lite"
+);
+assert.strictEqual(
+  (productActions[0].match(/class="btn primary"/g) || []).length,
+  2,
+  "Try Lite and Buy Kitchen are both primary"
+);
 
 const support = read("plainrow/support/index.html");
 assert.match(support, /two files: stack, dedupe, and export/i);
@@ -117,6 +144,13 @@ assert.match(support, /<h2>Do files leave my machine\?<\/h2>/);
 assert.match(support, /<h2>What can Lite do\?<\/h2>/);
 assert.match(support, /<h2>What can Kitchen do\?<\/h2>/);
 assert.match(support, /<h2>How do I buy Kitchen\?<\/h2>/);
+const supportBuy = support.match(/<h2>How do I buy Kitchen\?<\/h2>\s*<p>([\s\S]*?)<\/p>/);
+assert.ok(supportBuy, "support missing How do I buy Kitchen body");
+assert.match(supportBuy[1], new RegExp(polarEsc));
+assert.match(supportBuy[1], /offline HTML file/);
+assert.match(supportBuy[1], /join, split, clean/);
+assert.match(supportBuy[1], /filter, columns, replace, dates, and sort/);
+assert.doesNotMatch(supportBuy[1], /testimonial|14-day|customers/i);
 assert.match(support, /property="og:title" content="Plainrow support"/);
 assert.match(support, /type="application\/ld\+json"/);
 const supportVisible = support
