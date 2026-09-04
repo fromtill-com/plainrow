@@ -156,11 +156,11 @@ assert.doesNotMatch(sitemap, /merge-csv-in-browser|stack-two-csv-files-in-browse
 assert.match(sitemap, /<lastmod>2026-08-31<\/lastmod>/);
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/<\/loc>\s*<lastmod>2026-09-02<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/<\/loc>\s*<lastmod>2026-09-03<\/lastmod>/
 );
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-02<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-03<\/lastmod>/
 );
 
 const polarKitchen =
