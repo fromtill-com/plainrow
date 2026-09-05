@@ -18,6 +18,7 @@ const publicPages = [
   "plainrow/index.html",
   "plainrow/app.html",
   "plainrow/support/index.html",
+  "plainrow/log/index.html",
   "plainrow/merge-csv-without-uploading/index.html",
   "plainrow/merge-csv-in-browser/index.html",
   "plainrow/stack-two-csv-files-in-browser/index.html",
@@ -85,6 +86,8 @@ assert.match(product, />Download Lite</);
 assert.match(product, /href="plainrow-lite\.html"/);
 assert.match(product, /How it works/);
 assert.match(product, /href="\/plainrow\/support\/"/);
+assert.match(product, /href="\/plainrow\/log\/"/);
+assert.match(product, />Log</);
 assert.match(product, /id="buyKitchen"/);
 assert.match(product, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
 assert.match(product, /target="_blank"/);
@@ -208,6 +211,23 @@ assert.doesNotMatch(support, /There is no paid product|nothing to refund/i);
 assert.doesNotMatch(support, /How do I join/i);
 assert.doesNotMatch(support, /<form|zendesk|intercom|crisp|drift|chat widget/i);
 assert.doesNotMatch(support, /polar\.sh\/plainrow/);
+assert.match(support, /href="\/plainrow\/log\/"/);
+assert.match(support, />Log</);
+assert.doesNotMatch(support, /<ul class="catalog">/, "support is not a second Tools card");
+
+const log = read("plainrow/log/index.html");
+assert.match(log, /<h1 class="product-name">Plainrow log<\/h1>/);
+assert.match(log, /<time datetime="2026-09-04">2026-09-04<\/time>/);
+assert.match(log, /Buy Kitchen · \$19 is the only primary button/);
+assert.match(log, /filter, columns, replace, dates, sort, recipes, join, stack, split, clean/);
+assert.match(log, /Join, split, and clean pages lead with Buy Kitchen/);
+assert.match(log, /Lite empty state is Stack two CSV files/);
+assert.match(log, /property="og:title" content="Plainrow log"/);
+assert.match(log, /property="og:url" content="https:\/\/fromtill\.com\/plainrow\/log\/"/);
+assert.match(log, /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/log\/"/);
+assert.doesNotMatch(log, /14-day|testimonial|customers|as seen in|users|downloads/i);
+assert.doesNotMatch(log, /kitchen\/plainrow\.html|hosted Kitchen/i);
+assert.doesNotMatch(home, /href="\/plainrow\/log\/"/, "house stays one card, no log Tools item");
 
 const lite = read("plainrow/app.html");
 assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);
@@ -252,6 +272,7 @@ assert.doesNotMatch(lite, /recipeInput|btnLoadRecipe|Load recipe JSON|function o
 
 const sitemap = read("sitemap.xml");
 assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/support\//);
+assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/log\//);
 assert.doesNotMatch(sitemap, /\/kitchen\//);
 
 console.log("public-copy.test.js ok");

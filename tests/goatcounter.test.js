@@ -20,6 +20,7 @@ const livePages = [
   "plainrow/app.html",
   "plainrow/plainrow-lite.html",
   "plainrow/support/index.html",
+  "plainrow/log/index.html",
   "plainrow/stack-two-csv-files-in-browser/index.html",
   "plainrow/merge-csv-without-uploading/index.html",
   "plainrow/merge-csv-in-browser/index.html",
