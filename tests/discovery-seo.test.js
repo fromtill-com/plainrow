@@ -36,6 +36,7 @@ const pages = [
   "plainrow/index.html",
   "plainrow/app.html",
   "plainrow/support/index.html",
+  "plainrow/log/index.html",
   "plainrow/append-csv-files-in-browser/index.html",
   "plainrow/merge-csv-without-uploading/index.html",
   "plainrow/dedupe-csv-without-uploading/index.html",
@@ -117,6 +118,23 @@ for (const question of supportLd.mainEntity) {
   );
 }
 
+const log = read("plainrow/log/index.html");
+assert.match(
+  log,
+  /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/log\/"/,
+  "log missing canonical"
+);
+assert.match(log, /property="og:title" content="Plainrow log"/);
+assert.match(log, /property="og:url" content="https:\/\/fromtill\.com\/plainrow\/log\/"/);
+assert.match(log, /property="og:image" content="https:\/\/fromtill\.com\/plainrow\/logo\.png"/);
+assert.match(
+  log,
+  /property="og:description" content="Dated Plainrow ships on fromtill.com. Kitchen is \$19. Lite is free. Nothing is uploaded."/
+);
+const logLd = jsonLd(log, "plainrow/log/index.html");
+assert.strictEqual(logLd["@type"], "CollectionPage", "log JSON-LD should be CollectionPage");
+assert.ok(Array.isArray(logLd.hasPart) && logLd.hasPart.length >= 1, "log CollectionPage missing entries");
+
 const jobPages = [
   "plainrow/append-csv-files-in-browser/index.html",
   "plainrow/merge-csv-without-uploading/index.html",
@@ -162,6 +180,10 @@ assert.match(
   sitemap,
   /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
 );
+assert.match(
+  sitemap,
+  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
+);
 
 const polarKitchen =
   "https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9";
@@ -175,6 +197,7 @@ assert.match(llms, /\$19 one-time/);
 assert.match(llms, /Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean/);
 assert.match(llms, new RegExp(polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 assert.match(llms, /till@fromtill\.com/);
+assert.match(llms, /https:\/\/fromtill\.com\/plainrow\/log\//);
 assert.doesNotMatch(llms, /kitchen\/plainrow\.html|github\.io/i);
 assert.doesNotMatch(llms, /google-analytics|googletagmanager|gtag\(/i);
 assert.doesNotMatch(llms, /14-day|14 day|testimonial|customers/i);

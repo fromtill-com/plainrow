@@ -388,6 +388,13 @@ ul, ol { margin: 0; padding: 0; }
   color: var(--muted);
 }
 
+.colophon a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.colophon a:hover { color: var(--pine); }
+
 :focus-visible {
   outline: 2px solid var(--pine);
   outline-offset: 3px;

@@ -19,7 +19,8 @@ const pages = [
   { rel: "index.html", png: "/logo.png" },
   { rel: "plainrow/index.html", png: "/plainrow/logo.png" },
   { rel: "plainrow/app.html", png: "/plainrow/logo.png" },
-  { rel: "plainrow/support/index.html", png: "/plainrow/logo.png" }
+  { rel: "plainrow/support/index.html", png: "/plainrow/logo.png" },
+  { rel: "plainrow/log/index.html", png: "/plainrow/logo.png" }
 ];
 
 for (const page of pages) {
