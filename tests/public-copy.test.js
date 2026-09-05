@@ -18,6 +18,7 @@ const publicPages = [
   "plainrow/index.html",
   "plainrow/app.html",
   "plainrow/support/index.html",
+  "plainrow/log/index.html",
   "plainrow/merge-csv-without-uploading/index.html",
   "plainrow/merge-csv-in-browser/index.html",
   "plainrow/stack-two-csv-files-in-browser/index.html",
@@ -46,6 +47,9 @@ assert.match(home, /Kitchen is \$19/);
 assert.match(home, /Kitchen is \$19: filter, columns, replace, dates, sort, recipes, join, stack, split, clean\./);
 assert.doesNotMatch(home, /Kitchen is \$19: join, stack, split, clean\./);
 assert.match(home, /<h1 class="lede">Small offline tools\.<\/h1>/);
+assert.match(home, /href="\/plainrow\/log\/"/);
+assert.match(home, />Release log</);
+assert.doesNotMatch(home, /<span class="item-name">Release log</);
 assert.match(home, /<ul class="catalog">/);
 assert.match(home, /<ul class="catalog">[\s\S]*>Buy Kitchen · \$19 · filter/);
 assert.match(home, new RegExp('href="' + polarEsc + '"'));
@@ -85,6 +89,8 @@ assert.match(product, />Download Lite</);
 assert.match(product, /href="plainrow-lite\.html"/);
 assert.match(product, /How it works/);
 assert.match(product, /href="\/plainrow\/support\/"/);
+assert.match(product, /href="\/plainrow\/log\/"/);
+assert.match(product, />Release log</);
 assert.match(product, /id="buyKitchen"/);
 assert.match(product, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
 assert.match(product, /target="_blank"/);
@@ -149,6 +155,8 @@ assert.strictEqual(
 
 const support = read("plainrow/support/index.html");
 assert.match(support, /two files: stack, dedupe, and export/i);
+assert.match(support, /href="\/plainrow\/log\/"/);
+assert.match(support, />Release log</);
 assert.match(support, /href="\/plainrow\/app\.html"/);
 assert.match(support, />Try Lite</);
 assert.match(support, />Email till@fromtill\.com</);

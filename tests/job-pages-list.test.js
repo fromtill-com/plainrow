@@ -20,6 +20,8 @@ assert.match(product, /<h2>How it works<\/h2>/);
 assert.match(product, /Open two CSV files\. They never leave this computer\./);
 assert.match(product, /href="\/plainrow\/support\/"/);
 assert.match(product, />Support</);
+assert.match(product, /href="\/plainrow\/log\/"/);
+assert.match(product, />Release log</);
 
 const jobs = [
   ["/plainrow/merge-csv-without-uploading/", "Merge CSV without uploading", "Lite"],

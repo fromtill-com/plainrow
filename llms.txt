@@ -8,6 +8,7 @@ Plainrow Lite is free: stack two CSVs, remove duplicate rows. Kitchen is the pai
 
 - [Plainrow Lite](https://fromtill.com/plainrow/app.html): free. Stack and dedupe in the browser.
 - [Buy Kitchen](https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9): $19 one-time. Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean.
+- [Plainrow release log](https://fromtill.com/plainrow/log/): dated ships. Kitchen is $19. Lite is free.
 
 ## Support
 

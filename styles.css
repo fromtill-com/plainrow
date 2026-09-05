@@ -322,6 +322,15 @@ ul, ol { margin: 0; padding: 0; }
   color: var(--ink);
 }
 
+.steps p + p { margin-top: 0.7rem; }
+
+.colophon a {
+  color: var(--pine);
+  text-decoration: none;
+}
+
+.colophon a:hover { color: var(--pine-2); }
+
 .example { margin-top: 2rem; }
 
 .example h2 {

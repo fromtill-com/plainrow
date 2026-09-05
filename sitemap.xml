@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://fromtill.com/</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </url>
   <url>
     <loc>https://fromtill.com/plainrow/</loc>
@@ -42,6 +42,10 @@
   </url>
   <url>
     <loc>https://fromtill.com/plainrow/support/</loc>
+    <lastmod>2026-09-05</lastmod>
+  </url>
+  <url>
+    <loc>https://fromtill.com/plainrow/log/</loc>
     <lastmod>2026-09-05</lastmod>
   </url>
 </urlset>

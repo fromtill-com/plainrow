@@ -26,7 +26,8 @@ const livePages = [
   "plainrow/join-csv-without-uploading/index.html",
   "plainrow/split-csv-in-browser/index.html",
   "plainrow/clean-csv-without-uploading/index.html",
-  "plainrow/dedupe-csv-without-uploading/index.html"
+  "plainrow/dedupe-csv-without-uploading/index.html",
+  "plainrow/log/index.html"
 ];
 
 const marker = /data-goatcounter="https:\/\/fromtill\.goatcounter\.com\/count"/g;

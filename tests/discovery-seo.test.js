@@ -41,7 +41,8 @@ const pages = [
   "plainrow/dedupe-csv-without-uploading/index.html",
   "plainrow/join-csv-without-uploading/index.html",
   "plainrow/split-csv-in-browser/index.html",
-  "plainrow/clean-csv-without-uploading/index.html"
+  "plainrow/clean-csv-without-uploading/index.html",
+  "plainrow/log/index.html"
 ];
 
 for (const rel of pages) {
@@ -51,6 +52,13 @@ for (const rel of pages) {
   assert.doesNotMatch(html, /kitchen\/plainrow\.html/, rel + " links kitchen/plainrow.html");
   jsonLd(html, rel);
 }
+
+const logPage = read("plainrow/log/index.html");
+const logLd = jsonLd(logPage, "plainrow/log/index.html");
+assert.strictEqual(logLd["@type"], "Blog", "log JSON-LD should be Blog");
+assert.strictEqual(logLd.url, "https://fromtill.com/plainrow/log/");
+assert.match(logPage, /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/log\/"/);
+assert.match(logPage, /property="og:title" content="Plainrow release log"/);
 
 const home = read("index.html");
 assert.match(home, /<h1[\s>]/, "house page missing h1");
@@ -162,6 +170,14 @@ assert.match(
   sitemap,
   /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
 );
+assert.match(
+  sitemap,
+  /<loc>https:\/\/fromtill\.com\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
+);
+assert.match(
+  sitemap,
+  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
+);
 
 const polarKitchen =
   "https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9";
@@ -175,6 +191,7 @@ assert.match(llms, /\$19 one-time/);
 assert.match(llms, /Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean/);
 assert.match(llms, new RegExp(polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 assert.match(llms, /till@fromtill\.com/);
+assert.match(llms, /https:\/\/fromtill\.com\/plainrow\/log\//);
 assert.doesNotMatch(llms, /kitchen\/plainrow\.html|github\.io/i);
 assert.doesNotMatch(llms, /google-analytics|googletagmanager|gtag\(/i);
 assert.doesNotMatch(llms, /14-day|14 day|testimonial|customers/i);
