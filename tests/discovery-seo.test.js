@@ -133,7 +133,8 @@ assert.match(
 );
 const logLd = jsonLd(log, "plainrow/log/index.html");
 assert.strictEqual(logLd["@type"], "CollectionPage", "log JSON-LD should be CollectionPage");
-assert.ok(Array.isArray(logLd.hasPart) && logLd.hasPart.length >= 1, "log CollectionPage missing entries");
+assert.ok(Array.isArray(logLd.hasPart) && logLd.hasPart.length >= 3, "log CollectionPage missing entries");
+assert.strictEqual(logLd.hasPart[0].datePublished, "2026-09-06", "log JSON-LD must lead with newest date");
 
 const jobPages = [
   "plainrow/append-csv-files-in-browser/index.html",
@@ -182,7 +183,7 @@ assert.match(
 );
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-06<\/lastmod>/
 );
 
 const polarKitchen =
