@@ -129,12 +129,20 @@ assert.match(log, /property="og:url" content="https:\/\/fromtill\.com\/plainrow\
 assert.match(log, /property="og:image" content="https:\/\/fromtill\.com\/plainrow\/logo\.png"/);
 assert.match(
   log,
-  /property="og:description" content="Dated Plainrow ships on fromtill.com. Kitchen is \$19. Lite is free. Nothing is uploaded."/
+  /property="og:description" content="What shipped. How to use Lite and Kitchen. Why Kitchen is \$19. Lite is free. Nothing is uploaded."/
 );
 const logLd = jsonLd(log, "plainrow/log/index.html");
 assert.strictEqual(logLd["@type"], "CollectionPage", "log JSON-LD should be CollectionPage");
 assert.ok(Array.isArray(logLd.hasPart) && logLd.hasPart.length >= 3, "log CollectionPage missing entries");
 assert.strictEqual(logLd.hasPart[0].datePublished, "2026-09-06", "log JSON-LD must lead with newest date");
+assert.match(String(logLd.hasPart[0].articleBody || ""), /Plainrow is offline CSV work in the browser/);
+assert.match(String(logLd.hasPart[2].articleBody || ""), /Stack two CSV files/);
+const logPublic = visibleCopy(log) + " " + JSON.stringify(logLd);
+assert.doesNotMatch(
+  logPublic,
+  /FRO-\d+|PR\s*#|keep\/kill|Polar Kitchen still 0|GoatCounter|Product Hunt|Curlie|integrity PASS|\bbet\b/i,
+  "log page and JSON-LD must not leak internal ops"
+);
 
 const jobPages = [
   "plainrow/append-csv-files-in-browser/index.html",

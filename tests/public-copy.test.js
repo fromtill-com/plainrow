@@ -216,19 +216,27 @@ assert.match(support, />Log</);
 assert.doesNotMatch(support, /<ul class="catalog">/, "support is not a second Tools card");
 
 const log = read("plainrow/log/index.html");
+const logVisible = log
+  .replace(/<script[\s\S]*?<\/script>/gi, " ")
+  .replace(/<style[\s\S]*?<\/style>/gi, " ")
+  .replace(/<[^>]+>/g, " ")
+  .replace(/\s+/g, " ");
 assert.match(log, /<h1 class="product-name">Plainrow log<\/h1>/);
 assert.match(log, /<time datetime="2026-09-06">2026-09-06<\/time>/);
 assert.match(log, /<time datetime="2026-09-05">2026-09-05<\/time>/);
 assert.match(log, /<time datetime="2026-09-04">2026-09-04<\/time>/);
 assert.ok(log.indexOf("2026-09-06") < log.indexOf("2026-09-05"), "newest dates first");
-assert.match(log, /Sunday keep\/kill: <strong>keep<\/strong>/);
-assert.match(log, /Integrity PASS/);
-assert.match(log, /honest left-join/);
+assert.match(logVisible, /Plainrow is offline CSV work in the browser/);
+assert.match(logVisible, /Lite is free: two files, stack, dedupe, export/);
+assert.match(logVisible, /Kitchen is \$19 one-time/);
+assert.match(logVisible, /that is Lite/);
+assert.match(logVisible, /that is Kitchen/);
 assert.match(log, /Buy Kitchen · \$19 is the only primary button/);
 assert.match(log, /filter, columns, replace, dates, sort, recipes, join, stack, split, clean/);
 assert.match(log, /Join, split, and clean pages lead with Buy Kitchen/);
 assert.match(log, /Lite empty state is Stack two CSV files/);
 assert.doesNotMatch(log, /perfect[\s-]*inner[\s-]*join/i);
+assert.doesNotMatch(logVisible, /FRO-\d+|PR\s*#|keep\/kill|Polar Kitchen still 0|GoatCounter|Product Hunt|Curlie|integrity PASS|\bbet\b/i);
 assert.match(log, /property="og:title" content="Plainrow log"/);
 assert.match(log, /property="og:url" content="https:\/\/fromtill\.com\/plainrow\/log\/"/);
 assert.match(log, /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/log\/"/);

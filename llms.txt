@@ -12,4 +12,4 @@ Plainrow Lite is free: stack two CSVs, remove duplicate rows. Kitchen is the pai
 ## Support
 
 - [till@fromtill.com](mailto:till@fromtill.com)
-- [Plainrow log](https://fromtill.com/plainrow/log/): dated ships. Kitchen is $19. Lite is free.
+- [Plainrow log](https://fromtill.com/plainrow/log/): what shipped, how to use Lite and Kitchen. Kitchen is $19. Lite is free.
