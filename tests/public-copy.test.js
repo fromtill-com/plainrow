@@ -217,11 +217,18 @@ assert.doesNotMatch(support, /<ul class="catalog">/, "support is not a second To
 
 const log = read("plainrow/log/index.html");
 assert.match(log, /<h1 class="product-name">Plainrow log<\/h1>/);
+assert.match(log, /<time datetime="2026-09-06">2026-09-06<\/time>/);
+assert.match(log, /<time datetime="2026-09-05">2026-09-05<\/time>/);
 assert.match(log, /<time datetime="2026-09-04">2026-09-04<\/time>/);
+assert.ok(log.indexOf("2026-09-06") < log.indexOf("2026-09-05"), "newest dates first");
+assert.match(log, /Sunday keep\/kill: <strong>keep<\/strong>/);
+assert.match(log, /Integrity PASS/);
+assert.match(log, /honest left-join/);
 assert.match(log, /Buy Kitchen · \$19 is the only primary button/);
 assert.match(log, /filter, columns, replace, dates, sort, recipes, join, stack, split, clean/);
 assert.match(log, /Join, split, and clean pages lead with Buy Kitchen/);
 assert.match(log, /Lite empty state is Stack two CSV files/);
+assert.doesNotMatch(log, /perfect[\s-]*inner[\s-]*join/i);
 assert.match(log, /property="og:title" content="Plainrow log"/);
 assert.match(log, /property="og:url" content="https:\/\/fromtill\.com\/plainrow\/log\/"/);
 assert.match(log, /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/log\/"/);

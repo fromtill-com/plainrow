@@ -34,26 +34,37 @@ assert.match(
   /<script data-goatcounter="https:\/\/fromtill\.goatcounter\.com\/count"\n        async src="\/\/gc\.zgo\.at\/count\.js"><\/script>/
 );
 
+assert.match(log, /<time datetime="2026-09-06">2026-09-06<\/time>/);
+assert.match(log, /<time datetime="2026-09-05">2026-09-05<\/time>/);
 assert.match(log, /<time datetime="2026-09-04">2026-09-04<\/time>/);
-assert.ok(
-  /2026-09-04|2026-09-05/.test(log),
-  "log needs a 2026-09-04 and/or 2026-09-05 entry"
-);
+const dateOrder = log.indexOf('id="2026-09-06"');
+assert.ok(dateOrder > -1, "log missing 2026-09-06 section");
+assert.ok(dateOrder < log.indexOf('id="2026-09-05"'), "2026-09-06 must sit above 2026-09-05");
+assert.ok(log.indexOf('id="2026-09-05"') < log.indexOf('id="2026-09-04"'), "2026-09-05 must sit above 2026-09-04");
+assert.match(log, /Sunday keep\/kill: <strong>keep<\/strong>/);
+assert.match(log, /Integrity PASS/);
+assert.match(log, /honest left-join/);
+assert.match(log, /GoatCounter: Aug 28–Sep 6 total ~20/);
+assert.match(log, /Public release log went live at <a href="\/plainrow\/log\/">\/plainrow\/log\/<\/a> \(FRO-38 \/ PR #41\)/);
+assert.match(log, /Curlie directory suggest submitted \(not live yet\)/);
+assert.doesNotMatch(log, /perfect[\s-]*inner[\s-]*join/i);
 
 const data = jsonLd(log, "plainrow/log/index.html");
 assert.strictEqual(data["@type"], "CollectionPage", "log JSON-LD should be CollectionPage");
 assert.strictEqual(data.url, "https://fromtill.com/plainrow/log/");
-assert.ok(Array.isArray(data.hasPart) && data.hasPart.length >= 1, "log missing dated part");
+assert.ok(Array.isArray(data.hasPart) && data.hasPart.length >= 3, "log missing dated parts");
 assert.strictEqual(data.hasPart[0]["@type"], "BlogPosting");
-assert.ok(
-  data.hasPart[0].datePublished === "2026-09-04" || data.hasPart[0].datePublished === "2026-09-05",
-  "first log entry date"
-);
+assert.strictEqual(data.hasPart[0].datePublished, "2026-09-06", "first log entry date");
+assert.strictEqual(data.hasPart[1].datePublished, "2026-09-05");
+assert.strictEqual(data.hasPart[2].datePublished, "2026-09-04");
 const body = String(data.hasPart[0].articleBody || "");
+assert.match(body, /Sunday keep\/kill: keep/);
 assert.match(body, /Buy Kitchen · \$19/);
-assert.match(body, /filter, columns, replace, dates, sort, recipes, join, stack, split, clean/);
-assert.match(body, /Join, split, and clean/);
-assert.match(body, /Stack two CSV files/);
+assert.match(body, /honest left-join/);
+assert.match(body, /GoatCounter/);
+assert.match(body, /~24 days left to Sep 30 score/);
+assert.match(String(data.hasPart[1].articleBody || ""), /FRO-38 \/ PR #41/);
+assert.match(String(data.hasPart[2].articleBody || ""), /Stack two CSV files/);
 const visible = log
   .replace(/<script[\s\S]*?<\/script>/gi, " ")
   .replace(/<[^>]+>/g, " ")
@@ -76,7 +87,7 @@ assert.doesNotMatch(home, /href="\/plainrow\/log\/"/);
 
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-06<\/lastmod>/
 );
 assert.doesNotMatch(sitemap, /\/kitchen\//);
 
