@@ -77,12 +77,14 @@ function tableFromDemo(pack) {
 
 const liteBytes = fs.readFileSync(path.join(root, "plainrow/app.html"));
 const kitchenLiteBytes = fs.readFileSync(path.join(root, "kitchen/plainrow-lite.html"));
+const downloadFileBytes = fs.readFileSync(path.join(root, "plainrow/plainrow-lite.bin"));
 const liteHtml = liteBytes.toString("utf8");
 const kitchenHtml = fs.readFileSync(path.join(root, "kitchen/plainrow.html"), "utf8");
 const liteSrc = scriptFrom(liteHtml);
 const kitchenSrc = scriptFrom(kitchenHtml);
 
 assert.ok(liteBytes.equals(kitchenLiteBytes), "plainrow/app.html must be byte-identical to kitchen/plainrow-lite.html");
+assert.ok(liteBytes.equals(downloadFileBytes), "plainrow/app.html must be byte-identical to plainrow/plainrow-lite.bin");
 
 assert.doesNotMatch(liteHtml, /\bjoinTables\b/, "Lite must not contain joinTables");
 assert.doesNotMatch(liteHtml, /recipeInput|btnLoadRecipe|Load recipe JSON|extraRecipes/, "Lite must not load recipe JSON");

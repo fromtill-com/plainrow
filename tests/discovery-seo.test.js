@@ -133,10 +133,11 @@ assert.match(
 );
 const logLd = jsonLd(log, "plainrow/log/index.html");
 assert.strictEqual(logLd["@type"], "CollectionPage", "log JSON-LD should be CollectionPage");
-assert.ok(Array.isArray(logLd.hasPart) && logLd.hasPart.length >= 3, "log CollectionPage missing entries");
-assert.strictEqual(logLd.hasPart[0].datePublished, "2026-09-06", "log JSON-LD must lead with newest date");
-assert.match(String(logLd.hasPart[0].articleBody || ""), /Plainrow is offline CSV work in the browser/);
-assert.match(String(logLd.hasPart[2].articleBody || ""), /Stack two CSV files/);
+assert.ok(Array.isArray(logLd.hasPart) && logLd.hasPart.length >= 4, "log CollectionPage missing entries");
+assert.strictEqual(logLd.hasPart[0].datePublished, "2026-09-07", "log JSON-LD must lead with newest date");
+assert.match(String(logLd.hasPart[0].articleBody || ""), /Download Lite saves one HTML file/);
+assert.match(String(logLd.hasPart[1].articleBody || ""), /Plainrow is offline CSV work in the browser/);
+assert.match(String(logLd.hasPart[3].articleBody || ""), /Stack two CSV files/);
 const logPublic = visibleCopy(log) + " " + JSON.stringify(logLd);
 assert.doesNotMatch(
   logPublic,
@@ -191,7 +192,7 @@ assert.match(
 );
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-06<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-07<\/lastmod>/
 );
 
 const polarKitchen =

@@ -9,20 +9,32 @@ const root = path.join(__dirname, "..");
 const product = fs.readFileSync(path.join(root, "plainrow/index.html"), "utf8");
 const app = fs.readFileSync(path.join(root, "plainrow/app.html"));
 const downloadCopy = fs.readFileSync(path.join(root, "plainrow/plainrow-lite.html"));
+const downloadFile = fs.readFileSync(path.join(root, "plainrow/plainrow-lite.bin"));
 const kitchenLite = fs.readFileSync(path.join(root, "kitchen/plainrow-lite.html"));
 const sitemap = fs.readFileSync(path.join(root, "sitemap.xml"), "utf8");
+const nginx = fs.readFileSync(path.join(root, "deploy/plainrow-lite-download.conf"), "utf8");
 
 assert.match(product, />Try Lite</);
 assert.match(product, />Download Lite</);
-assert.match(product, /href="plainrow-lite.html"/);
+assert.match(product, /href="plainrow-lite\.bin"/);
 assert.match(product, /download="plainrow-lite.html"/);
+assert.doesNotMatch(
+  product,
+  /id="downloadLite"[^>]*href="[^"]*\.html"/,
+  "Download Lite must not point at a hosted HTML page"
+);
 assert.match(product, />Buy Kitchen · \$19</);
 assert.match(product, /href="https:\/\/buy\.polar\.sh\/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9"/);
 assert.doesNotMatch(product, /github\.io|buy now/i);
 assert.match(sitemap, /https:\/\/fromtill\.com\/plainrow\/plainrow-lite\.html/);
 
 assert.ok(app.equals(downloadCopy), "plainrow/plainrow-lite.html must be the same bytes as plainrow/app.html");
+assert.ok(app.equals(downloadFile), "plainrow/plainrow-lite.bin must be the same bytes as plainrow/app.html");
 assert.ok(app.equals(kitchenLite), "kitchen/plainrow-lite.html must be the same bytes as plainrow/app.html");
+
+assert.match(nginx, /location = \/plainrow\/plainrow-lite\.bin/);
+assert.match(nginx, /Content-Disposition 'attachment; filename="plainrow-lite.html"'/);
+assert.match(nginx, /default_type application\/octet-stream/);
 
 const html = app.toString("utf8");
 assert.doesNotMatch(html, /unpkg|jsdelivr|googleapis|googletagmanager|google-analytics|gtag\(/i);

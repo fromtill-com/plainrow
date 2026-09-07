@@ -46,13 +46,17 @@ assert.match(
   /<script data-goatcounter="https:\/\/fromtill\.goatcounter\.com\/count"\n        async src="\/\/gc\.zgo\.at\/count\.js"><\/script>/
 );
 
+assert.match(log, /<time datetime="2026-09-07">2026-09-07<\/time>/);
 assert.match(log, /<time datetime="2026-09-06">2026-09-06<\/time>/);
 assert.match(log, /<time datetime="2026-09-05">2026-09-05<\/time>/);
 assert.match(log, /<time datetime="2026-09-04">2026-09-04<\/time>/);
-const dateOrder = log.indexOf('id="2026-09-06"');
-assert.ok(dateOrder > -1, "log missing 2026-09-06 section");
-assert.ok(dateOrder < log.indexOf('id="2026-09-05"'), "2026-09-06 must sit above 2026-09-05");
+const dateOrder = log.indexOf('id="2026-09-07"');
+assert.ok(dateOrder > -1, "log missing 2026-09-07 section");
+assert.ok(dateOrder < log.indexOf('id="2026-09-06"'), "2026-09-07 must sit above 2026-09-06");
+assert.ok(log.indexOf('id="2026-09-06"') < log.indexOf('id="2026-09-05"'), "2026-09-06 must sit above 2026-09-05");
 assert.ok(log.indexOf('id="2026-09-05"') < log.indexOf('id="2026-09-04"'), "2026-09-05 must sit above 2026-09-04");
+assert.match(visible, /Download Lite saves one HTML file/);
+assert.match(visible, /It is not another tab of Lite/);
 
 assert.match(visible, /Plainrow is offline CSV work in the browser/);
 assert.match(visible, /Lite is free: two files, stack, dedupe, export/);
@@ -106,18 +110,20 @@ for (const leak of opsLeaks) {
 
 assert.strictEqual(data["@type"], "CollectionPage", "log JSON-LD should be CollectionPage");
 assert.strictEqual(data.url, "https://fromtill.com/plainrow/log/");
-assert.ok(Array.isArray(data.hasPart) && data.hasPart.length >= 3, "log missing dated parts");
+assert.ok(Array.isArray(data.hasPart) && data.hasPart.length >= 4, "log missing dated parts");
 assert.strictEqual(data.hasPart[0]["@type"], "BlogPosting");
-assert.strictEqual(data.hasPart[0].datePublished, "2026-09-06", "first log entry date");
-assert.strictEqual(data.hasPart[1].datePublished, "2026-09-05");
-assert.strictEqual(data.hasPart[2].datePublished, "2026-09-04");
-assert.match(String(data.hasPart[0].articleBody || ""), /Plainrow is offline CSV work in the browser/);
-assert.match(String(data.hasPart[0].articleBody || ""), /Buy Kitchen · \$19/);
-assert.match(String(data.hasPart[0].articleBody || ""), /Lite is free/);
-assert.match(String(data.hasPart[1].articleBody || ""), /that is Lite/);
-assert.match(String(data.hasPart[1].articleBody || ""), /that is Kitchen/);
-assert.match(String(data.hasPart[2].articleBody || ""), /Stack two CSV files/);
-assert.match(String(data.hasPart[2].articleBody || ""), /Buy Kitchen · \$19 is the only primary button/);
+assert.strictEqual(data.hasPart[0].datePublished, "2026-09-07", "first log entry date");
+assert.strictEqual(data.hasPart[1].datePublished, "2026-09-06");
+assert.strictEqual(data.hasPart[2].datePublished, "2026-09-05");
+assert.strictEqual(data.hasPart[3].datePublished, "2026-09-04");
+assert.match(String(data.hasPart[0].articleBody || ""), /Download Lite saves one HTML file/);
+assert.match(String(data.hasPart[1].articleBody || ""), /Plainrow is offline CSV work in the browser/);
+assert.match(String(data.hasPart[1].articleBody || ""), /Buy Kitchen · \$19/);
+assert.match(String(data.hasPart[1].articleBody || ""), /Lite is free/);
+assert.match(String(data.hasPart[2].articleBody || ""), /that is Lite/);
+assert.match(String(data.hasPart[2].articleBody || ""), /that is Kitchen/);
+assert.match(String(data.hasPart[3].articleBody || ""), /Stack two CSV files/);
+assert.match(String(data.hasPart[3].articleBody || ""), /Buy Kitchen · \$19 is the only primary button/);
 
 for (const part of data.hasPart) {
   const body = String(part.articleBody || "");
@@ -139,7 +145,7 @@ assert.doesNotMatch(home, /href="\/plainrow\/log\/"/);
 
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-06<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-07<\/lastmod>/
 );
 assert.doesNotMatch(sitemap, /\/kitchen\//);
 
