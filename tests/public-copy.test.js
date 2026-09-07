@@ -158,6 +158,36 @@ assert.strictEqual(
   1,
   "Buy Kitchen is the only primary CTA on /plainrow/"
 );
+assert.doesNotMatch(
+  productActions[0],
+  /Polar emails the zip after pay/,
+  "trust line sits under .actions, not inside the button row"
+);
+assert.match(
+  product,
+  /<\/div>\s*<p class="fine">Polar emails the zip after pay\. \$19 one-time\. Refunds: <a href="mailto:till@fromtill\.com">till@fromtill\.com<\/a>\.<\/p>\s*<section class="steps">/,
+  "locked delivery + one-time + refunds line sits immediately under .actions"
+);
+assert.strictEqual(
+  (product.match(/Polar emails the zip after pay\. \$19 one-time\. Refunds:/g) || []).length,
+  1,
+  "one locked trust line on /plainrow/"
+);
+assert.doesNotMatch(productLede[0], /Polar emails the zip after pay|Refunds:/);
+const productVisible = product
+  .replace(/<script[\s\S]*?<\/script>/gi, " ")
+  .replace(/<style[\s\S]*?<\/style>/gi, " ")
+  .replace(/<[^>]+>/g, " ")
+  .replace(/\s+/g, " ");
+assert.ok(
+  productVisible.indexOf("Polar emails the zip after pay") < productVisible.indexOf("How it works"),
+  "trust line must appear before How it works"
+);
+assert.ok(
+  productVisible.indexOf("Polar emails the zip after pay") < productVisible.indexOf("Support"),
+  "trust line must appear before Support"
+);
+assert.match(css, /\.product \.actions \+ \.fine \{/);
 
 const support = read("plainrow/support/index.html");
 assert.match(support, /two files: stack, dedupe, and export/i);
