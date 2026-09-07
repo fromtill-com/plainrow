@@ -105,7 +105,7 @@ for (const rel of kitchenJobPages) {
   const html = read(rel);
   assert.match(
     html,
-    /Lite names Kitchen · \$19 on the toolbar: filter, columns, replace, dates, sort, recipes, join, stack, split, clean\. Kitchen is the zip that actually runs them\./,
+    /Lite toolbar says Buy Kitchen · \$19\. Filter, columns, replace, dates, sort, recipes, join, stack, split, clean live in Kitchen\. Kitchen is the zip that actually runs them\./,
     rel + " missing honest Lite/Kitchen line"
   );
 }

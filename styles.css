@@ -223,9 +223,7 @@ ul, ol { margin: 0; padding: 0; }
 .catalog .kitchen-buy {
   display: inline-block;
   margin: 0 0.2rem 1.15rem;
-  white-space: normal;
-  line-height: 1.35;
-  max-width: 34rem;
+  white-space: nowrap;
   font-weight: 650;
 }
 
