@@ -88,7 +88,13 @@ assert.doesNotMatch(product, /14-day|testimonial|as seen in|customers|\d+%/i);
 assert.match(product, />Try Lite</);
 assert.match(product, /href="app\.html"/);
 assert.match(product, />Download Lite</);
-assert.match(product, /href="plainrow-lite\.html"/);
+assert.match(product, /href="plainrow-lite\.bin"/);
+assert.match(product, /download="plainrow-lite\.html"/);
+assert.doesNotMatch(
+  product,
+  /id="downloadLite"[^>]*href="[^"]*\.html"/,
+  "Download Lite must not point at a hosted HTML page"
+);
 assert.match(product, /How it works/);
 assert.match(product, /href="\/plainrow\/support\/"/);
 assert.match(product, /href="\/plainrow\/log\/"/);
@@ -231,10 +237,12 @@ const logVisible = log
   .replace(/<[^>]+>/g, " ")
   .replace(/\s+/g, " ");
 assert.match(log, /<h1 class="product-name">Plainrow log<\/h1>/);
+assert.match(log, /<time datetime="2026-09-07">2026-09-07<\/time>/);
 assert.match(log, /<time datetime="2026-09-06">2026-09-06<\/time>/);
 assert.match(log, /<time datetime="2026-09-05">2026-09-05<\/time>/);
 assert.match(log, /<time datetime="2026-09-04">2026-09-04<\/time>/);
-assert.ok(log.indexOf("2026-09-06") < log.indexOf("2026-09-05"), "newest dates first");
+assert.ok(log.indexOf("2026-09-07") < log.indexOf("2026-09-06"), "newest dates first");
+assert.ok(log.indexOf("2026-09-06") < log.indexOf("2026-09-05"), "2026-09-06 before 2026-09-05");
 assert.match(logVisible, /Plainrow is offline CSV work in the browser/);
 assert.match(logVisible, /Lite is free: two files, stack, dedupe, export/);
 assert.match(logVisible, /Kitchen is \$19 one-time/);

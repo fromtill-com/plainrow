@@ -6,10 +6,12 @@ const assert = require("assert");
 
 const lite = fs.readFileSync(path.join(__dirname, "../plainrow/app.html"), "utf8");
 const download = fs.readFileSync(path.join(__dirname, "../plainrow/plainrow-lite.html"));
+const downloadFile = fs.readFileSync(path.join(__dirname, "../plainrow/plainrow-lite.bin"));
 const kitchenLite = fs.readFileSync(path.join(__dirname, "../kitchen/plainrow-lite.html"));
 const kitchen = fs.readFileSync(path.join(__dirname, "../kitchen/plainrow.html"), "utf8");
 
 assert.ok(Buffer.from(lite).equals(download), "download Lite matches live app.html");
+assert.ok(Buffer.from(lite).equals(downloadFile), "plainrow-lite.bin matches live app.html");
 assert.ok(Buffer.from(lite).equals(kitchenLite), "kitchen/plainrow-lite.html matches live app.html");
 
 const empty = lite.slice(lite.indexOf('id="empty"'), lite.indexOf('id="tableHost"'));

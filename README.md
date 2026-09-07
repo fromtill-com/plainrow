@@ -3,6 +3,7 @@
 House site files at the repo root match what is published to https://fromtill.com.
 
 - `/plainrow/` is the public Plainrow product pages (Lite lives at `plainrow/app.html`).
+- `plainrow/plainrow-lite.bin` is Download Lite: the same bytes as `app.html`, served as a file. Optional nginx include: `deploy/plainrow-lite-download.conf`.
 - `/kitchen/` is the $19 Kitchen source, Lite source, recipes, and samples.
 
 Org: https://github.com/fromtill-com
