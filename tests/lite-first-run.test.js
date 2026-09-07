@@ -14,6 +14,7 @@ assert.ok(Buffer.from(lite).equals(kitchenLite), "kitchen/plainrow-lite.html mat
 
 const empty = lite.slice(lite.indexOf('id="empty"'), lite.indexOf('id="tableHost"'));
 assert.match(empty, /Stack two CSV files/);
+assert.match(empty, /virtual assistants, nonprofit ops, and one-seat bookkeepers who cannot upload client CSVs/);
 assert.match(empty, /two weekly timesheets/);
 assert.match(empty, /then Stack them/);
 assert.match(empty, /Load the stack demo/);

@@ -80,6 +80,11 @@ assert.doesNotMatch(mergeLede[0], /duplicate/i, "merge lede should not promise d
 assert.match(mergeLede[0], /Stack two CSV files in your browser/);
 
 const product = read("plainrow/index.html");
+assert.match(
+  product,
+  /name="description" content="For virtual assistants, nonprofit ops, and one-seat bookkeepers who cannot upload client CSVs\./
+);
+assert.doesNotMatch(product, /14-day|testimonial|as seen in|customers|\d+%/i);
 assert.match(product, />Try Lite</);
 assert.match(product, /href="app\.html"/);
 assert.match(product, />Download Lite</);
@@ -94,6 +99,10 @@ assert.match(product, /target="_blank"/);
 assert.match(product, />Buy Kitchen · \$19</);
 const productLede = product.match(/<p class="lede">([\s\S]*?)<\/p>/);
 assert.ok(productLede, "product missing lede");
+assert.match(productLede[0], /virtual assistants/);
+assert.match(productLede[0], /nonprofit ops/);
+assert.match(productLede[0], /one-seat bookkeepers who cannot upload client CSVs/);
+assert.match(productLede[0], /Monday jobs like catalog and warehouse SKU join/);
 assert.match(productLede[0], /two files/);
 assert.match(productLede[0], /stack/i);
 assert.match(productLede[0], /duplicate rows/);
@@ -248,6 +257,7 @@ const lite = read("plainrow/app.html");
 assert.match(lite, /Two files\. Stack\. Dedupe\. Export/);
 const liteEmpty = lite.slice(lite.indexOf('id="empty"'), lite.indexOf('id="tableHost"'));
 assert.match(liteEmpty, /Stack two CSV files/);
+assert.match(liteEmpty, /virtual assistants, nonprofit ops, and one-seat bookkeepers who cannot upload client CSVs/);
 assert.doesNotMatch(liteEmpty, /Drop a CSV on the counter/);
 assert.match(liteEmpty, /Load the stack demo/);
 assert.strictEqual((liteEmpty.match(/Open CSV/g) || []).length, 1);
