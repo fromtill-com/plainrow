@@ -48,7 +48,7 @@ assert.match(home, /Kitchen is \$19: filter, columns, replace, dates, sort, reci
 assert.doesNotMatch(home, /Kitchen is \$19: join, stack, split, clean\./);
 assert.match(home, /<h1 class="lede">Small offline tools\.<\/h1>/);
 assert.match(home, /<ul class="catalog">/);
-assert.match(home, /<ul class="catalog">[\s\S]*>Buy Kitchen · \$19 · filter/);
+assert.match(home, /<ul class="catalog">[\s\S]*>Buy Kitchen · \$19</);
 assert.match(home, new RegExp('href="' + polarEsc + '"'));
 assert.match(home, /target="_blank"/);
 assert.match(home, /rel="noopener noreferrer"/);
@@ -59,11 +59,13 @@ assert.strictEqual((home.match(/>Open</g) || []).length, 1, "house stays one Ope
 assert.match(houseCatalog[0], /<span class="item-name">Plainrow<\/span>/);
 assert.match(houseCatalog[0], />Open</);
 assert.match(houseCatalog[0], /class="btn primary kitchen-buy"/);
-assert.match(
+assert.match(houseCatalog[0], />Buy Kitchen · \$19</);
+assert.doesNotMatch(
   houseCatalog[0],
-  />Buy Kitchen · \$19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files</
+  /filter, columns, replace, dates, sort, recipes, join, stack, split, clean/,
+  "Kitchen tools stay in the house lede, not the Buy Kitchen control"
 );
-assert.doesNotMatch(houseCatalog[0], /class="fine"|toolbar-note/, "Kitchen tools are on the Buy Kitchen control");
+assert.doesNotMatch(houseCatalog[0], /class="fine"|toolbar-note/, "do not park Kitchen tools under the catalog button");
 assert.doesNotMatch(home, /<span class="item-name">Kitchen</);
 assert.doesNotMatch(home, /<span class="item-name">Filter/);
 assert.doesNotMatch(home, /polar\.sh\/plainrow/);
@@ -71,7 +73,7 @@ assert.doesNotMatch(home, /Try Lite|Download Lite/);
 assert.doesNotMatch(home, /<div class="actions">/, "house stays a catalog, not a product pitch");
 const css = read("styles.css");
 assert.match(css, /\.catalog \.kitchen-buy \{[\s\S]*?font-weight: 650/);
-assert.match(css, /\.catalog \.kitchen-buy \{[\s\S]*?white-space: normal/);
+assert.match(css, /\.catalog \.kitchen-buy \{[\s\S]*?white-space: nowrap/);
 
 const merge = read("plainrow/merge-csv-without-uploading/index.html");
 const mergeLede = merge.match(/<p class="lede">([\s\S]*?)<\/p>/);
@@ -164,6 +166,36 @@ assert.strictEqual(
   1,
   "Buy Kitchen is the only primary CTA on /plainrow/"
 );
+assert.doesNotMatch(
+  productActions[0],
+  /Polar emails the zip after pay/,
+  "trust line sits under .actions, not inside the button row"
+);
+assert.match(
+  product,
+  /<\/div>\s*<p class="fine">Polar emails the zip after pay\. \$19 one-time\. Refunds: <a href="mailto:till@fromtill\.com">till@fromtill\.com<\/a>\.<\/p>\s*<section class="steps">/,
+  "locked delivery + one-time + refunds line sits immediately under .actions"
+);
+assert.strictEqual(
+  (product.match(/Polar emails the zip after pay\. \$19 one-time\. Refunds:/g) || []).length,
+  1,
+  "one locked trust line on /plainrow/"
+);
+assert.doesNotMatch(productLede[0], /Polar emails the zip after pay|Refunds:/);
+const productVisible = product
+  .replace(/<script[\s\S]*?<\/script>/gi, " ")
+  .replace(/<style[\s\S]*?<\/style>/gi, " ")
+  .replace(/<[^>]+>/g, " ")
+  .replace(/\s+/g, " ");
+assert.ok(
+  productVisible.indexOf("Polar emails the zip after pay") < productVisible.indexOf("How it works"),
+  "trust line must appear before How it works"
+);
+assert.ok(
+  productVisible.indexOf("Polar emails the zip after pay") < productVisible.indexOf("Support"),
+  "trust line must appear before Support"
+);
+assert.match(css, /\.product \.actions \+ \.fine \{/);
 
 const support = read("plainrow/support/index.html");
 assert.match(support, /two files: stack, dedupe, and export/i);
@@ -272,10 +304,7 @@ assert.strictEqual((liteEmpty.match(/Open CSV/g) || []).length, 1);
 assert.match(lite, /id="btnStack"/);
 assert.match(lite, /id="btnDedupe"/);
 assert.match(lite, /class="buy-job"/);
-assert.match(
-  lite,
-  />Kitchen · \$19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files</
-);
+assert.match(lite, />Buy Kitchen · \$19</);
 assert.doesNotMatch(lite, />Join · Kitchen · \$19</);
 assert.doesNotMatch(lite, />Split · Kitchen · \$19</);
 assert.doesNotMatch(lite, />Clean · Kitchen · \$19</);
@@ -286,16 +315,19 @@ assert.strictEqual(
   1,
   "one Kitchen · $19 control on Lite"
 );
-assert.match(
+assert.match(liteToolbar[0], />Buy Kitchen · \$19</);
+assert.doesNotMatch(
   liteToolbar[0],
-  />Kitchen · \$19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files</
+  /filter, columns, replace, dates, sort, recipes, join, stack, split, clean/,
+  "Kitchen tools stay off the Lite buy control"
 );
 assert.doesNotMatch(lite, /toolbar-note|Kitchen also does|buy-job-set|buy-job-label/, "Kitchen tools are not a Lite whisper");
-assert.strictEqual(
-  (lite.match(/filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files/g) || []).length,
-  1,
-  "one Kitchen sentence on Lite"
+assert.doesNotMatch(
+  lite,
+  /filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files/,
+  "Lite does not pack the Kitchen set into one control"
 );
+assert.match(lite, /\.toolbar a\.buy-job \{[\s\S]*?white-space: nowrap/);
 assert.match(lite, new RegExp('href="' + polarKitchen.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
 assert.match(lite, /rel="canonical" href="https:\/\/fromtill\.com\/plainrow\/app\.html"/);
 assert.match(lite, /property="og:title" content="Plainrow Lite"/);

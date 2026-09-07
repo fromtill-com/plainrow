@@ -104,10 +104,7 @@ assert.match(liteToolbar[0], /id="btnStack"/);
 assert.match(liteToolbar[0], /id="btnDedupe"/);
 const buyJobs = [...liteToolbar[0].matchAll(/<a class="buy-job"[^>]*>([^<]*)<\/a>/g)];
 assert.strictEqual(buyJobs.length, 1, "one Kitchen · $19 buy control");
-assert.strictEqual(
-  buyJobs[0][1],
-  "Kitchen · $19 · filter, columns, replace, dates, sort, recipes, join, stack, split, clean · more than two files"
-);
+assert.strictEqual(buyJobs[0][1], "Buy Kitchen · $19");
 assert.doesNotMatch(liteToolbar[0], /Join · Kitchen · \$19|toolbar-note/);
 for (const m of buyJobs) {
   const tag = m[0].slice(0, m[0].indexOf(">") + 1);
