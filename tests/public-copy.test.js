@@ -47,6 +47,10 @@ assert.match(home, /Kitchen is \$19/);
 assert.match(home, /Kitchen is \$19: filter, columns, replace, dates, sort, recipes, join, stack, split, clean\./);
 assert.doesNotMatch(home, /Kitchen is \$19: join, stack, split, clean\./);
 assert.match(home, /<h1 class="lede">Small offline tools\.<\/h1>/);
+assert.match(home, /virtual assistants, nonprofit ops, and one-seat bookkeepers who cannot upload client CSVs/);
+assert.match(home, /Monday jobs like catalog and warehouse SKU join/);
+assert.match(home, /name="description" content="For virtual assistants, nonprofit ops, and one-seat bookkeepers who cannot upload client CSVs\./);
+
 assert.match(home, /<ul class="catalog">/);
 assert.match(home, /<ul class="catalog">[\s\S]*>Buy Kitchen · \$19</);
 assert.match(home, new RegExp('href="' + polarEsc + '"'));
