@@ -183,7 +183,7 @@ assert.doesNotMatch(sitemap, /merge-csv-in-browser|stack-two-csv-files-in-browse
 assert.match(sitemap, /<lastmod>2026-08-31<\/lastmod>/);
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/<\/loc>\s*<lastmod>2026-09-07<\/lastmod>/
 );
 assert.match(
   sitemap,
@@ -199,6 +199,7 @@ const polarKitchen =
 const llms = read("llms.txt");
 assert.match(llms, /^# From Till\n/);
 assert.match(llms, /https:\/\/fromtill\.com\/plainrow\/app\.html/);
+assert.match(llms, /virtual assistants, nonprofit ops, and one-seat bookkeepers who cannot upload client CSVs/);
 assert.match(llms, /stack/i);
 assert.match(llms, /dedupe/i);
 assert.match(llms, /Nothing is uploaded/);
