@@ -24,7 +24,7 @@ assert.match(product, />Support</);
 const jobs = [
   ["/plainrow/merge-csv-without-uploading/", "Merge CSV without uploading", "Lite"],
   ["/plainrow/dedupe-csv-without-uploading/", "Dedupe CSV without uploading", "Lite"],
-  ["/plainrow/join-csv-without-uploading/", "Join CSV without uploading", "Kitchen"],
+  ["/plainrow/join-csv-without-uploading/", "Put warehouse stock on the catalog", "Kitchen"],
   ["/plainrow/split-csv-in-browser/", "Split CSV in the browser", "Kitchen"],
   ["/plainrow/clean-csv-without-uploading/", "Clean CSV without uploading", "Kitchen"]
 ];

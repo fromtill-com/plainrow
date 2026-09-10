@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Join CSV without uploading</title>
-  <meta name="description" content="Left join two CSVs on a shared key in the browser. Nothing is uploaded. Unmatched catalog keys are kept. Warehouse-only keys are dropped.">
+  <title>Put warehouse stock on the catalog</title>
+  <meta name="description" content="Put warehouse stock on every catalog product in the browser. Blank stock stays. Warehouse leftovers disappear. Nothing is uploaded.">
   <link rel="canonical" href="https://fromtill.com/plainrow/join-csv-without-uploading/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="From Till">
-  <meta property="og:title" content="Join CSV without uploading">
-  <meta property="og:description" content="Left join two CSVs on a shared key in the browser. Nothing is uploaded. Unmatched catalog keys are kept. Warehouse-only keys are dropped.">
+  <meta property="og:title" content="Put warehouse stock on the catalog">
+  <meta property="og:description" content="Put warehouse stock on every catalog product in the browser. Blank stock stays. Warehouse leftovers disappear. Nothing is uploaded.">
   <meta property="og:url" content="https://fromtill.com/plainrow/join-csv-without-uploading/">
   <meta property="og:image" content="https://fromtill.com/plainrow/logo.png">
   <meta name="twitter:card" content="summary">
@@ -17,24 +17,24 @@
   {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "Join CSV without uploading",
-    "description": "Left join two CSVs on a shared key in the browser. Nothing is uploaded. Unmatched catalog keys are kept. Warehouse-only keys are dropped.",
+    "name": "Put warehouse stock on the catalog",
+    "description": "Put warehouse stock on every catalog product in the browser. Blank stock stays. Warehouse leftovers disappear. Nothing is uploaded.",
     "url": "https://fromtill.com/plainrow/join-csv-without-uploading/",
     "step": [
       {
         "@type": "HowToStep",
-        "name": "Open catalog.csv and warehouse.csv.",
-        "text": "Open catalog.csv and warehouse.csv."
+        "name": "Open the catalog and the warehouse file.",
+        "text": "Open the catalog and the warehouse file."
       },
       {
         "@type": "HowToStep",
-        "name": "Left join on SKU.",
-        "text": "Left join on SKU."
+        "name": "Put warehouse stock onto every catalog product.",
+        "text": "Put warehouse stock onto every catalog product."
       },
       {
         "@type": "HowToStep",
-        "name": "Download one table with columns from each.",
-        "text": "Download one table with columns from each."
+        "name": "Download one sheet.",
+        "text": "Download one sheet."
       }
     ]
   }
@@ -52,13 +52,13 @@
   </header>
   <main class="sheet product">
     <p class="crumb"><a href="/">Tools</a> / <a href="/plainrow/">Plainrow</a> / join without uploading</p>
-    <h1 class="product-name">Join CSV without uploading</h1>
-    <p class="lede">Left join two CSVs on a shared key in the browser. Unmatched catalog keys stay (empty right-side cells). Warehouse-only keys never appear. Files never leave the machine.</p>
-    <p class="sub">Open catalog.csv and warehouse.csv. Left join on SKU. Download one table with columns from each. No account. Offline once loaded.</p>
+    <h1 class="product-name">Put warehouse stock on the catalog</h1>
+    <p class="lede">A client trusted you with these files. You cannot put their CSV on someone else's computer.</p>
+    <p class="sub">Put warehouse stock on every catalog product — blank stock stays, leftovers that were never listed go — and keep both files on this computer.</p>
     <ol>
-      <li>Open catalog.csv and warehouse.csv.</li>
-      <li>Left join on SKU.</li>
-      <li>Download one table with columns from each.</li>
+      <li>Open the catalog and the warehouse file.</li>
+      <li>Put warehouse stock onto every catalog product.</li>
+      <li>Download one sheet.</li>
     </ol>
     <section class="example" aria-label="Example">
       <h2>Example</h2>
@@ -68,8 +68,8 @@
           <table>
             <thead><tr><th>SKU</th><th>Product</th><th>Price</th></tr></thead>
             <tbody>
-              <tr><td>SKU-1001</td><td>Linen tea towel</td><td>18.00</td></tr>
-              <tr><td>SKU-1002</td><td>Stoneware mug</td><td>14.00</td></tr>
+              <tr><td>TOWEL-01</td><td>Linen tea towel</td><td>18.00</td></tr>
+              <tr><td>MUG-02</td><td>Stoneware mug</td><td>14.00</td></tr>
             </tbody>
           </table>
         </figure>
@@ -78,8 +78,8 @@
           <table>
             <thead><tr><th>SKU</th><th>On Hand</th><th>Bin</th></tr></thead>
             <tbody>
-              <tr><td>SKU-1001</td><td>12</td><td>A-1</td></tr>
-              <tr><td>SKU-1008</td><td>11</td><td>B-8</td></tr>
+              <tr><td>TOWEL-01</td><td>12</td><td>A-1</td></tr>
+              <tr><td>CRATE-08</td><td>11</td><td>B-8</td></tr>
             </tbody>
           </table>
         </figure>
@@ -88,19 +88,19 @@
           <table>
             <thead><tr><th>SKU</th><th>Product</th><th>Price</th><th>On Hand</th><th>Bin</th></tr></thead>
             <tbody>
-              <tr><td>SKU-1001</td><td>Linen tea towel</td><td>18.00</td><td>12</td><td>A-1</td></tr>
-              <tr><td>SKU-1002</td><td>Stoneware mug</td><td>14.00</td><td></td><td></td></tr>
+              <tr><td>TOWEL-01</td><td>Linen tea towel</td><td>18.00</td><td>12</td><td>A-1</td></tr>
+              <tr><td>MUG-02</td><td>Stoneware mug</td><td>14.00</td><td></td><td></td></tr>
             </tbody>
           </table>
         </figure>
       </div>
-      <p class="example-note">After a left Join on SKU, SKU-1002 (Stoneware mug) still has a price and an empty On Hand, while warehouse-only SKU-1008 (11 in B-8) never appears.</p>
+      <p class="example-note">The stoneware mug stays on the sheet with a blank On Hand. The leftover that was only in the warehouse never appears.</p>
     </section>
     <div class="actions">
       <a class="btn primary" href="https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9" target="_blank" rel="noopener noreferrer">Buy Kitchen · $19</a>
       <a class="btn" href="/plainrow/app.html">Try Lite</a>
     </div>
-    <p class="fine">Lite toolbar says Buy Kitchen · $19. Filter, columns, replace, dates, sort, recipes, join, stack, split, clean live in Kitchen. Kitchen is the zip that actually runs them. <a href="/plainrow/support/">Support</a>.</p>
+    <p class="fine">Kitchen is the $19 zip Polar emails. This job runs on this computer. Lite is stack and dedupe only. <a href="/plainrow/support/">Support</a>.</p>
   </main>
   <footer class="colophon">fromtill.com</footer>
 <script data-goatcounter="https://fromtill.goatcounter.com/count"

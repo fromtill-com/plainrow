@@ -129,8 +129,8 @@ assert.match(join, /<figcaption>warehouse.csv<\/figcaption>/);
 assert.match(join, /<figcaption>Result<\/figcaption>/);
 const joinResult = figureByCaption(join, "Result");
 assert.match(joinResult, /<th>Price<\/th>/, "join result must have a Price column");
-assert.match(joinResult, /SKU-1002/, "join result keeps unmatched catalog SKU");
-assert.doesNotMatch(joinResult, /SKU-1008/, "join result drops warehouse-only SKU");
+assert.match(joinResult, /MUG-02/, "join result keeps unmatched catalog SKU");
+assert.doesNotMatch(joinResult, /CRATE-08/, "join result drops warehouse-only SKU");
 
 const split = read("plainrow/split-csv-in-browser/index.html");
 const splitInput = figureByCaption(split, "Input");
