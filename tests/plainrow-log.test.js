@@ -46,17 +46,32 @@ assert.match(
   /<script data-goatcounter="https:\/\/fromtill\.goatcounter\.com\/count"\n        async src="\/\/gc\.zgo\.at\/count\.js"><\/script>/
 );
 
+assert.match(log, /<time datetime="2026-09-09">2026-09-09<\/time>/);
+assert.match(log, /<time datetime="2026-09-08">2026-09-08<\/time>/);
 assert.match(log, /<time datetime="2026-09-07">2026-09-07<\/time>/);
 assert.match(log, /<time datetime="2026-09-06">2026-09-06<\/time>/);
 assert.match(log, /<time datetime="2026-09-05">2026-09-05<\/time>/);
 assert.match(log, /<time datetime="2026-09-04">2026-09-04<\/time>/);
-const dateOrder = log.indexOf('id="2026-09-07"');
-assert.ok(dateOrder > -1, "log missing 2026-09-07 section");
-assert.ok(dateOrder < log.indexOf('id="2026-09-06"'), "2026-09-07 must sit above 2026-09-06");
+const dateOrder = log.indexOf('id="2026-09-09"');
+assert.ok(dateOrder > -1, "log missing 2026-09-09 section");
+assert.ok(dateOrder < log.indexOf('id="2026-09-08"'), "2026-09-09 must sit above 2026-09-08");
+assert.ok(log.indexOf('id="2026-09-08"') < log.indexOf('id="2026-09-07"'), "2026-09-08 must sit above 2026-09-07");
+assert.ok(log.indexOf('id="2026-09-07"') < log.indexOf('id="2026-09-06"'), "2026-09-07 must sit above 2026-09-06");
 assert.ok(log.indexOf('id="2026-09-06"') < log.indexOf('id="2026-09-05"'), "2026-09-06 must sit above 2026-09-05");
 assert.ok(log.indexOf('id="2026-09-05"') < log.indexOf('id="2026-09-04"'), "2026-09-05 must sit above 2026-09-04");
-assert.match(visible, /Download Lite saves one HTML file/);
-assert.match(visible, /It is not another tab of Lite/);
+assert.match(visible, /You already have the catalog/);
+assert.match(visible, /put stock on every product, even the ones that are empty/);
+assert.match(visible, /without keeping warehouse leftovers that were never in the catalog/);
+assert.match(visible, /Lite cannot do that join\. Kitchen can: \$19 once/);
+assert.match(visible, /Polar emails a zip, files stay on this computer/);
+assert.match(visible, /Monday is matching stock to the catalog without sending either file off this computer/);
+assert.match(visible, /Keep every catalog product even if stock is blank/);
+assert.match(visible, /Drop warehouse leftovers that aren’t in the catalog/);
+assert.match(visible, /Kitchen is \$19 one-time for that join/);
+assert.match(visible, /Lite stays free for two-file stack and dedupe/);
+assert.match(visible, /Download Lite saves the free tool as one HTML file/);
+assert.match(visible, /it is not another tab of the site/);
+assert.match(visible, /that is Kitchen, not Lite/);
 
 assert.match(visible, /Plainrow is offline CSV work in the browser/);
 assert.match(visible, /Lite is free: two files, stack, dedupe, export/);
@@ -108,22 +123,36 @@ for (const leak of opsLeaks) {
   assert.doesNotMatch(publicText, leak, "public log leaked internal ops: " + leak);
 }
 
+assert.doesNotMatch(publicText, /SKU-100/, "log must not show demo SKUs");
+assert.doesNotMatch(publicText, /left-join/i, "log must not lead with left-join jargon");
+
 assert.strictEqual(data["@type"], "CollectionPage", "log JSON-LD should be CollectionPage");
 assert.strictEqual(data.url, "https://fromtill.com/plainrow/log/");
 assert.ok(Array.isArray(data.hasPart) && data.hasPart.length >= 4, "log missing dated parts");
 assert.strictEqual(data.hasPart[0]["@type"], "BlogPosting");
-assert.strictEqual(data.hasPart[0].datePublished, "2026-09-07", "first log entry date");
-assert.strictEqual(data.hasPart[1].datePublished, "2026-09-06");
-assert.strictEqual(data.hasPart[2].datePublished, "2026-09-05");
-assert.strictEqual(data.hasPart[3].datePublished, "2026-09-04");
-assert.match(String(data.hasPart[0].articleBody || ""), /Download Lite saves one HTML file/);
-assert.match(String(data.hasPart[1].articleBody || ""), /Plainrow is offline CSV work in the browser/);
-assert.match(String(data.hasPart[1].articleBody || ""), /Buy Kitchen · \$19/);
-assert.match(String(data.hasPart[1].articleBody || ""), /Lite is free/);
-assert.match(String(data.hasPart[2].articleBody || ""), /that is Lite/);
-assert.match(String(data.hasPart[2].articleBody || ""), /that is Kitchen/);
-assert.match(String(data.hasPart[3].articleBody || ""), /Stack two CSV files/);
-assert.match(String(data.hasPart[3].articleBody || ""), /Buy Kitchen · \$19 is the only primary button/);
+assert.strictEqual(data.hasPart[0].datePublished, "2026-09-09", "first log entry date");
+assert.strictEqual(data.hasPart[1].datePublished, "2026-09-08");
+assert.strictEqual(data.hasPart[2].datePublished, "2026-09-07");
+assert.strictEqual(data.hasPart[3].datePublished, "2026-09-06");
+assert.strictEqual(data.hasPart[4].datePublished, "2026-09-05");
+assert.strictEqual(data.hasPart[5].datePublished, "2026-09-04");
+assert.match(String(data.hasPart[0].articleBody || ""), /You already have the catalog/);
+assert.match(String(data.hasPart[0].articleBody || ""), /Lite cannot do that join\. Kitchen can: \$19 once/);
+assert.match(String(data.hasPart[0].articleBody || ""), /Polar emails a zip/);
+assert.doesNotMatch(String(data.hasPart[0].articleBody || ""), /SKU-1002|SKU-1008|left-join|SKU-100/i);
+assert.match(String(data.hasPart[1].articleBody || ""), /Monday is matching stock to the catalog/);
+assert.match(String(data.hasPart[1].articleBody || ""), /Lite stays free for two-file stack and dedupe/);
+assert.doesNotMatch(String(data.hasPart[1].articleBody || ""), /SKU-1002|SKU-1008|left-join|SKU-100/i);
+assert.match(String(data.hasPart[2].articleBody || ""), /Download Lite saves the free tool as one HTML file/);
+assert.match(String(data.hasPart[2].articleBody || ""), /that is Kitchen, not Lite/);
+assert.doesNotMatch(String(data.hasPart[2].articleBody || ""), /SKU-1002|SKU-1008|left-join|SKU-100/i);
+assert.match(String(data.hasPart[3].articleBody || ""), /Plainrow is offline CSV work in the browser/);
+assert.match(String(data.hasPart[3].articleBody || ""), /Buy Kitchen · \$19/);
+assert.match(String(data.hasPart[3].articleBody || ""), /Lite is free/);
+assert.match(String(data.hasPart[4].articleBody || ""), /that is Lite/);
+assert.match(String(data.hasPart[4].articleBody || ""), /that is Kitchen/);
+assert.match(String(data.hasPart[5].articleBody || ""), /Stack two CSV files/);
+assert.match(String(data.hasPart[5].articleBody || ""), /Buy Kitchen · \$19 is the only primary button/);
 
 for (const part of data.hasPart) {
   const body = String(part.articleBody || "");
@@ -145,7 +174,7 @@ assert.doesNotMatch(home, /href="\/plainrow\/log\/"/);
 
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-07<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-09<\/lastmod>/
 );
 assert.doesNotMatch(sitemap, /\/kitchen\//);
 

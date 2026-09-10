@@ -134,16 +134,21 @@ assert.match(
 const logLd = jsonLd(log, "plainrow/log/index.html");
 assert.strictEqual(logLd["@type"], "CollectionPage", "log JSON-LD should be CollectionPage");
 assert.ok(Array.isArray(logLd.hasPart) && logLd.hasPart.length >= 4, "log CollectionPage missing entries");
-assert.strictEqual(logLd.hasPart[0].datePublished, "2026-09-07", "log JSON-LD must lead with newest date");
-assert.match(String(logLd.hasPart[0].articleBody || ""), /Download Lite saves one HTML file/);
-assert.match(String(logLd.hasPart[1].articleBody || ""), /Plainrow is offline CSV work in the browser/);
-assert.match(String(logLd.hasPart[3].articleBody || ""), /Stack two CSV files/);
+assert.strictEqual(logLd.hasPart[0].datePublished, "2026-09-09", "log JSON-LD must lead with newest date");
+assert.match(String(logLd.hasPart[0].articleBody || ""), /You already have the catalog/);
+assert.match(String(logLd.hasPart[0].articleBody || ""), /Lite cannot do that join\. Kitchen can: \$19 once/);
+assert.doesNotMatch(String(logLd.hasPart[0].articleBody || ""), /SKU-1002|SKU-1008|left-join|SKU-100/i);
+assert.match(String(logLd.hasPart[1].articleBody || ""), /Monday is matching stock to the catalog/);
+assert.match(String(logLd.hasPart[2].articleBody || ""), /Download Lite saves the free tool as one HTML file/);
+assert.match(String(logLd.hasPart[3].articleBody || ""), /Plainrow is offline CSV work in the browser/);
+assert.match(String(logLd.hasPart[5].articleBody || ""), /Stack two CSV files/);
 const logPublic = visibleCopy(log) + " " + JSON.stringify(logLd);
 assert.doesNotMatch(
   logPublic,
   /FRO-\d+|PR\s*#|keep\/kill|Polar Kitchen still 0|GoatCounter|Product Hunt|Curlie|integrity PASS|\bbet\b/i,
   "log page and JSON-LD must not leak internal ops"
 );
+assert.doesNotMatch(logPublic, /SKU-100|left-join/i, "log must not keep demo SKU / left-join copy");
 
 const jobPages = [
   "plainrow/append-csv-files-in-browser/index.html",
@@ -184,15 +189,15 @@ assert.doesNotMatch(sitemap, /merge-csv-in-browser|stack-two-csv-files-in-browse
 assert.match(sitemap, /<lastmod>2026-08-31<\/lastmod>/);
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/<\/loc>\s*<lastmod>2026-09-07<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/<\/loc>\s*<lastmod>2026-09-09<\/lastmod>/
 );
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-08<\/lastmod>/
 );
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-07<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/log\/<\/loc>\s*<lastmod>2026-09-09<\/lastmod>/
 );
 
 const polarKitchen =
