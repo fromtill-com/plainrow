@@ -274,11 +274,15 @@ const logVisible = log
   .replace(/<[^>]+>/g, " ")
   .replace(/\s+/g, " ");
 assert.match(log, /<h1 class="product-name">Plainrow log<\/h1>/);
+assert.match(log, /<time datetime="2026-09-09">2026-09-09<\/time>/);
+assert.match(log, /<time datetime="2026-09-08">2026-09-08<\/time>/);
 assert.match(log, /<time datetime="2026-09-07">2026-09-07<\/time>/);
 assert.match(log, /<time datetime="2026-09-06">2026-09-06<\/time>/);
 assert.match(log, /<time datetime="2026-09-05">2026-09-05<\/time>/);
 assert.match(log, /<time datetime="2026-09-04">2026-09-04<\/time>/);
-assert.ok(log.indexOf("2026-09-07") < log.indexOf("2026-09-06"), "newest dates first");
+assert.ok(log.indexOf("2026-09-09") < log.indexOf("2026-09-08"), "newest dates first");
+assert.ok(log.indexOf("2026-09-08") < log.indexOf("2026-09-07"), "2026-09-08 before 2026-09-07");
+assert.ok(log.indexOf("2026-09-07") < log.indexOf("2026-09-06"), "2026-09-07 before 2026-09-06");
 assert.ok(log.indexOf("2026-09-06") < log.indexOf("2026-09-05"), "2026-09-06 before 2026-09-05");
 assert.match(logVisible, /Plainrow is offline CSV work in the browser/);
 assert.match(logVisible, /Lite is free: two files, stack, dedupe, export/);
@@ -290,6 +294,8 @@ assert.match(log, /filter, columns, replace, dates, sort, recipes, join, stack, 
 assert.match(log, /Join, split, and clean pages lead with Buy Kitchen/);
 assert.match(log, /Lite empty state is Stack two CSV files/);
 assert.doesNotMatch(log, /perfect[\s-]*inner[\s-]*join/i);
+assert.doesNotMatch(logVisible, /SKU-1002|SKU-1008|left-join/i, "log must not keep demo SKU / left-join copy");
+assert.match(logVisible, /You already have the catalog/);
 assert.doesNotMatch(logVisible, /FRO-\d+|PR\s*#|keep\/kill|Polar Kitchen still 0|GoatCounter|Product Hunt|Curlie|integrity PASS|\bbet\b/i);
 assert.match(log, /property="og:title" content="Plainrow log"/);
 assert.match(log, /property="og:url" content="https:\/\/fromtill\.com\/plainrow\/log\/"/);
