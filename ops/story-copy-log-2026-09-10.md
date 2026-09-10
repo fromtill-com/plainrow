@@ -4,4 +4,4 @@ Monday is putting the catalog and the warehouse on one sheet. Every product stay
 
 Lite cannot do that. Lite is free: two files, stack, dedupe, export.
 
-Kitchen can. It is $19 one-time: join, split, clean, plus filter, columns, replace, dates, sort, recipes, and more than two files. Polar emails the zip after you buy. The files stay on this computer. Nothing is uploaded. There is no account.
+Kitchen does that join — $19 one-time, Polar emails a zip, work stays on this computer. You get the sheet back without uploading.
