@@ -192,7 +192,7 @@ assert.match(
 );
 assert.match(
   sitemap,
-  /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-05<\/lastmod>/
+  /<loc>https:\/\/fromtill\.com\/plainrow\/support\/<\/loc>\s*<lastmod>2026-09-08<\/lastmod>/
 );
 assert.match(
   sitemap,
