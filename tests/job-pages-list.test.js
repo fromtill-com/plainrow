@@ -17,7 +17,7 @@ const css = read("styles.css");
 assert.match(product, />Try Lite</);
 assert.match(product, />Download Lite</);
 assert.match(product, /<h2>How it works<\/h2>/);
-assert.match(product, /Open two CSV files\. They never leave this computer\./);
+assert.match(product, /Open the catalog and the warehouse file/);
 assert.match(product, /href="\/plainrow\/support\/"/);
 assert.match(product, />Support</);
 

@@ -89,7 +89,7 @@ assert.match(mergeLede[0], /Stack two CSV files in your browser/);
 const product = read("plainrow/index.html");
 assert.match(
   product,
-  /name="description" content="For virtual assistants, nonprofit ops, and one-seat bookkeepers who cannot upload client CSVs\./
+  /name="description" content="A client trusted you with these files\./
 );
 assert.doesNotMatch(product, /14-day|testimonial|as seen in|customers|\d+%/i);
 assert.match(product, />Try Lite</);
@@ -112,17 +112,19 @@ assert.match(product, /target="_blank"/);
 assert.match(product, />Buy Kitchen · \$19</);
 const productLede = product.match(/<p class="lede">([\s\S]*?)<\/p>/);
 assert.ok(productLede, "product missing lede");
-assert.match(productLede[0], /virtual assistants/);
-assert.match(productLede[0], /nonprofit ops/);
-assert.match(productLede[0], /one-seat bookkeepers who cannot upload client CSVs/);
-assert.match(productLede[0], /Monday jobs like catalog and warehouse SKU join/);
-assert.match(productLede[0], /two files/);
-assert.match(productLede[0], /stack/i);
-assert.match(productLede[0], /duplicate rows/);
-assert.match(
-  productLede[0],
-  /Kitchen is \$19: filter, columns, replace, dates, sort, recipes, join, stack, split, clean, more than two files/
-);
+assert.match(productLede[0], /A client trusted you with these files/);
+assert.match(productLede[0], /virtual assistant/);
+assert.match(productLede[0], /nonprofit ops person/);
+assert.match(productLede[0], /one-seat bookkeeper/);
+assert.match(productLede[0], /cannot put this client's CSV on someone else's computer/);
+assert.match(product, /<p class="sub">Monday is putting warehouse stock on every catalog product/);
+assert.match(product, /Lite cannot do that\. Lite is free: two files, stack, dedupe, export\./);
+assert.match(product, /Kitchen does this job\. \$19 one-time\. Polar emails a zip\./);
+assert.match(product, /Open the catalog and the warehouse file/);
+assert.match(product, /Put warehouse stock onto every catalog product/);
+assert.match(product, /Download one sheet/);
+assert.doesNotMatch(productLede[0], /left-?join/i);
+assert.doesNotMatch(product, /SKU-100/);
 assert.match(
   product,
   /Kitchen is the paid offline HTML file\. Polar delivers the zip\. \$19 one-time\. Filter, columns, replace, dates, sort, recipes, and more than two files, plus join, stack, split, and clean\. Lite stays two files, stack, dedupe, export\./
