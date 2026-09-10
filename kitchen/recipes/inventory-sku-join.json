@@ -1,6 +1,6 @@
 {
-  "name": "Inventory SKU join",
-  "description": "Left-join warehouse counts onto the shop catalog using SKU.",
+  "name": "Monday stock on the catalog",
+  "description": "Put warehouse counts on every catalog product; blank stock stays; leftovers not in the catalog drop.",
   "version": 1,
   "steps": [
     {
