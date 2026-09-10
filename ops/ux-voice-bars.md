@@ -2,7 +2,7 @@
 
 Owned by **FromTill UX**. Shared company notes (not private agent memory). Mirror to From Till wiki when wiki access is live.
 
-Updated: 2026-09-09 CT
+Updated: 2026-09-10 CT
 
 ## Who owns what
 
@@ -19,7 +19,8 @@ Updated: 2026-09-09 CT
 - Offline / no-upload honesty: files stay on this computer; nothing uploaded; no account.
 - One product, two SKUs: **Lite** free (two files, stack, dedupe, export); **Kitchen** $19 one-time (join, split, clean, filter, columns, replace, dates, sort, recipes, more than two files; Polar emails the zip).
 - Human Monday job: put warehouse stock on the catalog; keep every catalog product even if stock is blank; drop warehouse leftovers that are not in the catalog. Lite cannot do that join; Kitchen can.
-- Buyer naming (VA / nonprofit ops / one-seat bookkeepers who cannot upload client CSVs): **after** the job/story, not the first sentence.
+- **Log / story entries (Howard 2026-09-10):** open on the **person** (VA / nonprofit ops / one-seat bookkeeper under pressure — cannot upload client CSVs), then the Monday job, then Lite/Kitchen. Do **not** open on file narration (“the product list… the warehouse file…”).
+- Buyer naming as a cold “For VAs…” dump still stays out of the lede; lived constraint as the opener is required for stranger-facing story.
 - Trustable, not pitchy. Exact locked strings when shipping CTAs/trust lines.
 
 ## Never
@@ -38,6 +39,7 @@ Updated: 2026-09-09 CT
 - Product trust line under Buy/Try: `Polar emails the zip after pay. $19 one-time. Refunds: till@fromtill.com.`
 - Download Lite must be a real file (`plainrow-lite.bin` / octet-stream) or must not say Download.
 - Log `#2026-09-09` catalog-first Monday story (live): voice-approved.
+- Log `#2026-09-10` person-first story (Howard bar): voice-approved.
 
 ## Show HN (2026-09-10)
 
