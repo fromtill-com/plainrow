@@ -16,7 +16,9 @@ const nginx = fs.readFileSync(path.join(root, "deploy/plainrow-lite-download.con
 
 assert.match(product, />Try Lite</);
 assert.match(product, />Download Lite</);
-assert.match(product, /href="plainrow-lite\.bin"/);
+assert.match(product, /href="\/plainrow\/plainrow-lite\.bin"/);
+assert.match(product, /href="\/plainrow\/app\.html"/);
+assert.doesNotMatch(product, /href="app\.html"/, "Try Lite must be root-absolute so / does not 404");
 assert.match(product, /download="plainrow-lite.html"/);
 assert.doesNotMatch(
   product,
