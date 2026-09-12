@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Split CSV in the browser</title>
-  <meta name="description" content="Split one CSV column into two in your browser. Nothing is uploaded. Works offline.">
+  <title>Send each store its own sheet</title>
+  <meta name="description" content="Send each store its own sheet from one mixed export in the browser. North only sees North. South only sees South. Nothing is uploaded.">
   <link rel="canonical" href="https://fromtill.com/plainrow/split-csv-in-browser/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="From Till">
-  <meta property="og:title" content="Split CSV in the browser">
-  <meta property="og:description" content="Split one CSV column into two in your browser. Nothing is uploaded. Works offline.">
+  <meta property="og:title" content="Send each store its own sheet">
+  <meta property="og:description" content="Send each store its own sheet from one mixed export in the browser. North only sees North. South only sees South. Nothing is uploaded.">
   <meta property="og:url" content="https://fromtill.com/plainrow/split-csv-in-browser/">
   <meta property="og:image" content="https://fromtill.com/plainrow/logo.png">
   <meta name="twitter:card" content="summary">
@@ -17,24 +17,24 @@
   {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "Split CSV in the browser",
-    "description": "Split one CSV column into two in your browser. Nothing is uploaded. Works offline.",
+    "name": "Send each store its own sheet",
+    "description": "Send each store its own sheet from one mixed export in the browser. North only sees North. South only sees South. Nothing is uploaded.",
     "url": "https://fromtill.com/plainrow/split-csv-in-browser/",
     "step": [
       {
         "@type": "HowToStep",
-        "name": "Open the file",
-        "text": "Open the file."
+        "name": "Open the mixed export.",
+        "text": "Open the mixed export."
       },
       {
         "@type": "HowToStep",
-        "name": "Pick a delimiter",
-        "text": "Pick a delimiter."
+        "name": "Send each store its own sheet.",
+        "text": "Send each store its own sheet."
       },
       {
         "@type": "HowToStep",
-        "name": "Download first and last as their own columns",
-        "text": "Download first and last as their own columns."
+        "name": "Download one file per store.",
+        "text": "Download one file per store."
       }
     ]
   }
@@ -52,38 +52,58 @@
   </header>
   <main class="sheet product">
     <p class="crumb"><a href="/">Tools</a> / <a href="/plainrow/">Plainrow</a> / split in the browser</p>
-    <h1 class="product-name">Split CSV in the browser</h1>
-    <p class="lede">Split one CSV column into two in your browser. The file never leaves your machine.</p>
-    <p class="sub">Open the file, pick a delimiter, download first and last as their own columns. No account. No server. Offline once the page is loaded.</p>
+    <h1 class="product-name">Send each store its own sheet</h1>
+    <p class="lede">A client trusted you with this export. You cannot put their CSV on someone else's computer.</p>
+    <p class="sub">Send each store its own sheet from one mixed export — North only sees North, leftovers stay off South — and keep the file on this computer.</p>
+    <ol>
+      <li>Open the mixed export.</li>
+      <li>Send each store its own sheet.</li>
+      <li>Download one file per store.</li>
+    </ol>
     <section class="example" aria-label="Example">
       <h2>Example</h2>
       <div class="example-grid">
         <figure class="csv">
-          <figcaption>Input</figcaption>
+          <figcaption>export.csv</figcaption>
           <table>
-            <thead><tr><th>order</th><th>name</th></tr></thead>
+            <thead><tr><th>Store</th><th>Product</th><th>Qty</th></tr></thead>
             <tbody>
-              <tr><td>104</td><td>Ada Lee</td></tr>
+              <tr><td>North</td><td>Linen tea towel</td><td>12</td></tr>
+              <tr><td>South</td><td>Stoneware mug</td><td>4</td></tr>
+              <tr><td>North</td><td>Wooden crate</td><td>11</td></tr>
             </tbody>
           </table>
         </figure>
         <figure class="csv">
-          <figcaption>Result</figcaption>
+          <figcaption>North.csv</figcaption>
           <table>
-            <thead><tr><th>order</th><th>first</th><th>last</th></tr></thead>
+            <thead><tr><th>Store</th><th>Product</th><th>Qty</th></tr></thead>
             <tbody>
-              <tr><td>104</td><td>Ada</td><td>Lee</td></tr>
+              <tr><td>North</td><td>Linen tea towel</td><td>12</td></tr>
+              <tr><td>North</td><td>Wooden crate</td><td>11</td></tr>
+            </tbody>
+          </table>
+        </figure>
+        <figure class="csv">
+          <figcaption>South.csv</figcaption>
+          <table>
+            <thead><tr><th>Store</th><th>Product</th><th>Qty</th></tr></thead>
+            <tbody>
+              <tr><td>South</td><td>Stoneware mug</td><td>4</td></tr>
             </tbody>
           </table>
         </figure>
       </div>
-      <p class="example-note">Kitchen splits on a delimiter you pick.</p>
+      <p class="example-note">The stoneware mug is only on South. The tea towel and the crate never appear on that sheet.</p>
     </section>
+    <p>A client is waiting on a sheet for each store. You are the virtual assistant, the nonprofit ops person, the one-seat bookkeeper. The next screen wants an upload. You cannot put this client's CSV in the cloud.</p>
+    <p>Lite cannot do that. Lite is free: two files, stack, dedupe, export.</p>
+    <p>Kitchen does this job. $19 one-time. Polar emails a zip. You get the sheets back without uploading.</p>
     <div class="actions">
       <a class="btn primary" href="https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9" target="_blank" rel="noopener noreferrer">Buy Kitchen · $19</a>
       <a class="btn" href="/plainrow/app.html">Try Lite</a>
     </div>
-    <p class="fine">Lite toolbar says Buy Kitchen · $19. Filter, columns, replace, dates, sort, recipes, join, stack, split, clean live in Kitchen. Kitchen is the zip that actually runs them. <a href="/plainrow/support/">Support</a>.</p>
+    <p class="fine">Kitchen is the $19 zip Polar emails. This job runs on this computer. Lite is stack and dedupe only. <a href="/plainrow/support/">Support</a>.</p>
   </main>
   <footer class="colophon">fromtill.com</footer>
 <script data-goatcounter="https://fromtill.goatcounter.com/count"
