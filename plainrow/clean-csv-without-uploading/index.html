@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Clean CSV without uploading</title>
-  <meta name="description" content="Trim whitespace and drop blank CSV rows in your browser. Nothing is uploaded. Works offline.">
+  <title>Clean the client export before anyone else sees it</title>
+  <meta name="description" content="Clean the client export in the browser before anyone else sees it. Padded cells trim. Blank rows go. Nothing is uploaded.">
   <link rel="canonical" href="https://fromtill.com/plainrow/clean-csv-without-uploading/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="From Till">
-  <meta property="og:title" content="Clean CSV without uploading">
-  <meta property="og:description" content="Trim whitespace and drop blank CSV rows in your browser. Nothing is uploaded. Works offline.">
+  <meta property="og:title" content="Clean the client export before anyone else sees it">
+  <meta property="og:description" content="Clean the client export in the browser before anyone else sees it. Padded cells trim. Blank rows go. Nothing is uploaded.">
   <meta property="og:url" content="https://fromtill.com/plainrow/clean-csv-without-uploading/">
   <meta property="og:image" content="https://fromtill.com/plainrow/logo.png">
   <meta name="twitter:card" content="summary">
@@ -17,24 +17,24 @@
   {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "Clean CSV without uploading",
-    "description": "Trim whitespace and drop blank CSV rows in your browser. Nothing is uploaded. Works offline.",
+    "name": "Clean the client export before anyone else sees it",
+    "description": "Clean the client export in the browser before anyone else sees it. Padded cells trim. Blank rows go. Nothing is uploaded.",
     "url": "https://fromtill.com/plainrow/clean-csv-without-uploading/",
     "step": [
       {
         "@type": "HowToStep",
-        "name": "Open the file",
-        "text": "Open the file."
+        "name": "Open the messy export.",
+        "text": "Open the messy export."
       },
       {
         "@type": "HowToStep",
-        "name": "Trim cells, drop empty rows",
-        "text": "Trim cells, drop empty rows."
+        "name": "Trim the cells and drop the blank rows.",
+        "text": "Trim the cells and drop the blank rows."
       },
       {
         "@type": "HowToStep",
-        "name": "Download one",
-        "text": "Download one."
+        "name": "Download one sheet.",
+        "text": "Download one sheet."
       }
     ]
   }
@@ -52,41 +52,51 @@
   </header>
   <main class="sheet product">
     <p class="crumb"><a href="/">Tools</a> / <a href="/plainrow/">Plainrow</a> / clean without uploading</p>
-    <h1 class="product-name">Clean CSV without uploading</h1>
-    <p class="lede">Trim whitespace and drop blank CSV rows in your browser. The file never leaves your machine.</p>
-    <p class="sub">Open the file, trim cells, drop empty rows, download one. No account. No server. Offline once the page is loaded.</p>
+    <h1 class="product-name">Clean the client export before anyone else sees it</h1>
+    <p class="lede">A client trusted you with this export. You cannot put their CSV on someone else's computer.</p>
+    <p class="sub">Trim the padded cells, drop the blank rows, and keep the file on this computer before anyone else sees it.</p>
+    <ol>
+      <li>Open the messy export.</li>
+      <li>Trim the cells and drop the blank rows.</li>
+      <li>Download one sheet.</li>
+    </ol>
     <section class="example" aria-label="Example">
       <h2>Example</h2>
       <div class="example-grid">
         <figure class="csv">
-          <figcaption>Input</figcaption>
+          <figcaption>export.csv</figcaption>
           <table>
-            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <thead><tr><th>Product</th><th>Qty</th><th>Notes</th></tr></thead>
             <tbody>
-              <tr><td> A-1 </td><td>2</td></tr>
-              <tr><td></td><td></td></tr>
-              <tr><td>B-9</td><td>4</td></tr>
+              <tr><td>&nbsp;Linen tea towel</td><td>12</td><td></td></tr>
+              <tr><td></td><td></td><td></td></tr>
+              <tr><td>Stoneware mug</td><td>4</td><td></td></tr>
+              <tr><td>Wooden crate&nbsp;</td><td>11</td><td></td></tr>
             </tbody>
           </table>
         </figure>
         <figure class="csv">
           <figcaption>Result</figcaption>
           <table>
-            <thead><tr><th>sku</th><th>qty</th></tr></thead>
+            <thead><tr><th>Product</th><th>Qty</th></tr></thead>
             <tbody>
-              <tr><td>A-1</td><td>2</td></tr>
-              <tr><td>B-9</td><td>4</td></tr>
+              <tr><td>Linen tea towel</td><td>12</td></tr>
+              <tr><td>Stoneware mug</td><td>4</td></tr>
+              <tr><td>Wooden crate</td><td>11</td></tr>
             </tbody>
           </table>
         </figure>
       </div>
-      <p class="example-note">Kitchen trims cells and drops empty rows.</p>
+      <p class="example-note">The blank row is gone. Extra spaces on the tea towel and the crate are gone. The empty Notes column never appears.</p>
     </section>
+    <p>A client is waiting on a clean sheet. You are the virtual assistant, the nonprofit ops person, the one-seat bookkeeper. The next screen wants an upload. You cannot put this client's CSV in the cloud.</p>
+    <p>Lite cannot do that. Lite is free: two files, stack, dedupe, export.</p>
+    <p>Kitchen does this job. $19 one-time. Polar emails a zip. You get the sheet back without uploading.</p>
     <div class="actions">
       <a class="btn primary" href="https://buy.polar.sh/polar_cl_WC72cncKI9qvJnIsKuSqE9gv2Aha7xU6HtiG50Pc2F9" target="_blank" rel="noopener noreferrer">Buy Kitchen · $19</a>
       <a class="btn" href="/plainrow/app.html">Try Lite</a>
     </div>
-    <p class="fine">Lite toolbar says Buy Kitchen · $19. Filter, columns, replace, dates, sort, recipes, join, stack, split, clean live in Kitchen. Kitchen is the zip that actually runs them. <a href="/plainrow/support/">Support</a>.</p>
+    <p class="fine">Kitchen is the $19 zip Polar emails. This job runs on this computer. Lite is stack and dedupe only. <a href="/plainrow/support/">Support</a>.</p>
   </main>
   <footer class="colophon">fromtill.com</footer>
 <script data-goatcounter="https://fromtill.goatcounter.com/count"
